@@ -18,10 +18,10 @@ import com.example.citiway.ui.screens.SplashScreen
 import com.example.citiway.ui.screens.StartLocationScreen
 
 @Composable
-fun setupNavGraph(navController: NavHostController) {
+fun SetupNavGraph(navController: NavHostController) {
     NavHost(
         navController = navController,
-        startDestination = Screen.Home.route,
+        startDestination = HOME_ROUTE,
         route = ROOT_ROUTE
     ) {
         // Top-level destinations
