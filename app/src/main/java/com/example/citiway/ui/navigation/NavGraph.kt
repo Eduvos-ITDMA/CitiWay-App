@@ -9,10 +9,10 @@ import com.example.citiway.ui.screens.DestinationSelectionScreen
 import com.example.citiway.ui.screens.FavouritesScreen
 import com.example.citiway.ui.screens.HelpScreen
 import com.example.citiway.ui.screens.HomeScreen
+import com.example.citiway.ui.screens.JourneyHistoryScreen
 import com.example.citiway.ui.screens.JourneySelectionScreen
 import com.example.citiway.ui.screens.JourneySummaryScreen
 import com.example.citiway.ui.screens.ProgressTrackerScreen
-import com.example.citiway.ui.screens.RouteHistoryScreen
 import com.example.citiway.ui.screens.SchedulesScreen
 import com.example.citiway.ui.screens.SplashScreen
 import com.example.citiway.ui.screens.StartLocationScreen
@@ -27,7 +27,7 @@ fun SetupNavGraph(navController: NavHostController) {
         // Top-level destinations
         composable(route = Screen.Splash.route) { SplashScreen(navController = navController) }
         composable(route = Screen.ProgressTracker.route) { ProgressTrackerScreen(navController = navController) }
-        composable(route = Screen.JourneySummary.route) { JourneySummaryScreen(navController = navController) }
+        composable(route = Screen.Help.route) { HelpScreen(navController = navController) }
 
         // Home Graph
         navigation(startDestination = Screen.Home.route, route = HOME_ROUTE) {
@@ -54,10 +54,10 @@ fun SetupNavGraph(navController: NavHostController) {
             composable(route = Screen.JourneySelection.route) { JourneySelectionScreen(navController = navController) }
         }
 
-        // Drawer Graph
-        navigation(startDestination = Screen.Help.route, route = DRAWER_ROUTE) {
-            composable(route = Screen.Help.route) { HelpScreen(navController = navController) }
-            composable(route = Screen.RouteHistory.route) { RouteHistoryScreen(navController = navController) }
+        // Trips Graph
+        navigation(startDestination = Screen.Help.route, route = TRIPS_ROUTE) {
+            composable(route = Screen.JourneyHistory.route) { JourneyHistoryScreen(navController = navController) }
+            composable(route = Screen.JourneySummary.route) { JourneySummaryScreen(navController = navController) }
         }
     }
 }

@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.citiway.ui.navigation.SetupNavGraph
@@ -28,4 +29,12 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun CitiWayApp(navController: NavHostController) {
     SetupNavGraph(navController = navController)
+}
+
+@Preview
+@Composable
+fun PreviewApp() {
+    CitiWayTheme {
+        CitiWayApp(navController = rememberNavController())
+    }
 }

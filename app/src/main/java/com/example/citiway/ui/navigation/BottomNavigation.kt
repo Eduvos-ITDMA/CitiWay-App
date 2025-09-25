@@ -1,67 +1,90 @@
 // BottomNavigation.kt
 package com.example.citiway.ui.navigation
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination
+import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
 
-data class BottomNavItem(
-    val name: String,
-    val route: String,
-    val icon: ImageVector
-)
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BottomNavigationBar(navController: NavController) {
     val items = listOf(
-        BottomNavItem("Home", "home", Icons.Default.Home),
-        BottomNavItem("Map", "map", Icons.Default.LocationOn),
-        BottomNavItem("Favorites", "favorites", Icons.Default.Favorite),
-        BottomNavItem("Settings", "settings", Icons.Default.Settings)
+        BottomNavScreen.Home,
+        BottomNavScreen.Plan,
+        BottomNavScreen.Trips,
+        BottomNavScreen.Settings
     )
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
+    val currentDestination = navBackStackEntry?.destination
 
     NavigationBar(
-        containerColor = Color.White,
-        contentColor = Color(0xFF2196F3)
+        containerColor = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.onSurface
     ) {
         items.forEach { item ->
-            NavigationBarItem(
-                icon = {
-                    Icon(
-                        imageVector = item.icon,
-                        contentDescription = item.name
-                    )
-                },
-                label = { Text(item.name) },
-                selected = currentRoute == item.route,
-                onClick = {
-                    navController.navigate(item.route) {
-                        // Pop up to the start destination to avoid building up a large stack
-                        popUpTo(navController.graph.startDestinationId)
-                        // Avoid multiple copies of the same destination
-                        launchSingleTop = true
-                    }
-                },
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = Color(0xFF2196F3),
-                    selectedTextColor = Color(0xFF2196F3),
-                    unselectedIconColor = Color.Gray,
-                    unselectedTextColor = Color.Gray,
-                    indicatorColor = Color(0xFFE3F2FD)
-                )
-            )
+            BottomNavItem(item, currentDestination, navController)
         }
     }
+}
+
+@Composable
+fun RowScope.BottomNavItem(
+    item: BottomNavScreen,
+    currentDestination: NavDestination?,
+    navController: NavController
+) {
+    val isSelected = currentDestination?.hierarchy?.any {
+        it.route == item.route
+    } == true
+
+    NavigationBarItem(
+        icon = {
+            Icon(
+                imageVector = item.icon, contentDescription = item.title
+            )
+        }, label = { Text(item.title) }, selected = isSelected, onClick = {
+            navController.navigate(item.route) {
+                popUpTo(navController.graph.startDestinationId)
+                launchSingleTop = true
+            }
+        },
+        // indicator = {
+        //     if (isSelected) {
+        //         Box(
+        //             modifier = Modifier
+        //                 .fillMaxWidth()
+        //                 .height(2.dp)
+        //                 .align(Alignment.Bottom)
+        //                 .background(MaterialTheme.colorScheme.primary)
+        //                 .padding(bottom = 0.dp)
+        //         )
+        //     }
+        // },
+        colors = NavigationBarItemDefaults.colors(
+            selectedIconColor = MaterialTheme.colorScheme.primary,
+            selectedTextColor = MaterialTheme.colorScheme.primary,
+            unselectedIconColor = Color.Gray,
+            unselectedTextColor = Color.Gray,
+            indicatorColor = Color.Transparent
+        )
+    )
 }

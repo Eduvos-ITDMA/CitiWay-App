@@ -3,7 +3,7 @@ package com.example.citiway.ui.navigation
 const val ROOT_ROUTE = "root"
 const val HOME_ROUTE = "home"
 const val JOURNEY_SELECTION_ROUTE = "journey_selection"
-const val DRAWER_ROUTE = "drawer"
+const val TRIPS_ROUTE = "trips"
 
 sealed class Screen(val route: String) {
     object Home: Screen(route = "home_screen")
@@ -15,6 +15,6 @@ sealed class Screen(val route: String) {
     object ProgressTracker: Screen(route = "progress_tracker_screen")
     object JourneySummary: Screen(route = "journey_summary_screen")
     object Help: Screen(route = "help_screen")
-    object RouteHistory: Screen(route = "route_history_screen")
+    object JourneyHistory: Screen(route = "journey_history_screen")
     object Splash: Screen(route = "splash_screen")
 }
