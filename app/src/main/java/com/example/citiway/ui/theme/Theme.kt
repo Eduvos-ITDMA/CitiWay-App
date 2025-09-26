@@ -36,8 +36,7 @@ private val LightColorScheme = lightColorScheme(
 @Composable
 fun CitiWayTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+ - Changed to false so we use our own brand colors
-    dynamicColor: Boolean = false,// Stops phone generating app colors based on your phone's wallpaper
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
