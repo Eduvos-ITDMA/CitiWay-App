@@ -12,5 +12,5 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
 @Composable
-fun SchedulesScreen(navController: NavController) {
+fun SchedulesScreen(navController: NavController, paddingValues: PaddingValues) {
 }

@@ -1,5 +1,5 @@
-// BottomNavigation.kt
-package com.example.citiway.ui.navigation
+// BottomNavBar.kt
+package com.example.citiway.ui.navigation.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -30,14 +30,15 @@ import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.citiway.ui.navigation.routes.BottomNavScreen
 
 @Composable
 fun BottomNavigationBar(navController: NavController) {
     val items = listOf(
         BottomNavScreen.Home,
         BottomNavScreen.Plan,
-        BottomNavScreen.Trips,
-        BottomNavScreen.Settings
+        BottomNavScreen.Journey,
+        BottomNavScreen.Trips
     )
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
