@@ -20,7 +20,7 @@ fun SplashScreen(navController: NavController) {
         modifier = Modifier
             .fillMaxSize()
             .background(
-                Color(0xFF2196F3) // Blue background like tristan's mockup
+                Color(0xFF2196F3) // Blue background like Tristan's mockup
             ),
         contentAlignment = Alignment.Center
     ) {
@@ -34,7 +34,7 @@ fun SplashScreen(navController: NavController) {
                 fontSize = 48.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFFFFD700) // Golden yellow color
-            )
+            ) // Tristan/Calebs color palette for acutual values
 
             // Subtitle
             Text(
