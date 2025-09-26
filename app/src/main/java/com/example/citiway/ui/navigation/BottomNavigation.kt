@@ -1,24 +1,31 @@
 // BottomNavigation.kt
 package com.example.citiway.ui.navigation
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Icon
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -56,35 +63,50 @@ fun RowScope.BottomNavItem(
         it.route == item.route
     } == true
 
-    NavigationBarItem(
-        icon = {
-            Icon(
-                imageVector = item.icon, contentDescription = item.title
-            )
-        }, label = { Text(item.title) }, selected = isSelected, onClick = {
-            navController.navigate(item.route) {
-                popUpTo(navController.graph.startDestinationId)
-                launchSingleTop = true
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier
+            .clickable {
+                navController.navigate(item.route) {
+                    popUpTo(navController.graph.startDestinationId)
+                    launchSingleTop = true
+                }
             }
-        },
-        // indicator = {
-        //     if (isSelected) {
-        //         Box(
-        //             modifier = Modifier
-        //                 .fillMaxWidth()
-        //                 .height(2.dp)
-        //                 .align(Alignment.Bottom)
-        //                 .background(MaterialTheme.colorScheme.primary)
-        //                 .padding(bottom = 0.dp)
-        //         )
-        //     }
-        // },
-        colors = NavigationBarItemDefaults.colors(
-            selectedIconColor = MaterialTheme.colorScheme.primary,
-            selectedTextColor = MaterialTheme.colorScheme.primary,
-            unselectedIconColor = Color.Gray,
-            unselectedTextColor = Color.Gray,
-            indicatorColor = Color.Transparent
+            .weight(1f)
+    ) {
+        Image(
+            painter = painterResource(id = item.iconResId),
+            contentDescription = item.title,
+            modifier = Modifier
+                .height(24.dp)
+                .width(24.dp),
+            colorFilter = if (isSelected) {
+                ColorFilter.tint(MaterialTheme.colorScheme.onBackground)
+            } else {
+                ColorFilter.tint(Color.Gray)
+            }
         )
-    )
+        Text(
+            text = item.title,
+            fontSize = 14.sp,
+            fontWeight = if (isSelected) {
+                FontWeight.Bold
+            } else {
+                FontWeight.Normal
+            }
+        )
+
+        if (isSelected) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.5f)
+                    .height(4.dp)
+                    .align(Alignment.CenterHorizontally)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(MaterialTheme.colorScheme.secondary)
+            )
+        }
+
+    }
 }

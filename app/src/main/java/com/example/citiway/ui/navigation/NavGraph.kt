@@ -55,7 +55,7 @@ fun SetupNavGraph(navController: NavHostController) {
         }
 
         // Trips Graph
-        navigation(startDestination = Screen.Help.route, route = TRIPS_ROUTE) {
+        navigation(startDestination = Screen.JourneyHistory.route, route = TRIPS_ROUTE) {
             composable(route = Screen.JourneyHistory.route) { JourneyHistoryScreen(navController = navController) }
             composable(route = Screen.JourneySummary.route) { JourneySummaryScreen(navController = navController) }
         }
