@@ -33,10 +33,6 @@ fun StartLocationSelectionScreen(
 
     val defaultLocation = LatLng(-33.9249, 18.4241)
 
-    LaunchedEffect(Unit) {
-        selectedLocation = defaultLocation
-    }
-
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(defaultLocation, 12f)
     }
@@ -48,7 +44,7 @@ fun StartLocationSelectionScreen(
     ) {
         // Title only (TopBar is handled by ScreenWrapper)
         Text(
-            text = "But where are you now?",
+            text = "Where are you now?",
             fontSize = 20.sp,
             fontWeight = FontWeight.Medium,
             modifier = Modifier.padding(horizontal = 16.dp),
@@ -61,7 +57,7 @@ fun StartLocationSelectionScreen(
             value = searchText,
             onValueChange = { searchText = it },
             placeholder = {
-                Text("Your Location", color = Color.Gray, fontSize = 14.sp)
+                Text("Search for your Location", color = Color.Gray, fontSize = 14.sp)
             },
             trailingIcon = {
                 Icon(
@@ -89,7 +85,7 @@ fun StartLocationSelectionScreen(
                 .padding(horizontal = 16.dp),
             horizontalArrangement = Arrangement.Center
         ) {
-            Text("🌍 Turn on Location", color = Color(0xFF2196F3), fontSize = 14.sp)
+            Text("📍 Tap map to select your location", color = Color(0xFF2196F3), fontSize = 14.sp)
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -105,12 +101,13 @@ fun StartLocationSelectionScreen(
             selectedLocation?.let { location ->
                 Marker(
                     state = MarkerState(position = location),
-                    title = "Your Location"
+                    title = "Selected Location"
                 )
             }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
+
 
         Button(
             onClick = { selectedLocation?.let { onConfirmLocation(it) } },
@@ -118,10 +115,18 @@ fun StartLocationSelectionScreen(
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
                 .height(50.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2196F3)),
-            shape = RoundedCornerShape(25.dp)
+            colors = ButtonDefaults.buttonColors(
+                containerColor = if (selectedLocation != null) Color(0xFF2196F3) else Color.Gray
+            ),
+            shape = RoundedCornerShape(25.dp),
+            enabled = selectedLocation != null
         ) {
-            Text("Confirm", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Medium)
+            Text(
+                text = if (selectedLocation != null) "Confirm Location" else "Select Location",
+                color = Color.White,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium
+            )
         }
 
         Spacer(modifier = Modifier.height(16.dp))
