@@ -133,7 +133,7 @@ fun StartLocationScreenPreview() {
     CitiWayTheme {
         val drawerState = rememberDrawerState(DrawerValue.Closed)
         ScreenWrapper(rememberNavController(), drawerState, true) { nav, paddingValues ->
-            StartLocationScreen(nav, paddingValues)
+            StartLocationSelectionScreen(nav, paddingValues)
         }
     }
 }

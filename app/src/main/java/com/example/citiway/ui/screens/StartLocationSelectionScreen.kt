@@ -7,6 +7,6 @@ import androidx.compose.runtime.*
 import androidx.navigation.NavController
 
 @Composable
-fun StartLocationScreen(navController: NavController, paddingValues: PaddingValues) {
+fun StartLocationSelectionScreen(navController: NavController, paddingValues: PaddingValues) {
         // TODO: Make StartLocationScreen
 }

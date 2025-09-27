@@ -10,7 +10,7 @@ import com.example.citiway.ui.navigation.routes.JOURNEY_SELECTION_ROUTE
 import com.example.citiway.ui.navigation.routes.Screen
 import com.example.citiway.ui.screens.DestinationSelectionScreen
 import com.example.citiway.ui.screens.JourneySelectionScreen
-import com.example.citiway.ui.screens.StartLocationScreen
+import com.example.citiway.ui.screens.StartLocationSelectionScreen
 
 fun NavGraphBuilder.journeySelectionGraph(
     navController: NavController, drawerState: DrawerState
@@ -30,7 +30,7 @@ fun NavGraphBuilder.journeySelectionGraph(
         // Start Location Selection screen
         composable(Screen.StartLocationSelection.route) {
             ScreenWrapper(navController, drawerState, true) { nav, paddingValues ->
-                StartLocationScreen(
+                StartLocationSelectionScreen(
                     nav, paddingValues
                 )
             }
