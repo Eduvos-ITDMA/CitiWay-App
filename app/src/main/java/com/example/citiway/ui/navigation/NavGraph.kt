@@ -15,7 +15,7 @@ import com.example.citiway.ui.screens.JourneySummaryScreen
 import com.example.citiway.ui.screens.ProgressTrackerScreen
 import com.example.citiway.ui.screens.SchedulesScreen
 import com.example.citiway.ui.screens.SplashScreen
-import com.example.citiway.ui.screens.StartLocationScreen
+import com.example.citiway.ui.screens.StartLocationSelectionScreen
 
 @Composable
 fun SetupNavGraph(navController: NavHostController) {
@@ -36,9 +36,9 @@ fun SetupNavGraph(navController: NavHostController) {
             composable(route = Screen.Favourites.route) { FavouritesScreen(navController = navController) }
         }
 
-        // Journey Selection Graph
+        // Journey Selection Graph **
         navigation(
-            startDestination = Screen.DestinationSelection.route,
+            startDestination = Screen.StartLocationSelection.route,
             route = JOURNEY_SELECTION_ROUTE
         ) {
             composable(route = Screen.DestinationSelection.route) {
@@ -47,7 +47,7 @@ fun SetupNavGraph(navController: NavHostController) {
                 )
             }
             composable(route = Screen.StartLocationSelection.route) {
-                StartLocationScreen(
+                StartLocationSelectionScreen(
                     navController = navController
                 )
             }

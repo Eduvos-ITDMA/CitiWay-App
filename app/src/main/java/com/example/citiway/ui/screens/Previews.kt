@@ -77,14 +77,6 @@ fun ProgressTrackerScreenPreview() {
     }
 }
 
-// Route History Screen Preview
-@Preview(showBackground = true, name = "Route History Screen")
-@Composable
-fun RouteHistoryScreenPreview() {
-    CitiWayTheme {
-        RouteHistoryScreen(navController = rememberNavController())
-    }
-}
 
 // Schedules Screen Preview
 @Preview(showBackground = true, name = "Schedules Screen")
@@ -100,6 +92,6 @@ fun SchedulesScreenPreview() {
 @Composable
 fun StartLocationScreenPreview() {
     CitiWayTheme {
-        StartLocationScreen(navController = rememberNavController())
+        StartLocationSelectionScreen(navController = rememberNavController())
     }
 }
