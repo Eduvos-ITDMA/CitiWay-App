@@ -107,10 +107,14 @@ fun ProgressTrackerScreenPreview() {
 @Composable
 fun JourneyHistoryScreenPreview() {
     CitiWayTheme {
+<<<<<<< HEAD
         val drawerState = rememberDrawerState(DrawerValue.Closed)
         ScreenWrapper(rememberNavController(), drawerState, true) { nav, paddingValues ->
             JourneyHistoryScreen(nav, paddingValues)
         }
+=======
+        JourneyHistoryScreen(navController = rememberNavController())
+>>>>>>> bc22da0 (Add home screen UI - WIP)
     }
 }
 
