@@ -16,16 +16,21 @@ fun NavGraphBuilder.homeNavGraph(
     navController: NavController, drawerState: DrawerState
 ) {
     navigation(startDestination = Screen.Home.route, route = HOME_ROUTE) {
+        // Home screen
         composable(Screen.Home.route) {
             ScreenWrapper(navController, drawerState, true) { nav, paddingValues ->
                 HomeScreen(nav, paddingValues)
             }
         }
+
+        // Schedules screen
         composable(Screen.Schedules.route) {
             ScreenWrapper(navController, drawerState, true) { nav, paddingValue ->
                 SchedulesScreen(nav, paddingValue)
             }
         }
+
+        // Favourites screen
         composable(Screen.Favourites.route) {
             ScreenWrapper(navController, drawerState, true) { nav, paddingValue ->
                 FavouritesScreen(nav, paddingValue)

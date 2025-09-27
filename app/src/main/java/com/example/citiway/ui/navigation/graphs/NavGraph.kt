@@ -1,5 +1,14 @@
 package com.example.citiway.ui.navigation.graphs
 
+/** This file defines the main navigation graph for the application using Jetpack Navigation.
+ * The nav graph contains all of the app's destinations and their organization hierarchy.
+ *
+ * The SetupNavGraph composable here acts as the central hub for defining how different
+ * screens (or groups of screens, AKA nested navigation graphs) are connected.
+ * It sets up the NavHost, which is the container for swapping different composable
+ * destinations.
+ */
+
 import androidx.compose.material3.DrawerState
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
@@ -12,7 +21,6 @@ fun SetupNavGraph(navController: NavHostController, drawerState: DrawerState) {
     NavHost(
         navController = navController, startDestination = HOME_ROUTE, route = ROOT_ROUTE
     ) {
-        // Top-level destinations
         topLevelDestinations(navController, drawerState)
         homeNavGraph(navController, drawerState)
         journeySelectionGraph(navController, drawerState)

@@ -18,6 +18,7 @@ fun NavGraphBuilder.journeySelectionGraph(
     navigation(
         startDestination = Screen.DestinationSelection.route, route = JOURNEY_SELECTION_ROUTE
     ) {
+        // Destination Selection screen
         composable(Screen.DestinationSelection.route) {
             ScreenWrapper(navController, drawerState, true) { nav, paddingValues ->
                 DestinationSelectionScreen(
@@ -25,6 +26,8 @@ fun NavGraphBuilder.journeySelectionGraph(
                 )
             }
         }
+
+        // Start Location Selection screen
         composable(Screen.StartLocationSelection.route) {
             ScreenWrapper(navController, drawerState, true) { nav, paddingValues ->
                 StartLocationScreen(
@@ -32,6 +35,8 @@ fun NavGraphBuilder.journeySelectionGraph(
                 )
             }
         }
+
+        // Journey Selection screen
         composable(Screen.JourneySelection.route) {
             ScreenWrapper(navController, drawerState, true) { nav, paddingValues ->
                 JourneySelectionScreen(nav, paddingValues)

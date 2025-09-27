@@ -15,11 +15,14 @@ fun NavGraphBuilder.tripsNavGraph(
     navController: NavController, drawerState: DrawerState
 ) {
     navigation(startDestination = Screen.JourneyHistory.route, route = TRIPS_ROUTE) {
+        // Journey History screen
         composable(Screen.JourneyHistory.route) {
             ScreenWrapper(navController, drawerState, true) { nav, paddingValues ->
                 JourneyHistoryScreen(nav, paddingValues)
             }
         }
+
+        // Journey Summary screen
         composable(Screen.JourneySummary.route) {
             ScreenWrapper(navController, drawerState, true) { nav, paddingValues ->
                 JourneySummaryScreen(nav, paddingValues)

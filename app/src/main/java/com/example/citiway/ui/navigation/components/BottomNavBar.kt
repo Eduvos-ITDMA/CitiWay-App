@@ -1,6 +1,12 @@
 // BottomNavBar.kt
 package com.example.citiway.ui.navigation.components
 
+/** This file defines the BottomNavigationBar composable, which is responsible for
+ * displaying the main navigation options at the bottom of the screen. It integrates
+ * with the Navigation Graph defined in graphs/NavGraph.kt to handle item selection
+ * and navigation state.
+ */
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -29,16 +35,15 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.citiway.ui.navigation.routes.BottomNavScreen
 
 @Composable
 fun BottomNavigationBar(navController: NavController) {
+    // Bottom navigation items
     val items = listOf(
-        BottomNavScreen.Home,
-        BottomNavScreen.Plan,
-        BottomNavScreen.Journey,
-        BottomNavScreen.Trips
+        BottomNavScreen.Home, BottomNavScreen.Plan, BottomNavScreen.Journey, BottomNavScreen.Trips
     )
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -56,9 +61,7 @@ fun BottomNavigationBar(navController: NavController) {
 
 @Composable
 fun RowScope.BottomNavItem(
-    item: BottomNavScreen,
-    currentDestination: NavDestination?,
-    navController: NavController
+    item: BottomNavScreen, currentDestination: NavDestination?, navController: NavController
 ) {
     val isSelected = currentDestination?.hierarchy?.any {
         it.route == item.route
@@ -69,13 +72,19 @@ fun RowScope.BottomNavItem(
         verticalArrangement = Arrangement.Center,
         modifier = Modifier
             .clickable {
+                // This code ensures we pop the current tab's back stack before navigating to the
+                // specified screen BUT save the state so it can be restored when needed
                 navController.navigate(item.route) {
-                    popUpTo(navController.graph.startDestinationId)
+                    popUpTo(navController.graph.findStartDestination().id) {
+                        saveState = true
+                    }
                     launchSingleTop = true
+                    restoreState = true
                 }
             }
-            .weight(1f)
-    ) {
+            .weight(1f)) {
+
+        // Nav item icon
         Image(
             painter = painterResource(id = item.iconResId),
             contentDescription = item.title,
@@ -88,16 +97,17 @@ fun RowScope.BottomNavItem(
                 ColorFilter.tint(Color.Gray)
             }
         )
+
+        // Nav item label
         Text(
-            text = item.title,
-            fontSize = 14.sp,
-            fontWeight = if (isSelected) {
+            text = item.title, fontSize = 14.sp, fontWeight = if (isSelected) {
                 FontWeight.Bold
             } else {
                 FontWeight.Normal
             }
         )
 
+        // Nav item indicator (stripe below selected item)
         if (isSelected) {
             Box(
                 modifier = Modifier

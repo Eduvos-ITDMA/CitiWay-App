@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.citiway.ui.navigation.NavStackLogger
 import com.example.citiway.ui.navigation.graphs.SetupNavGraph
 import com.example.citiway.ui.theme.CitiWayTheme
 
@@ -31,6 +32,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun CitiWayApp(navController: NavHostController) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
+    NavStackLogger(navController)
     SetupNavGraph(navController = navController, drawerState = drawerState)
 }
 

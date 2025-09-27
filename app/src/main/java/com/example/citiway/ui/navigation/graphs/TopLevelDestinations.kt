@@ -14,7 +14,10 @@ fun NavGraphBuilder.topLevelDestinations(
     navController: NavController,
     drawerState: DrawerState,
 ) {
+    // Splash screen
     composable(Screen.Splash.route) { SplashScreen(navController) }
+
+    // Progress Tracker screen
     composable(Screen.ProgressTracker.route) {
         ScreenWrapper(
             navController, drawerState, true
@@ -22,6 +25,8 @@ fun NavGraphBuilder.topLevelDestinations(
             ProgressTrackerScreen(navController, paddingValues)
         }
     }
+
+    // Help screen
     composable(Screen.Help.route) {
         ScreenWrapper(navController, drawerState, true) { navController, paddingValues ->
             HelpScreen(navController, paddingValues)

@@ -9,6 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.citiway.ui.navigation.routes.Screen
 
 @Composable
 fun DestinationSelectionScreen(navController: NavController, paddingValues: PaddingValues) {
@@ -21,8 +22,8 @@ fun DestinationSelectionScreen(navController: NavController, paddingValues: Padd
     ) {
         Text("Welcome to Destination Selection Screen", fontSize = 24.sp)
         // TODO: Implement navigation
-        Button(onClick = { navController.navigate("") }) {
-            Text("Go... nowhere (not implemented yet)")
+        Button(onClick = { navController.navigate(Screen.StartLocationSelection.route) }) {
+            Text("Start Location Selection Screen")
         }
     }
 }

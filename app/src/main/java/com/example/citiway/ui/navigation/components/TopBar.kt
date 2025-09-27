@@ -1,5 +1,10 @@
 package com.example.citiway.ui.navigation.components
 
+/**
+ * This file defines the top app bar that houses the back button and the hamburger menu for opening
+ * the app's drawer
+ */
+
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -27,7 +32,11 @@ fun TopBar(
     val canPop = navController.previousBackStackEntry != null
 
     CenterAlignedTopAppBar(
-        title = {}, modifier = modifier, navigationIcon = {
+        title = {},
+        modifier = modifier,
+
+        // Back Button
+        navigationIcon = {
             IconButton(
                 onClick = {
                     if (canPop) {
@@ -41,7 +50,10 @@ fun TopBar(
                     modifier = Modifier.size(24.dp)
                 )
             }
-        }, actions = {
+        },
+
+        // Hamburger icon for app drawer
+        actions = {
             IconButton(
                 onClick = {
                     scope.launch { drawerState.open() }
