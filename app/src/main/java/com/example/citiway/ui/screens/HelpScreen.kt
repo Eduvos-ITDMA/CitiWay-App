@@ -12,5 +12,5 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
 @Composable
-fun HelpScreen(navController: NavController) {
+fun HelpScreen(navController: NavController, paddingValues: PaddingValues) {
 }
