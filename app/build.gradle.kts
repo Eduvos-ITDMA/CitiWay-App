@@ -45,6 +45,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
     implementation("com.google.maps.android:maps-compose:4.3.0") // Maps Compose (cleaner for Jetpack Compose)
+    implementation("com.google.accompanist:accompanist-permissions:0.32.0") // User location
     implementation("com.google.android.gms:play-services-maps:18.2.0")
     implementation("com.google.android.gms:play-services-location:21.0.1")
     implementation(platform(libs.androidx.compose.bom))
