@@ -35,6 +35,7 @@ import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
 import com.google.android.libraries.places.api.net.FetchPlaceRequest
 import android.location.Geocoder
+import com.example.citiway.ui.navigation.routes.Screen
 import kotlinx.coroutines.launch
 import java.util.Locale
 
@@ -456,7 +457,12 @@ fun StartLocationSelectionScreen(
             contentAlignment = Alignment.Center // Centering the button horizontally
         ) {
             Button(
-                onClick = { selectedLocation?.let { onConfirmLocation(it) } },
+                onClick = {
+                    selectedLocation?.let { location ->
+                        onConfirmLocation(location)
+                        navController.navigate(Screen.JourneySummary.route)
+                    }
+                },
                 modifier = Modifier
                     .fillMaxWidth(0.6f) // Using 60% of available width for better proportions
                     .height(50.dp),
