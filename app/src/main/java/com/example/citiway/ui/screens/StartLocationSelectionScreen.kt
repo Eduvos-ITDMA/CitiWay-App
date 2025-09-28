@@ -221,7 +221,7 @@ fun StartLocationSelectionScreen(
                     }
                 }
         } catch (e: SecurityException) {
-            // Handling cases where location access is denied
+            // Handling cases where location access is denied  ** WIP, will do.
         }
     }
 
@@ -287,7 +287,7 @@ fun StartLocationSelectionScreen(
                 },
                 singleLine = true, // Prevents new lines when user hits Enter
                 keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Search // Shows "Search" instead of "Enter" on keyboard
+                    imeAction = ImeAction.Search // Shows "Search" instead of "Enter" on keyboard. Better UI
                 ),
                 keyboardActions = KeyboardActions(
                     onSearch = {
@@ -414,6 +414,9 @@ fun StartLocationSelectionScreen(
          * - Tap map → marker moves, address appears in search field
          * - Search and select → marker moves to searched location
          * - Use current location → marker shows user's position with address
+         * TO DO:
+         * - Need to show loading states for location services and reverse geocoding during API calls.
+         * - UX currently a bit janky and slow.
          */
         GoogleMap(
             modifier = Modifier
