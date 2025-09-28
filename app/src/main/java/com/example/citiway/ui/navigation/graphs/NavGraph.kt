@@ -9,6 +9,7 @@ package com.example.citiway.ui.navigation.graphs
  * destinations.
  */
 
+import android.util.Log
 import androidx.compose.material3.DrawerState
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
@@ -17,9 +18,14 @@ import com.example.citiway.ui.navigation.routes.HOME_ROUTE
 import com.example.citiway.ui.navigation.routes.ROOT_ROUTE
 
 @Composable
-fun SetupNavGraph(navController: NavHostController, drawerState: DrawerState) {
+fun SetupNavGraph(
+    navController: NavHostController,
+    drawerState: DrawerState,
+    startRoute: String = HOME_ROUTE
+) {
+    Log.d("Start route", startRoute)
     NavHost(
-        navController = navController, startDestination = HOME_ROUTE, route = ROOT_ROUTE
+        navController = navController, startDestination = startRoute, route = ROOT_ROUTE
     ) {
         topLevelDestinations(navController, drawerState)
         homeNavGraph(navController, drawerState)

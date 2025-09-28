@@ -7,12 +7,17 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.citiway.ui.navigation.NavStackLogger
 import com.example.citiway.ui.navigation.components.Drawer
 import com.example.citiway.ui.navigation.graphs.SetupNavGraph
+import com.example.citiway.ui.navigation.routes.HOME_ROUTE
+import com.example.citiway.ui.navigation.routes.Screen
+import com.example.citiway.ui.previews.ScreenRouteProvider
 import com.example.citiway.ui.theme.CitiWayTheme
 
 class MainActivity : ComponentActivity() {
@@ -31,18 +36,12 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun CitiWayApp(navController: NavHostController) {
+fun CitiWayApp(navController: NavHostController, startRoute: String = HOME_ROUTE) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
-    NavStackLogger(navController)
-    Drawer(drawerState) {
-        SetupNavGraph(navController = navController, drawerState = drawerState)
-    }
-}
 
-@Preview
-@Composable
-fun PreviewApp() {
-    CitiWayTheme {
-        CitiWayApp(navController = rememberNavController())
+//    NavStackLogger(navController)
+
+    Drawer(drawerState) {
+        SetupNavGraph(navController, drawerState, startRoute)
     }
 }

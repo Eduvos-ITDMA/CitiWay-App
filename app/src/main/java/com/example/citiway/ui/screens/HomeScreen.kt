@@ -7,6 +7,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,7 +25,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
@@ -37,17 +37,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.citiway.R
 import com.example.citiway.ui.components.Space
+import com.example.citiway.ui.navigation.routes.Screen
+import com.example.citiway.ui.previews.PreviewApp
 
 @Composable
-fun HomeScreen(navController: NavController) {
+fun HomeScreen(navController: NavController, paddingValues: PaddingValues) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(16.dp),
+            .padding(paddingValues),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         HeaderSection()
@@ -124,8 +125,6 @@ private fun DestinationSearchBar() {
     }
 }
 
-// ----------------------------------------
-
 @Composable
 fun RecentRoutesSection() {
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -157,8 +156,6 @@ fun RecentRoutesSection() {
         // More routes would go here...
     }
 }
-
-// ----------------------------------------
 
 @Composable
 fun RouteCardPlaceholder(route: String, subtext: String) {
@@ -228,8 +225,6 @@ fun RouteCardPlaceholder(route: String, subtext: String) {
     }
 }
 
-// ----------------------------------------
-
 @Composable
 fun ScheduleLinksSection() {
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -265,19 +260,8 @@ fun ScheduleLink(label: String) {
 }
 
 
-// --- Preview (Optional but Recommended) ---
-
-@Preview(showBackground = true)
+@Preview
 @Composable
 fun CommuterScreenPreview() {
-    // Note: The BottomBar and TopBar are usually implemented
-    // outside this Composable, typically in a Scaffold.
-    // We only show the body content here for preview.
-    Surface(
-        color = MaterialTheme.colorScheme.background,
-        modifier = Modifier.fillMaxSize()
-    ) {
-        val navController = rememberNavController()
-        HomeScreen(navController)
-    }
+    PreviewApp(Screen.Home.route)
 }

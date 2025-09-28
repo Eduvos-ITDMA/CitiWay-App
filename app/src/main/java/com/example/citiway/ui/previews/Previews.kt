@@ -1,12 +1,22 @@
-package com.example.citiway.ui.screens
+package com.example.citiway.ui.previews
 
-import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
 import com.example.citiway.ui.navigation.components.ScreenWrapper
+import com.example.citiway.ui.screens.DestinationSelectionScreen
+import com.example.citiway.ui.screens.FavouritesScreen
+import com.example.citiway.ui.screens.HelpScreen
+import com.example.citiway.ui.screens.HomeScreen
+import com.example.citiway.ui.screens.JourneyHistoryScreen
+import com.example.citiway.ui.screens.JourneySelectionScreen
+import com.example.citiway.ui.screens.JourneySummaryScreen
+import com.example.citiway.ui.screens.ProgressTrackerScreen
+import com.example.citiway.ui.screens.SchedulesScreen
+import com.example.citiway.ui.screens.SplashScreen
+import com.example.citiway.ui.screens.StartLocationScreen
 import com.example.citiway.ui.theme.CitiWayTheme
 
 // Home Screen Preview
@@ -35,8 +45,11 @@ fun SplashScreenPreview() {
 @Composable
 fun FavouritesScreenPreview() {
     CitiWayTheme {
-        val drawerState = rememberDrawerState(DrawerValue.Closed)
-        ScreenWrapper(rememberNavController(), rememberDrawerState(DrawerValue.Closed), true) { nav, paddingValues ->
+        ScreenWrapper(
+            rememberNavController(),
+            rememberDrawerState(DrawerValue.Closed),
+            true
+        ) { nav, paddingValues ->
             FavouritesScreen(nav, paddingValues)
         }
     }
@@ -107,14 +120,10 @@ fun ProgressTrackerScreenPreview() {
 @Composable
 fun JourneyHistoryScreenPreview() {
     CitiWayTheme {
-<<<<<<< HEAD
         val drawerState = rememberDrawerState(DrawerValue.Closed)
         ScreenWrapper(rememberNavController(), drawerState, true) { nav, paddingValues ->
             JourneyHistoryScreen(nav, paddingValues)
         }
-=======
-        JourneyHistoryScreen(navController = rememberNavController())
->>>>>>> bc22da0 (Add home screen UI - WIP)
     }
 }
 
