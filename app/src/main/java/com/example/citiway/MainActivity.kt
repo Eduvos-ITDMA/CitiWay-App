@@ -14,10 +14,17 @@ import com.example.citiway.ui.navigation.NavStackLogger
 import com.example.citiway.ui.navigation.components.Drawer
 import com.example.citiway.ui.navigation.graphs.SetupNavGraph
 import com.example.citiway.ui.theme.CitiWayTheme
+import com.google.android.libraries.places.api.Places
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Initialize Places SDK
+        if (!Places.isInitialized()) {
+            Places.initialize(applicationContext, "AIzaSyD71E9VvLNwHYV5ESHN_vrODGkzX2MPOs4")
+        }
+
         enableEdgeToEdge()
         setContent {
             CitiWayTheme {
