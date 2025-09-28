@@ -122,7 +122,7 @@ fun StartLocationSelectionScreen(
             fontSize = 20.sp,
             fontWeight = FontWeight.Medium,
             modifier = Modifier.padding(horizontal = 16.dp),
-            color = Color.Black
+            color = MaterialTheme.colorScheme.onBackground
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -132,13 +132,13 @@ fun StartLocationSelectionScreen(
             value = searchText,
             onValueChange = { searchText = it },
             placeholder = {
-                Text("Search for your location", color = Color.Gray, fontSize = 14.sp)
+                Text("Search for your location", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f), fontSize = 14.sp)
             },
             trailingIcon = {
                 Icon(
                     imageVector = Icons.Default.Search,
                     contentDescription = "Search",
-                    tint = Color.Gray,
+                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                     modifier = Modifier.size(20.dp)
                 )
             },
@@ -147,8 +147,8 @@ fun StartLocationSelectionScreen(
                 .padding(horizontal = 16.dp),
             shape = RoundedCornerShape(12.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                unfocusedBorderColor = Color.Gray.copy(alpha = 0.3f),
-                focusedBorderColor = Color(0xFF2196F3)
+                unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
+                focusedBorderColor = MaterialTheme.colorScheme.primary
             )
         )
 
@@ -171,7 +171,7 @@ fun StartLocationSelectionScreen(
                         "📍 Getting your location..."
                     else -> "📍 Tap map to select your location"
                 },
-                color = Color(0xFF2196F3),
+                color = MaterialTheme.colorScheme.primary,
                 fontSize = 14.sp
             )
 
@@ -180,25 +180,24 @@ fun StartLocationSelectionScreen(
                 TextButton(
                     onClick = { locationPermissionState.launchPermissionRequest() }
                 ) {
-                    Icon(imageVector = Icons.Default.LocationOn, contentDescription = "Use my location", tint = Color(0xFF2196F3), modifier = Modifier.size(16.dp))
+                    Icon(
+                        imageVector = Icons.Default.LocationOn,
+                        contentDescription = "Use my location",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(16.dp)
+                    )
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text(text = "Use my location", color = Color(0xFF2196F3), fontSize = 14.sp)
+                    Text(
+                        text = "Use my location",
+                        color = MaterialTheme.colorScheme.primary,
+                        fontSize = 14.sp
+                    )
                 }
             }
         }
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        /*
-         * Google Maps Integration:
-         * - cameraPositionState: Controls map view (zoom, center point)
-         * - onMapClick: Captures user taps and converts screen coordinates to LatLng
-         * - MapProperties: Controls map behavior (location enabled, map type)
-         * - MapUiSettings: Controls UI elements (zoom controls, my location button)
-         *
-         * The map is taking up remaining space with weight(1f) so it expands
-         * to fill available screen real estate between other UI elements.
-         */
         GoogleMap(
             modifier = Modifier
                 .fillMaxWidth()
@@ -240,13 +239,13 @@ fun StartLocationSelectionScreen(
                     .fillMaxWidth(0.6f) // Using 60% of available width for better proportions
                     .height(50.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = if (selectedLocation != null) Color(0xFF2196F3) else Color.Gray
+                    containerColor = if (selectedLocation != null) MaterialTheme.colorScheme.primary else Color.Gray
                 ),
                 shape = RoundedCornerShape(25.dp),
                 enabled = selectedLocation != null
             ) {
                 Text(
-                    text = if (selectedLocation != null) "Confirm Location" else "Select a location first",
+                    text = if (selectedLocation != null) "Confirm Location" else "Select Location",
                     color = Color.White,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Medium
