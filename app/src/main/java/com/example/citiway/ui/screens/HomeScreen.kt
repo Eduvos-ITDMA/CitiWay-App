@@ -2,10 +2,8 @@ package com.example.citiway.ui.screens
 
 
 // HomeScreen.kt
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -15,22 +13,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -38,9 +28,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.citiway.R
+import com.example.citiway.ui.components.CompletedJourneyCard
+import com.example.citiway.ui.components.LocationSearchField
 import com.example.citiway.ui.components.Space
 import com.example.citiway.ui.navigation.routes.Screen
 import com.example.citiway.ui.previews.PreviewApp
+import java.time.LocalDate
 
 @Composable
 fun HomeScreen(navController: NavController, paddingValues: PaddingValues) {
@@ -48,7 +41,8 @@ fun HomeScreen(navController: NavController, paddingValues: PaddingValues) {
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(paddingValues),
+            .padding(paddingValues)
+            .padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         HeaderSection()
@@ -72,9 +66,8 @@ private fun HeaderSection() {
     ) {
         Text(
             text = "Hi, Commuter 👋",
-            fontSize = 32.sp,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onBackground
+            color = MaterialTheme.colorScheme.onBackground,
+            style = MaterialTheme.typography.headlineLarge
         )
         Spacer(modifier = Modifier.height(4.dp))
         Text(
@@ -86,43 +79,13 @@ private fun HeaderSection() {
 }
 
 @Composable
-private fun DestinationSearchBar() {
-    OutlinedCard(
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Text Input Placeholder
-            Text(
-                text = "Where to?",
-                fontSize = 18.sp,
-                color = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.weight(1f)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            VerticalDivider(
-                modifier = Modifier
-                    .height(24.dp)
-                    .width(1.dp),
-                color = MaterialTheme.colorScheme.onBackground
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            // Map Icon on the right
-            Icon(
-                painterResource(R.drawable.ic_map),
-                contentDescription = "Open Map",
-                tint = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.size(24.dp)
-            )
-        }
+fun DestinationSearchBar() {
+    val mapIcon: @Composable (Modifier) -> Unit = { modifier ->
+        Icon(
+            painterResource(R.drawable.ic_map), contentDescription = "Open Map", modifier = modifier
+        )
     }
+    LocationSearchField(icon = mapIcon, placeholder = "Where to?")
 }
 
 @Composable
@@ -135,8 +98,7 @@ fun RecentRoutesSection() {
         ) {
             Text(
                 text = "Recent Routes",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onBackground
             )
         }
@@ -144,86 +106,20 @@ fun RecentRoutesSection() {
         Spacer(modifier = Modifier.height(12.dp))
 
         // PLACEHOLDER: Route Card Composable
-        RouteCardPlaceholder(
-            route = "Claremont to Cape Town CBD,",
-            subtext = "Cape Town · 50mins"
+        CompletedJourneyCard(
+            route = "Claremont to Cape Town",
+            date = LocalDate.of(2025, 12, 25),
+            durationMin = 50
         )
         Spacer(modifier = Modifier.height(10.dp))
-        RouteCardPlaceholder(
+        CompletedJourneyCard(
             route = "Milnerton to Mowbray",
-            subtext = "Cape Town · 60mins"
+            date = LocalDate.of(2025, 11, 17),
+            durationMin = 80
         )
-        // More routes would go here...
     }
 }
 
-@Composable
-fun RouteCardPlaceholder(route: String, subtext: String) {
-    Card(
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = route,
-                    color = MaterialTheme.colorScheme.background,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 16.sp
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        Icons.Default.LocationOn,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.background,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = subtext.split("·")[0].trim(),
-                        color = MaterialTheme.colorScheme.background,
-                        fontSize = 14.sp
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Icon(
-                        painterResource(R.drawable.ic_clock),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.background,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = subtext.split("·")[1].trim(),
-                        color = MaterialTheme.colorScheme.background,
-                        fontSize = 14.sp
-                    )
-                }
-            }
-            // Heart/Favorite Icon Placeholder
-        Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .background(Color.Transparent) // Actual design has a unique shape/color
-                    .padding(start = 8.dp)
-            ) {
-                // Placeholder for the heart icon (you'd use a custom icon here)
-                Text(
-                    text = "❤️",
-                    fontSize = 20.sp,
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            }
-        }
-    }
-}
 
 @Composable
 fun ScheduleLinksSection() {
