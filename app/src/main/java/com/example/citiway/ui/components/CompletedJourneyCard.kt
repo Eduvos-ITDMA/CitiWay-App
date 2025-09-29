@@ -22,7 +22,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun CompletedJourneyCard(route: String, date: LocalDate, durationMin: Int) {
+fun RowScope.CompletedJourneyCard(route: String, date: LocalDate, durationMin: Int, weight: Float = 1f) {
     val formattedDate = date.format(DateTimeFormatter.ofPattern("MMM dd, yyyy"))
 
     val hours = durationMin / 60
@@ -38,12 +38,12 @@ fun CompletedJourneyCard(route: String, date: LocalDate, durationMin: Int) {
     Card(
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary),
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.weight(weight)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(16.dp, 12.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -88,19 +88,19 @@ fun CompletedJourneyCard(route: String, date: LocalDate, durationMin: Int) {
                 }
             }
 
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .padding(start = 8.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.FavoriteBorder,
-                    contentDescription = "Add to favorites",
-                    tint = MaterialTheme.colorScheme.background,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
+            //Box(
+            //    modifier = Modifier
+            //        .size(40.dp)
+            //        .padding(start = 8.dp),
+            //    contentAlignment = Alignment.Center
+            //) {
+            //    Icon(
+            //        imageVector = Icons.Outlined.FavoriteBorder,
+            //        contentDescription = "Add to favorites",
+            //        tint = MaterialTheme.colorScheme.background,
+            //        modifier = Modifier.size(24.dp)
+            //    )
+            //}
         }
     }
 }

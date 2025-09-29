@@ -14,12 +14,6 @@ import com.example.citiway.ui.theme.CitiWayTheme
 fun PreviewApp(@PreviewParameter(ScreenRouteProvider::class) startRoute: String = HOME_ROUTE) {
     val navController = rememberNavController()
 
-    //LaunchedEffect(startRoute) {
-    //    navController.navigate(startRoute) {
-    //        popUpTo(navController.graph.startDestinationId) { inclusive = true }
-    //    }
-    //}
-
     CitiWayTheme {
         CitiWayApp(navController, startRoute)
     }

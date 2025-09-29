@@ -2,19 +2,20 @@ package com.example.citiway.ui.screens
 
 
 // HomeScreen.kt
+import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -28,9 +29,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.citiway.R
-import com.example.citiway.ui.components.CompletedJourneyCard
+import com.example.citiway.ui.components.CompletedJourneyCardWithButton
+import com.example.citiway.ui.components.Heading
 import com.example.citiway.ui.components.LocationSearchField
 import com.example.citiway.ui.components.Space
+import com.example.citiway.ui.components.Title
+import com.example.citiway.ui.components.VerticalSpace
 import com.example.citiway.ui.navigation.routes.Screen
 import com.example.citiway.ui.previews.PreviewApp
 import java.time.LocalDate
@@ -46,16 +50,19 @@ fun HomeScreen(navController: NavController, paddingValues: PaddingValues) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         HeaderSection()
-        Space(24)
+        VerticalSpace(24)
 
         DestinationSearchBar()
-        Space(24)
+        VerticalSpace(24)
 
-        RecentRoutesSection()
-        Space(24)
+        RecentTripsSection()
+        VerticalSpace(24)
 
-        ScheduleLinksSection()
-        Spacer(modifier = Modifier.weight(1f))
+        FavouriteTripsSection()
+        VerticalSpace(24)
+
+        SchedulesLink(navController)
+        Space(1f)
     }
 }
 
@@ -64,12 +71,8 @@ private fun HeaderSection() {
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
-        Text(
-            text = "Hi, Commuter 👋",
-            color = MaterialTheme.colorScheme.onBackground,
-            style = MaterialTheme.typography.headlineLarge
-        )
-        Spacer(modifier = Modifier.height(4.dp))
+        Title("Hi, Commuter 👋")
+        VerticalSpace(4)
         Text(
             text = "Where would you like to go today?",
             fontSize = 18.sp,
@@ -88,69 +91,78 @@ fun DestinationSearchBar() {
     LocationSearchField(icon = mapIcon, placeholder = "Where to?")
 }
 
+private val favouriteIcon: @Composable (Modifier) -> Unit = { modifier ->
+        Icon(
+            imageVector = Icons.Outlined.FavoriteBorder,
+            contentDescription = "Add to favourites",
+            modifier = modifier.clickable {
+                Log.d("Favourite Button", "Button clicked")
+            })
+}
+
 @Composable
-fun RecentRoutesSection() {
+fun RecentTripsSection() {
     Column(modifier = Modifier.fillMaxWidth()) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Recent Routes",
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onBackground
-            )
-        }
+        Heading("Recent Routes")
 
-        Spacer(modifier = Modifier.height(12.dp))
+        VerticalSpace(12)
 
-        // PLACEHOLDER: Route Card Composable
-        CompletedJourneyCard(
+        CompletedJourneyCardWithButton(
             route = "Claremont to Cape Town",
             date = LocalDate.of(2025, 12, 25),
-            durationMin = 50
+            durationMin = 50,
+            icon = favouriteIcon
         )
-        Spacer(modifier = Modifier.height(10.dp))
-        CompletedJourneyCard(
+        VerticalSpace(15)
+        CompletedJourneyCardWithButton(
             route = "Milnerton to Mowbray",
             date = LocalDate.of(2025, 11, 17),
-            durationMin = 80
+            durationMin = 80,
+            icon = favouriteIcon
         )
     }
 }
 
-
 @Composable
-fun ScheduleLinksSection() {
+fun FavouriteTripsSection(){
     Column(modifier = Modifier.fillMaxWidth()) {
-        ScheduleLink(label = "See Prasa Schedules")
-        Spacer(modifier = Modifier.height(12.dp))
-        ScheduleLink(label = "See MyCiti Schedules")
+        Heading("Favourite Routes")
+
+        VerticalSpace(12)
+
+        CompletedJourneyCardWithButton(
+            route = "Claremont to Cape Town",
+            date = LocalDate.of(2025, 12, 25),
+            durationMin = 50,
+            icon = favouriteIcon
+        )
     }
 }
 
 @Composable
-fun ScheduleLink(label: String) {
+fun SchedulesLink(navController: NavController) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            // Placeholder for making the whole row clickable
-            .padding(vertical = 4.dp),
+            .padding(vertical = 4.dp)
+            .padding(end = 12.dp)
+            .clickable{
+                navController.navigate(Screen.Schedules.route)
+            },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            text = label,
+            text = "See MyCiTi and Metrorail Schedules",
             color = MaterialTheme.colorScheme.onBackground,
-            fontWeight = FontWeight.Medium,
-            fontSize = 16.sp
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.Bold
         )
         Icon(
             Icons.AutoMirrored.Filled.ArrowForward,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.onBackground,
-            modifier = Modifier.size(24.dp)
+            modifier = Modifier.size(20.dp)
         )
     }
 }
