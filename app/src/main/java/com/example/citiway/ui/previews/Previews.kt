@@ -16,7 +16,7 @@ import com.example.citiway.ui.screens.JourneySummaryScreen
 import com.example.citiway.ui.screens.ProgressTrackerScreen
 import com.example.citiway.ui.screens.SchedulesScreen
 import com.example.citiway.ui.screens.SplashScreen
-import com.example.citiway.ui.screens.StartLocationScreen
+import com.example.citiway.ui.screens.StartLocationSelectionScreen
 import com.example.citiway.ui.theme.CitiWayTheme
 
 // Home Screen Preview
