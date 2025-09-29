@@ -2,7 +2,6 @@ package com.example.citiway.ui.screens
 
 
 // HomeScreen.kt
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,20 +14,27 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.citiway.R
+import com.example.citiway.data.CompletedJourney
 import com.example.citiway.ui.components.CompletedJourneyCardWithButton
 import com.example.citiway.ui.components.Heading
 import com.example.citiway.ui.components.LocationSearchField
@@ -37,10 +43,14 @@ import com.example.citiway.ui.components.Title
 import com.example.citiway.ui.components.VerticalSpace
 import com.example.citiway.ui.navigation.routes.Screen
 import com.example.citiway.ui.previews.PreviewApp
-import java.time.LocalDate
+import com.example.citiway.viewmodel.CompletedJourneysViewModel
 
 @Composable
-fun HomeScreen(navController: NavController, paddingValues: PaddingValues) {
+fun HomeScreen(
+    navController: NavController,
+    paddingValues: PaddingValues,
+    viewModel: CompletedJourneysViewModel = viewModel()
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -49,16 +59,20 @@ fun HomeScreen(navController: NavController, paddingValues: PaddingValues) {
             .padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        // Journey list state flows from the view model
+        val recentJourneys by viewModel.recentJourneys.collectAsStateWithLifecycle()
+        val favouriteJourneys by viewModel.favouriteJourneys.collectAsStateWithLifecycle()
+
         HeaderSection()
         VerticalSpace(24)
 
         DestinationSearchBar()
         VerticalSpace(24)
 
-        RecentTripsSection()
+        CompletedTripsSection(recentJourneys, viewModel, "Recent Trips")
         VerticalSpace(24)
 
-        FavouriteTripsSection()
+        CompletedTripsSection(favouriteJourneys, viewModel, "Favourite Trips")
         VerticalSpace(24)
 
         SchedulesLink(navController)
@@ -83,59 +97,44 @@ private fun HeaderSection() {
 
 @Composable
 fun DestinationSearchBar() {
-    val mapIcon: @Composable (Modifier) -> Unit = { modifier ->
-        Icon(
-            painterResource(R.drawable.ic_map), contentDescription = "Open Map", modifier = modifier
-        )
-    }
-    LocationSearchField(icon = mapIcon, placeholder = "Where to?")
-}
-
-private val favouriteIcon: @Composable (Modifier) -> Unit = { modifier ->
-        Icon(
-            imageVector = Icons.Outlined.FavoriteBorder,
-            contentDescription = "Add to favourites",
-            modifier = modifier.clickable {
-                Log.d("Favourite Button", "Button clicked")
-            })
+    LocationSearchField(
+        icon = { modifier ->
+            Icon(
+                painterResource(R.drawable.ic_map),
+                contentDescription = "Open Map",
+                modifier = modifier
+            )
+        }, placeholder = "Where to?"
+    )
 }
 
 @Composable
-fun RecentTripsSection() {
+fun CompletedTripsSection(
+    journeys: List<CompletedJourney>, viewModel: CompletedJourneysViewModel, title: String
+) {
     Column(modifier = Modifier.fillMaxWidth()) {
-        Heading("Recent Routes")
+        Heading(title)
 
         VerticalSpace(12)
 
-        CompletedJourneyCardWithButton(
-            route = "Claremont to Cape Town",
-            date = LocalDate.of(2025, 12, 25),
-            durationMin = 50,
-            icon = favouriteIcon
-        )
-        VerticalSpace(15)
-        CompletedJourneyCardWithButton(
-            route = "Milnerton to Mowbray",
-            date = LocalDate.of(2025, 11, 17),
-            durationMin = 80,
-            icon = favouriteIcon
-        )
-    }
-}
+        journeys.forEach { journey ->
+            key(journey.id) { // DO NOT REMOVE THIS. Recomposition will not be triggered without this
+                VerticalSpace(15)
 
-@Composable
-fun FavouriteTripsSection(){
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Heading("Favourite Routes")
-
-        VerticalSpace(12)
-
-        CompletedJourneyCardWithButton(
-            route = "Claremont to Cape Town",
-            date = LocalDate.of(2025, 12, 25),
-            durationMin = 50,
-            icon = favouriteIcon
-        )
+                CompletedJourneyCardWithButton(
+                    route = journey.route,
+                    date = journey.date,
+                    durationMin = journey.durationMin,
+                    icon = { modifier ->
+                        Icon(
+                            imageVector = if (journey.isFavourite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                            contentDescription = if (journey.isFavourite) "Remove from favourites" else "Add to favourites",
+                            tint = if (journey.isFavourite) Color.Red else MaterialTheme.colorScheme.onPrimary,
+                            modifier = modifier.clickable { viewModel.toggleFavourite(journey.id) }
+                        )
+                    })
+            }
+        }
     }
 }
 
@@ -146,7 +145,7 @@ fun SchedulesLink(navController: NavController) {
             .fillMaxWidth()
             .padding(vertical = 4.dp)
             .padding(end = 12.dp)
-            .clickable{
+            .clickable {
                 navController.navigate(Screen.Schedules.route)
             },
         verticalAlignment = Alignment.CenterVertically,
@@ -166,7 +165,6 @@ fun SchedulesLink(navController: NavController) {
         )
     }
 }
-
 
 @Preview
 @Composable
