@@ -18,3 +18,41 @@ sealed class Screen(val route: String) {
     object JourneyHistory : Screen(route = "journey_history_screen")
     object Splash : Screen(route = "splash_screen")
 }
+
+// --- Navigation Utility Maps ---
+
+/**
+ * A set of all defined navigation graph routes.
+ */
+val GraphRoutes: Set<String> = setOf(
+    ROOT_ROUTE,
+    HOME_ROUTE,
+    JOURNEY_SELECTION_ROUTE,
+    TRIPS_ROUTE
+)
+
+/**
+ * Maps a Screen Route to its immediate parent NavGraph Route for determining
+ * which graph the NavHost should start on when a specific screen is requested.
+ */
+val ScreenToGraphMap: Map<String, String> = mapOf(
+
+    // HOME_ROUTE graph
+    Screen.Home.route to HOME_ROUTE,
+    Screen.Schedules.route to HOME_ROUTE,
+    Screen.Favourites.route to HOME_ROUTE,
+    Screen.Help.route to HOME_ROUTE,
+    Screen.JourneyHistory.route to HOME_ROUTE,
+
+    // JOURNEY_SELECTION_ROUTE graph
+    Screen.DestinationSelection.route to JOURNEY_SELECTION_ROUTE,
+    Screen.StartLocationSelection.route to JOURNEY_SELECTION_ROUTE,
+    Screen.JourneySelection.route to JOURNEY_SELECTION_ROUTE,
+    Screen.JourneySummary.route to JOURNEY_SELECTION_ROUTE,
+
+    // TRIPS_ROUTE graph
+    Screen.ProgressTracker.route to TRIPS_ROUTE,
+
+    // ROOT_ROUTE
+    Screen.Splash.route to ROOT_ROUTE
+)
