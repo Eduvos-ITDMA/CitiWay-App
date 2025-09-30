@@ -74,8 +74,10 @@ Our app uses a **bottom navigation bar** (like most modern apps).
 
 The current bottom nav bar differs from the figma design due to a number of design considerations. Furthermore, we are using a Menu (hamburger icon) in the Top Bar to offer additional navigation and settings options.
 
+#### Old Design
 ![Old Design](readme-images/old-bottom-bar.png)
 
+#### Current Design
 ![Current Design](readme-images/current-bottom-bar.png)
 
 The following nav graph diagram shows the names of the **screens** (destinations) and **routes** used in the
@@ -100,7 +102,7 @@ To see the full setup, review these files in the [ui\theme\\](https://github.com
 
 ---
 
-## Some Custom Components
+## 🧩 Some Custom Components
 
 A number of UI components have been made that can be reused in different screens through the app. More such components will be coded as we go along. These are intended to be reused while allowing flexibility through the arguments you pass. These custom composables are located in the [components/](https://github.com/Eduvos-ITDMA/CitiWay-App/blob/main/app/src/main/java/com/example/citiway/ui/components) directory
 
@@ -111,6 +113,7 @@ A text input field designed for location searching, featuring an inline action i
 
 Refer to the figma design to see how this component will be reused.
 
+#### Appearance on home screen:
 ![Location Search Field](readme-images/location-search-field-composable.png)
 
 ---
