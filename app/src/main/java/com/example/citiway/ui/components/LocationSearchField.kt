@@ -27,7 +27,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-
+/**
+ * A custom text input field designed for location searching, featuring an inline action icon.
+ *
+ * This composable provides a styled text field, typically used for entering
+ * location queries. It includes a placeholder and an icon slot on the right side
+ * for actions.
+ *
+ * @param icon A composable lambda that defines the icon to be displayed on the right side of
+ *             the text field. This lambda receives a [Modifier] that should be used to define
+ *             an click action on the icon button. It is also intended that this composable
+ *             specify its own `imageVector` on its Icon composable`.
+ * @param modifier An optional [Modifier] to be applied to the `LocationSearchField` itself.
+ * @param initialValue The initial text to be displayed in the text field. Defaults to an empty string.
+ * @param placeholder The placeholder text to be displayed when the text field is empty.
+ *                    Defaults to an empty string.
+ */
 @Composable
 fun LocationSearchField(
     icon: @Composable (Modifier) -> Unit,

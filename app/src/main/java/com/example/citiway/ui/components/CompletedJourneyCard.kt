@@ -21,6 +21,17 @@ import androidx.compose.ui.unit.sp
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
+/**
+ * Custom composable that displays the route, date, and duration of a completed journey in a card format.
+ *
+ * This component is designed to be used within a [RowScope], allowing it to be
+ * weighted if multiple composables are displayed in a row.
+ *
+ * @param route A string representing the journey's route (e.g., "City A to City B").
+ * @param date The [LocalDate] when the journey was completed.
+ * @param durationMin The duration of the journey in minutes.
+ * @param weight The layout weight of this card within a [RowScope]. Defaults to 1f.
+ */
 @Composable
 fun RowScope.CompletedJourneyCard(route: String, date: LocalDate, durationMin: Int, weight: Float = 1f) {
     val formattedDate = date.format(DateTimeFormatter.ofPattern("MMM dd, yyyy"))
@@ -35,6 +46,7 @@ fun RowScope.CompletedJourneyCard(route: String, date: LocalDate, durationMin: I
         append("${minutes}min")
     }.trim()
 
+    // ========== Component composable ==========
     Card(
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary),
@@ -48,7 +60,7 @@ fun RowScope.CompletedJourneyCard(route: String, date: LocalDate, durationMin: I
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                // Route Text
+                // ========== Route text ==========
                 Text(
                     text = route,
                     color = MaterialTheme.colorScheme.onPrimary,
@@ -56,7 +68,7 @@ fun RowScope.CompletedJourneyCard(route: String, date: LocalDate, durationMin: I
                 )
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Date and Duration
+                // ========== Date and Duration ==========
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         painter = painterResource(R.drawable.ic_calendar),
@@ -72,7 +84,7 @@ fun RowScope.CompletedJourneyCard(route: String, date: LocalDate, durationMin: I
                     )
                     Spacer(modifier = Modifier.width(18.dp))
 
-                    // Duration Icon and Text
+                    // ========== Duration Icon and Text ==========
                     Icon(
                         painter = painterResource(R.drawable.ic_clock),
                         contentDescription = null,
@@ -87,20 +99,6 @@ fun RowScope.CompletedJourneyCard(route: String, date: LocalDate, durationMin: I
                     )
                 }
             }
-
-            //Box(
-            //    modifier = Modifier
-            //        .size(40.dp)
-            //        .padding(start = 8.dp),
-            //    contentAlignment = Alignment.Center
-            //) {
-            //    Icon(
-            //        imageVector = Icons.Outlined.FavoriteBorder,
-            //        contentDescription = "Add to favorites",
-            //        tint = MaterialTheme.colorScheme.background,
-            //        modifier = Modifier.size(24.dp)
-            //    )
-            //}
         }
     }
 }
