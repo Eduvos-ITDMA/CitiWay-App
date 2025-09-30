@@ -16,6 +16,13 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("Double", "CAPE_TOWN_LAT", "-33.9249")
+        buildConfigField("Double", "CAPE_TOWN_LNG", "18.4241")
+        buildConfigField("Double", "SOUTHWEST_CAPE_TOWN_LAT", "-34.3")
+        buildConfigField("Double", "SOUTHWEST_CAPE_TOWN_LNG", "18.0")
+        buildConfigField("Double", "NORTHEAST_CAPE_TOWN_LAT", "-33.5")
+        buildConfigField("Double", "NORTHEAST_CAPE_TOWN_LNG", "18.9")
     }
 
     buildTypes {

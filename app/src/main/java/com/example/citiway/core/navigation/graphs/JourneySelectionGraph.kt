@@ -1,0 +1,35 @@
+package com.example.citiway.core.navigation.graphs
+
+import androidx.compose.material3.DrawerState
+import androidx.navigation.NavController
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.compose.composable
+import androidx.navigation.navigation
+import com.example.citiway.core.navigation.routes.JOURNEY_SELECTION_ROUTE
+import com.example.citiway.core.navigation.routes.Screen
+import com.example.citiway.features.destination_selection.DestinationSelectionRoute
+import com.example.citiway.features.journey_selection.JourneySelectionRoute
+import com.example.citiway.features.start_location_selection.StartLocationSelectionRoute
+
+fun NavGraphBuilder.journeySelectionGraph(
+    navController: NavController, drawerState: DrawerState
+) {
+    navigation(
+        startDestination = Screen.DestinationSelection.route, route = JOURNEY_SELECTION_ROUTE
+    ) {
+        // Destination Selection screen
+        composable(Screen.DestinationSelection.route) {
+            DestinationSelectionRoute(navController, drawerState)
+        }
+
+        // Start Location Selection screen
+        composable(Screen.StartLocationSelection.route) {
+            StartLocationSelectionRoute(navController, drawerState)
+        }
+
+        // Journey Selection screen
+        composable(Screen.JourneySelection.route) {
+            JourneySelectionRoute(navController, drawerState)
+        }
+    }
+}

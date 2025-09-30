@@ -1,0 +1,11 @@
+package com.example.citiway.data.local
+
+import java.time.LocalDate
+
+data class CompletedJourney(
+    val id: String,
+    val route: String,
+    val date: LocalDate,
+    val durationMin: Int,
+    val isFavourite: Boolean = false
+)
