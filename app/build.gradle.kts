@@ -49,6 +49,7 @@ dependencies {
     implementation("com.google.android.gms:play-services-maps:18.2.0")
     implementation("com.google.android.gms:play-services-location:21.0.1")
     implementation("com.google.android.libraries.places:places:3.3.0") // Google Places SDK (has built-in UI components , no more RetroFit)
+    implementation("androidx.compose.material:material-icons-extended:1.7.5")
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
