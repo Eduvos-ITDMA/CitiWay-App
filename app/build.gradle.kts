@@ -50,6 +50,7 @@ dependencies {
     implementation("com.google.android.gms:play-services-location:21.0.1")
     implementation("com.google.android.libraries.places:places:3.3.0") // Google Places SDK (has built-in UI components , no more RetroFit)
     implementation("androidx.compose.material:material-icons-extended:1.7.5")
+    implementation("androidx.datastore:datastore-preferences:1.0.0") // Dark mode, will put into libs.versions.toml at a later stage
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
