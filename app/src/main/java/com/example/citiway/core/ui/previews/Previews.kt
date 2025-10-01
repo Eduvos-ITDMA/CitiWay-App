@@ -16,8 +16,10 @@ import com.example.citiway.features.journey_summary.JourneySummaryContent
 import com.example.citiway.features.progress_tracker.ProgressTrackerContent
 import com.example.citiway.features.schedules.SchedulesContent
 import com.example.citiway.features.shared.CompletedJourneysState
+import com.example.citiway.features.start_location_selection.StartLocationSelectionActions
 import com.example.citiway.features.start_location_selection.StartLocationSelectionContent
 import com.example.citiway.features.start_location_selection.StartLocationSelectionState
+import com.google.maps.android.compose.rememberCameraPositionState
 
 
 // Home Screen Preview
@@ -146,11 +148,25 @@ fun SchedulesScreenPreview() {
 @Preview(showBackground = true, name = "Start Location Screen")
 @Composable
 fun StartLocationScreenPreview() {
+    val MockStartLocationActions = StartLocationSelectionActions(
+        setSelectedLocation = {},
+        setSearchText = {},
+        setUserLocation = {},
+        toggleShowPredictions = {},
+        searchPlaces = {},
+        selectPlace = {},
+        reverseGeocode = {},
+        getCurrentLocation = {},
+        onLocationPermissionsStatusChanged = {}
+    )
+
     CitiWayTheme {
         StartLocationSelectionContent(
-            state = StartLocationSelectionState(),
             paddingValues = PaddingValues(),
-            navController = rememberNavController(),
+            state = StartLocationSelectionState(),
+            actions = MockStartLocationActions,
+            onPermissionRequest = {},
+            cameraPositionState = rememberCameraPositionState(),
             onConfirmLocation = {}
         )
     }

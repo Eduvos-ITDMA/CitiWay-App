@@ -35,7 +35,8 @@ data class StartLocationSelectionState(
     val selectedLocation: LatLng? = null,
     val userLocation: LatLng? = null,
     val predictions: List<AutocompletePrediction> = emptyList(),
-    val showPredictions: Boolean = false
+    val showPredictions: Boolean = false,
+    val isLocationPermissionGranted: Boolean = false
 )
 
 data class StartLocationSelectionActions(
@@ -46,7 +47,8 @@ data class StartLocationSelectionActions(
     val searchPlaces: (String) -> Unit,
     val selectPlace: (AutocompletePrediction) -> Unit,
     val reverseGeocode: (LatLng) -> Unit,
-    val getCurrentLocation: () -> Unit
+    val getCurrentLocation: () -> Unit,
+    val onLocationPermissionsStatusChanged: (Boolean) -> Unit
 )
 
 object DefaultLocations {
@@ -58,6 +60,9 @@ object DefaultLocations {
 }
 
 class StartLocationSelectionViewModel(application: Application) : AndroidViewModel(application) {
+    /*
+    * TODO: Track if location is enabled. If turned off, functions will have to behave differently
+    */
     private val _screenState = MutableStateFlow(StartLocationSelectionState())
     val screenState: StateFlow<StartLocationSelectionState> = _screenState
 
@@ -69,7 +74,8 @@ class StartLocationSelectionViewModel(application: Application) : AndroidViewMod
         this::searchPlaces,
         this::selectPlace,
         this::reverseGeocode,
-        this::getCurrentLocation
+        this::getCurrentLocation,
+        this::onLocationPermissionStatusChanged
     )
 
     /*
@@ -112,6 +118,12 @@ class StartLocationSelectionViewModel(application: Application) : AndroidViewMod
     fun setPredictions(predictions: List<AutocompletePrediction> = emptyList()) {
         _screenState.update { currentState ->
             currentState.copy(showPredictions = predictions.isEmpty(), predictions = predictions)
+        }
+    }
+
+    fun onLocationPermissionStatusChanged(isGranted: Boolean) {
+        _screenState.update { currentState ->
+            currentState.copy(isLocationPermissionGranted = isGranted)
         }
     }
 
@@ -243,6 +255,10 @@ class StartLocationSelectionViewModel(application: Application) : AndroidViewMod
              * 5. Reverse geocode to show user their current address
              * 6. Move camera to user's position with 15f zoom (street level view)
              */
+                if (!_screenState.value.isLocationPermissionGranted) {
+                    return@launch
+                }
+
                 val location = fusedLocationClient.lastLocation.await()
                 val latLng = LatLng(location.latitude, location.longitude)
                 _screenState.update { currentState ->

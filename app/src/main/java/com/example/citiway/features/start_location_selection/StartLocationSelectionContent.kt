@@ -1,9 +1,9 @@
 package com.example.citiway.features.start_location_selection
 
-import android.Manifest
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -21,9 +21,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.citiway.core.navigation.routes.Screen
+import com.example.citiway.core.ui.components.HorizontalSpace
+import com.example.citiway.core.ui.components.Title
+import com.example.citiway.core.ui.components.VerticalSpace
 import com.google.accompanist.permissions.*
 import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.*
+import com.google.maps.android.compose.CameraPositionState
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapProperties
+import com.google.maps.android.compose.MapType
+import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
@@ -32,7 +41,8 @@ fun StartLocationSelectionContent(
     state: StartLocationSelectionState,
     actions: StartLocationSelectionActions,
     onPermissionRequest: () -> Unit,
-    navController: NavController,
+    cameraPositionState: CameraPositionState,
+    onConfirmLocation: (LatLng) -> Unit
 ) {
     /* These state variables hold the current, up-to-date data for the UI, ensuring
     * the screen automatically refreshes whenever the data in the ViewModel changes.
@@ -41,11 +51,12 @@ fun StartLocationSelectionContent(
     *    predictions - List of autocomplete suggestions from Google Places API
     *    showPredictions - Controls visibility of the dropdown suggestion list
     */
-    val searchText = state::searchText
-    val selectedLocation = state::selectedLocation
-    val userLocation = state::userLocation
-    val predictions = state::predictions
-    val showPredictions = state::showPredictions
+    val searchText = state.searchText
+    val selectedLocation = state.selectedLocation
+    val userLocation = state.userLocation
+    val predictions = state.predictions
+    val showPredictions = state.showPredictions
+    val isLocationPermissionGranted = state.isLocationPermissionGranted
 
     // ========= CONTENT ===========
     Column(
@@ -53,14 +64,7 @@ fun StartLocationSelectionContent(
             .fillMaxSize()
             .padding(paddingValues)
     ) {
-        // Screen title - asking user where they are
-        Text(
-            text = "Where are you?",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier.padding(horizontal = 16.dp),
-            color = MaterialTheme.colorScheme.onBackground
-        )
+        Title("Where are you?")
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -76,10 +80,10 @@ fun StartLocationSelectionContent(
          */
         Column {
             OutlinedTextField(
-                value = searchText,
-                onValueChange = {
-                    searchText = it
-                    searchPlaces(it)
+                value = state.searchText,
+                onValueChange = { query ->
+                    actions.setSearchText(query)
+                    actions.searchPlaces(query)
                 },
                 placeholder = {
                     Text(
@@ -89,7 +93,7 @@ fun StartLocationSelectionContent(
                     )
                 },
                 trailingIcon = {
-                    IconButton(onClick = { searchPlaces(searchText) }) {
+                    IconButton(onClick = { actions.searchPlaces(state.searchText) }) {
                         Icon(
                             imageVector = Icons.Default.Search,
                             contentDescription = "Search",
@@ -98,13 +102,13 @@ fun StartLocationSelectionContent(
                         )
                     }
                 },
-                singleLine = true, // Prevents new lines when user hits Enter
+                singleLine = true,
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Search // Shows "Search" instead of "Enter" on keyboard. Better UI
                 ),
                 keyboardActions = KeyboardActions(
                     onSearch = {
-                        searchPlaces(searchText) // Handles Enter key press
+                        actions.searchPlaces(searchText)
                     }
                 ),
                 modifier = Modifier
@@ -142,7 +146,7 @@ fun StartLocationSelectionContent(
                             Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .clickable { selectPlace(prediction) }
+                                    .clickable { actions.selectPlace(prediction) }
                                     .padding(16.dp)
                             ) {
                                 Text(
@@ -162,7 +166,11 @@ fun StartLocationSelectionContent(
                                 )
                             }
                             if (prediction != predictions.last()) {
-                                Divider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f))
+                                HorizontalDivider(
+                                    color = MaterialTheme.colorScheme.onSurface.copy(
+                                        alpha = 0.1f
+                                    )
+                                )
                             }
                         }
                     }
@@ -170,7 +178,7 @@ fun StartLocationSelectionContent(
             }
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        VerticalSpace(8)
 
         // Location permission section - showing different states and providing access to location services
         Row(
@@ -183,12 +191,8 @@ fun StartLocationSelectionContent(
             // Displaying different messages based on permission status and location availability
             Text(
                 text = when {
-                    locationPermissionState.status.isGranted && userLocation != null ->
-                        "📍 Current location found"
-
-                    locationPermissionState.status.isGranted ->
-                        "📍 Getting your location..."
-
+                    isLocationPermissionGranted && userLocation != null -> "📍 Current location found"
+                    isLocationPermissionGranted -> "📍 Getting your location..."
                     else -> "📍 Tap map to select your location"
                 },
                 color = MaterialTheme.colorScheme.primary,
@@ -196,17 +200,15 @@ fun StartLocationSelectionContent(
             )
 
             // Location button - only shown when permission hasn't been granted
-            if (!locationPermissionState.status.isGranted) {
-                TextButton(
-                    onClick = { locationPermissionState.launchPermissionRequest() }
-                ) {
+            if (!isLocationPermissionGranted) {
+                TextButton(onClick = onPermissionRequest) {
                     Icon(
                         imageVector = Icons.Default.LocationOn,
                         contentDescription = "Use my location",
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(16.dp)
                     )
-                    Spacer(modifier = Modifier.width(4.dp))
+                    HorizontalSpace(4)
                     Text(
                         text = "Use my location",
                         color = MaterialTheme.colorScheme.primary,
@@ -216,21 +218,13 @@ fun StartLocationSelectionContent(
             }
         }
 
-        Spacer(modifier = Modifier.height(10.dp))
+        VerticalSpace(10)
 
         /*
-         * Enhanced Google Maps Integration:
-         * The map now supports both manual selection and search-based location setting.
-         * New functionality:
-         * 1. onMapClick now triggers reverse geocoding to show address in search field
-         * 2. Automatically hides search suggestions when map is tapped
-         * 3. Maintains all existing features: zoom controls, location services, markers
+         * onMapClick triggers reverse geocoding to show address in search field and
+         * Automatically hides search suggestions when map is tapped
          *
-         * User interaction flows:
-         * - Tap map → marker moves, address appears in search field
-         * - Search and select → marker moves to searched location
-         * - Use current location → marker shows user's position with address
-         * TO DO:
+         * TODO:
          * - Need to show loading states for location services and reverse geocoding during API calls.
          * - UX currently a bit janky and slow.
          */
@@ -242,17 +236,17 @@ fun StartLocationSelectionContent(
             cameraPositionState = cameraPositionState,
             onMapClick = { latLng ->
                 // When user taps the map, set location and get address
-                selectedLocation = latLng
-                reverseGeocode(latLng)
-                showPredictions = false // Hide search suggestions when map is used
+                actions.setSelectedLocation(latLng)
+                actions.reverseGeocode(latLng)
+                actions.toggleShowPredictions(false)
             },
             properties = MapProperties(
                 mapType = MapType.NORMAL,
-                isMyLocationEnabled = locationPermissionState.status.isGranted
+                isMyLocationEnabled = isLocationPermissionGranted
             ),
             uiSettings = MapUiSettings(
                 zoomControlsEnabled = true,
-                myLocationButtonEnabled = locationPermissionState.status.isGranted
+                myLocationButtonEnabled = isLocationPermissionGranted
             )
         ) {
             // Showing marker for selected location if one exists
@@ -264,9 +258,8 @@ fun StartLocationSelectionContent(
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        VerticalSpace(16)
 
-        // Confirm button section - centered and styled nicely
         Box(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center // Centering the button horizontally
@@ -275,7 +268,6 @@ fun StartLocationSelectionContent(
                 onClick = {
                     selectedLocation?.let { location ->
                         onConfirmLocation(location)
-                        navController.navigate(Screen.JourneySummary.route)
                     }
                 },
                 modifier = Modifier
@@ -296,6 +288,6 @@ fun StartLocationSelectionContent(
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        VerticalSpace(16)
     }
 }

@@ -55,9 +55,7 @@ class CompletedJourneysViewModel : ViewModel() {
             CompletedJourney("2", "Town to Suburb", LocalDate.of(2025, 11, 20), 35, false)
         )
 
-        _screenState.update { currentState ->
-            currentState.copy(journeys = testJourneys)
-        }
+        _journeys.value = testJourneys
     }
 
     fun toggleFavourite(id: String) {
