@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 /**
- * Created a DataStore extension on Context to handle persistent storage.
+ * Created a DataStore extension on Context to handle persistent storage. *Will move to app-level to share all prefs
  * Using DataStore instead of SharedPreferences because:
  * - DataStore is type-safe (prevents casting errors)
  * - Uses Kotlin Coroutines (non-blocking, won't freeze UI)

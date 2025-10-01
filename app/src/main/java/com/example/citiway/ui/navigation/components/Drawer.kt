@@ -12,21 +12,35 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import kotlinx.coroutines.launch
+import com.example.citiway.viewmodel.DrawerViewModel
 
 @Composable
 fun Drawer(
     drawerState: DrawerState,
+    navController: NavController,
     content: @Composable () -> Unit
 ) {
+    val viewModel: DrawerViewModel = viewModel()
+
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
         ModalNavigationDrawer(
             drawerState = drawerState,
             drawerContent = {
                 ModalDrawerSheet(
-                    modifier = Modifier.fillMaxWidth(0.7f)
+                    modifier = Modifier
+                        .fillMaxWidth(0.75f)
+                        .fillMaxHeight(0.85f) // Only 85% of screen height
+                        .padding(top = 48.dp) // Padding from top to avoid camera cutout
                 ) {
                     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-                        DrawerContent()
+                        DrawerContent(
+                            navController = navController,
+                            drawerState = drawerState,
+                            viewModel = viewModel
+                        )
                     }
                 }
             },
@@ -41,10 +55,15 @@ fun Drawer(
 }
 
 @Composable
-private fun DrawerContent() {
-    var locationEnabled by remember { mutableStateOf(true) }
-    var myCitiEnabled by remember { mutableStateOf(false) }
-    var darkModeEnabled by remember { mutableStateOf(false) }
+private fun DrawerContent(
+    navController: NavController,
+    drawerState: DrawerState,
+    viewModel: DrawerViewModel
+) {
+    val darkModeEnabled by viewModel.darkModeEnabled.collectAsState()
+    val locationEnabled by viewModel.locationEnabled.collectAsState()
+    val myCitiEnabled by viewModel.myCitiEnabled.collectAsState()
+    val scope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier
@@ -59,7 +78,11 @@ private fun DrawerContent() {
             horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            TextButton(onClick = { /* Handle go back */ }) {
+            TextButton(onClick = {
+                scope.launch {
+                    drawerState.close()
+                }
+            }) {
                 Text("Go Back")
                 Spacer(modifier = Modifier.width(4.dp))
                 Icon(
@@ -84,7 +107,12 @@ private fun DrawerContent() {
         DrawerMenuItem(
             title = "Journey History",
             subtitle = "Access Journey History",
-            onClick = { /* Handle click */ }
+            onClick = {
+                scope.launch {
+                    drawerState.close()
+                }
+                navController.navigate("journey_history")
+            }
         )
 
         HorizontalDivider()
@@ -94,7 +122,7 @@ private fun DrawerContent() {
             title = "Location",
             subtitle = "Turn Location on",
             checked = locationEnabled,
-            onCheckedChange = { locationEnabled = it }
+            onCheckedChange = { viewModel.toggleLocation(it) }
         )
 
         HorizontalDivider()
@@ -104,7 +132,7 @@ private fun DrawerContent() {
             title = "MyCiTi Connection",
             subtitle = "Card Member\nAccess discounted pricing\nwhile utilizing MyCiTi services",
             checked = myCitiEnabled,
-            onCheckedChange = { myCitiEnabled = it }
+            onCheckedChange = { viewModel.toggleMyCiti(it) }
         )
 
         HorizontalDivider()
@@ -113,7 +141,13 @@ private fun DrawerContent() {
         DrawerMenuItem(
             title = "Help & FAQ",
             subtitle = "Access Our Helpline",
-            onClick = { /* Handle click */ }
+            onClick = {
+                scope.launch {
+                    drawerState.close()
+                }
+                // Add navigation when you have the screen
+                // navController.navigate("help")
+            }
         )
 
         HorizontalDivider()
@@ -123,7 +157,7 @@ private fun DrawerContent() {
             title = "Theme",
             subtitle = "Switch to Dark/Light Mode",
             checked = darkModeEnabled,
-            onCheckedChange = { darkModeEnabled = it }
+            onCheckedChange = { viewModel.toggleDarkMode(it) }
         )
     }
 }
