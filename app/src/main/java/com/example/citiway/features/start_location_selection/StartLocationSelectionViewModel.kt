@@ -3,112 +3,177 @@ package com.example.citiway.features.start_location_selection
 import android.app.Application
 import android.location.Geocoder
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.citiway.BuildConfig
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.AutocompletePrediction
 import com.google.android.libraries.places.api.model.AutocompleteSessionToken
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.model.RectangularBounds
-import com.google.android.libraries.places.api.net.FetchPlaceRequest
-import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
 import com.google.android.libraries.places.api.net.PlacesClient
+import com.google.android.libraries.places.api.net.kotlin.awaitFetchPlace
+import com.google.android.libraries.places.api.net.kotlin.awaitFindAutocompletePredictions
+import com.google.maps.android.compose.CameraPositionState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import java.util.Locale
+
+data class StartLocationSelectionState(
+    val searchText: String = "",
+    val selectedLocation: LatLng? = null,
+    val userLocation: LatLng? = null,
+    val predictions: List<AutocompletePrediction> = emptyList(),
+    val showPredictions: Boolean = false
+)
+
+data class StartLocationSelectionActions(
+    val setSelectedLocation: (LatLng?) -> Unit,
+    val setSearchText: (String) -> Unit,
+    val setUserLocation: (LatLng?) -> Unit,
+    val toggleShowPredictions: (Boolean) -> Unit,
+    val searchPlaces: (String) -> Unit,
+    val selectPlace: (AutocompletePrediction) -> Unit,
+    val reverseGeocode: (LatLng) -> Unit,
+    val getCurrentLocation: () -> Unit
+)
+
+object DefaultLocations {
+    val CAPE_TOWN = LatLng(BuildConfig.CAPE_TOWN_LAT, BuildConfig.CAPE_TOWN_LNG)
+    val SOUTHWEST_BOUND =
+        LatLng(BuildConfig.SOUTHWEST_CAPE_TOWN_LAT, BuildConfig.SOUTHWEST_CAPE_TOWN_LNG)
+    val NORTHEAST_BOUND =
+        LatLng(BuildConfig.NORTHEAST_CAPE_TOWN_LAT, BuildConfig.NORTHEAST_CAPE_TOWN_LNG)
+}
 
 class StartLocationSelectionViewModel(application: Application) : AndroidViewModel(application) {
-
-    // StateFlow variables
-    private val _searchText = MutableStateFlow("")
-    val searchText: StateFlow<String> = _searchText
-
-    private val _selectedLocation = MutableStateFlow<LatLng?>(null)
-    val selectedLocation: StateFlow<LatLng?> = _selectedLocation
-
-    private val _userLocation = MutableStateFlow<LatLng?>(null)
-    val userLocation: StateFlow<LatLng?> = _userLocation
-
-    private val _predictions = MutableStateFlow<List<AutocompletePrediction>>(emptyList())
-    /** List of autocomplete suggestions from Google Places API */
-    val predictions: StateFlow<List<AutocompletePrediction>> = _predictions
-
-    private val _showPredictions = MutableStateFlow(false)
-    /** Controls visibility of the dropdown suggestion list */
-    val showPredictions: StateFlow<Boolean> = _showPredictions
+    private val _screenState = MutableStateFlow(StartLocationSelectionState())
+    val screenState: StateFlow<StartLocationSelectionState> = _screenState
 
     private val scope = CoroutineScope(Dispatchers.Main)
 
-    private val placesClient: PlacesClient = Places.createClient(context)
-    private val geocoder = Geocoder(context, Locale.getDefault())
+    /*
+    * autocompleteSessionToken - session token for billing - regenerated after fetchPlaces() call
+    * placesClient - Main interface for Google Places API calls
+    * geocoder - Android's built-in service for converting coordinates to addresses
+    * cameraPositionState - controls what the user sees on the map
+    */
+    private var autocompleteSessionToken = AutocompleteSessionToken.newInstance()
+    private val placesClient: PlacesClient = Places.createClient(application)
+    private val geocoder = Geocoder(application, Locale.getDefault())
+    val cameraPositionState =
+        CameraPositionState(CameraPosition.fromLatLngZoom(DefaultLocations.CAPE_TOWN, 12f))
 
-    // Functions to update flows
     fun updateSearchText(text: String) {
-        _searchText.value = text
-    }
-
-    fun setSelectedLocation(latLng: LatLng?) {
-        _selectedLocation.value = latLng
-    }
-
-    fun setUserLocation(latLng: LatLng?) {
-        _userLocation.value = latLng
-    }
-
-    fun toggleShowPredictions(show: Boolean) {
-        _showPredictions.value = show
-    }
-
-    // Search places based on query
-    fun searchPlaces(query: String) {
-        if (query.length > 2) {
-            val token = AutocompleteSessionToken.newInstance()
-            val request = FindAutocompletePredictionsRequest.builder()
-                .setSessionToken(token)
-                .setQuery(query)
-                .setLocationBias(
-                    RectangularBounds.newInstance(
-                        LatLng(-34.3, 18.0),
-                        LatLng(-33.5, 18.9)
-                    )
-                )
-                .setCountries("ZA")
-                .build()
-
-            placesClient.findAutocompletePredictions(request)
-                .addOnSuccessListener { response ->
-                    _predictions.value = response.autocompletePredictions
-                    _showPredictions.value = true
-                }
-                .addOnFailureListener {
-                    _predictions.value = emptyList()
-                    _showPredictions.value = false
-                }
-        } else {
-            _predictions.value = emptyList()
-            _showPredictions.value = false
+        _screenState.update { currentState ->
+            currentState.copy(searchText = text)
         }
     }
 
-    // Select place from predictions
-    fun selectPlace(prediction: AutocompletePrediction) {
-        val placeFields = listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG, Place.Field.ADDRESS)
-        val request = FetchPlaceRequest.newInstance(prediction.placeId, placeFields)
+    fun setSelectedLocation(location: LatLng?) {
+        _screenState.update { currentState ->
+            currentState.copy(selectedLocation = location)
+        }
+    }
 
-        scope.launch {
-            try {
-                val response = placesClient.fetchPlace(request).await()
-                val place = response.place
-                place.latLng?.let { latLng ->
-                    _selectedLocation.value = latLng
-                    _searchText.value = place.name ?: prediction.getPrimaryText(null).toString()
-                    toggleShowPredictions(false)
-                    // Assume that camera movement is handled via callback or separate state
+    fun setUserLocation(location: LatLng?) {
+        _screenState.update { currentState ->
+            currentState.copy(userLocation = location)
+        }
+    }
+
+    fun toggleShowPredictions(show: Boolean) {
+        _screenState.update { currentState ->
+            currentState.copy(showPredictions = show)
+        }
+    }
+
+    fun setPredictions(predictions: List<AutocompletePrediction> = emptyList()) {
+        _screenState.update { currentState ->
+            currentState.copy(showPredictions = predictions.isEmpty(), predictions = predictions)
+        }
+    }
+
+    /*
+     * This function handles real-time search as the user types.
+     * Key features:
+     * 1. Only searches after 2+ characters to avoid too many API calls
+     * 2. LocationBias restricts results to Cape Town area for relevance
+     * 3. setCountries("ZA") ensures only South African locations appear
+     * 4. Automatically shows/hides dropdown based on results
+     */
+    fun searchPlaces(queryText: String) {
+        if (queryText.length > 2) {
+            viewModelScope.launch {
+                val bounds = RectangularBounds.newInstance(
+                    DefaultLocations.SOUTHWEST_BOUND, DefaultLocations.NORTHEAST_BOUND
+                )
+
+                try {
+                    val response = placesClient.awaitFindAutocompletePredictions {
+                        sessionToken = autocompleteSessionToken
+                        locationBias = bounds
+                        query = query
+                        countries = listOf("ZA")
+                    }
+
+                    setPredictions(response.autocompletePredictions)
+                } catch (e: Exception) {
+                    setPredictions()
                 }
-            } catch (e: Exception) {
-                // Handle failure if needed
+            }
+        }
+    }
+
+    /*
+     * When user taps on a search suggestion, this function:
+     * 1. Fetches detailed place information including coordinates
+     * 2. Updates the search text with a clean location name
+     * 3. Sets the marker position on the map
+     * 4. Moves camera to the selected location
+     * 5. Hides the suggestions dropdown
+     */
+    fun selectPlace(prediction: AutocompletePrediction) {
+        viewModelScope.launch {
+            val placeFields = listOf(
+                Place.Field.ID,
+                Place.Field.DISPLAY_NAME,
+                Place.Field.LOCATION,
+                Place.Field.FORMATTED_ADDRESS
+            )
+
+            try {
+                // Fetch detailed info on the selected location
+                val response = placesClient.awaitFetchPlace(prediction.placeId, placeFields) {
+                    sessionToken = sessionToken
+                }
+
+                val place = response.place
+
+                // Update state with place info
+                place.location?.let { latLng ->
+                    _screenState.update { currentState ->
+                        currentState.copy(
+                            selectedLocation = latLng,
+                            searchText = place.displayName ?: prediction.getPrimaryText(null)
+                                .toString(),
+                            showPredictions = false
+                        )
+                    }
+
+                    // Adjust map camera
+                    cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
+                }
+            } catch (exception: Exception) {
+                // TODO: Handle fetchPlace failure
             }
         }
     }
@@ -133,7 +198,18 @@ class StartLocationSelectionViewModel(application: Application) : AndroidViewMod
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
 
         scope.launch {
-            try {
+            try {/*
+             * Location Retrieval Process:
+             * 1. lastLocation gives us cached location (faster than real-time GPS)
+             * 2. addOnSuccessListener handles async response when location is found
+             * 3. We convert Android Location to Google Maps LatLng format
+             * 4. Update both userLocation (for tracking) and selectedLocation (for UI)
+             * 5. Reverse geocode to show user their current address
+             * 6. Move camera to user's position with 15f zoom (street level view)
+             *
+             * Note: Location data is NOT saved to device storage - it's only kept
+             * in memory during this screen session for privacy reasons.
+             */
                 val location = fusedLocationClient.lastLocation.await()
                 location?.let {
                     val latLng = LatLng(it.latitude, it.longitude)
@@ -147,4 +223,3 @@ class StartLocationSelectionViewModel(application: Application) : AndroidViewMod
             }
         }
     }
-}

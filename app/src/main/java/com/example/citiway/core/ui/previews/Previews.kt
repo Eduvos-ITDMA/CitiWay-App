@@ -1,33 +1,36 @@
 package com.example.citiway.core.ui.previews
 
-import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.rememberDrawerState
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
-import com.example.citiway.core.util.ScreenWrapper
-import com.example.citiway.ui.screens.DestinationSelectionScreen
-import com.example.citiway.ui.screens.FavouritesScreen
-import com.example.citiway.ui.screens.HelpScreen
-import com.example.citiway.ui.screens.HomeScreen
-import com.example.citiway.ui.screens.JourneyHistoryScreen
-import com.example.citiway.ui.screens.JourneySelectionScreen
-import com.example.citiway.ui.screens.JourneySummaryScreen
-import com.example.citiway.ui.screens.ProgressTrackerScreen
-import com.example.citiway.ui.screens.SchedulesScreen
-import com.example.citiway.ui.screens.SplashScreen
-import com.example.citiway.ui.screens.StartLocationSelectionScreen
-import com.example.citiway.ui.theme.CitiWayTheme
+import com.example.citiway.core.ui.theme.CitiWayTheme
+import com.example.citiway.features.SplashScreen
+import com.example.citiway.features.destination_selection.DestinationSelectionContent
+import com.example.citiway.features.favourites.FavouritesContent
+import com.example.citiway.features.help.HelpContent
+import com.example.citiway.features.home.HomeContent
+import com.example.citiway.features.journey_history.JourneyHistoryContent
+import com.example.citiway.features.journey_selection.JourneySelectionContent
+import com.example.citiway.features.journey_summary.JourneySummaryContent
+import com.example.citiway.features.progress_tracker.ProgressTrackerContent
+import com.example.citiway.features.schedules.SchedulesContent
+import com.example.citiway.features.shared.CompletedJourneysState
+import com.example.citiway.features.start_location_selection.StartLocationSelectionContent
+import com.example.citiway.features.start_location_selection.StartLocationSelectionState
+
 
 // Home Screen Preview
 @Preview(showBackground = true, name = "Home Screen")
 @Composable
 fun HomeScreenPreview() {
-    val drawerState = rememberDrawerState(DrawerValue.Closed)
     CitiWayTheme {
-        ScreenWrapper(rememberNavController(), drawerState, true) { nav, paddingValues ->
-            HomeScreen(nav, paddingValues)
-        }
+        HomeContent(
+            state = CompletedJourneysState(),
+            paddingValues = PaddingValues(),
+            navController = rememberNavController(),
+            onToggleFavourite = {}
+        )
     }
 }
 
@@ -36,7 +39,7 @@ fun HomeScreenPreview() {
 @Composable
 fun SplashScreenPreview() {
     CitiWayTheme {
-        SplashScreen(navController = rememberNavController())
+        SplashScreen(navController = rememberNavController()) // Assuming SplashScreen is simple UI
     }
 }
 
@@ -45,13 +48,10 @@ fun SplashScreenPreview() {
 @Composable
 fun FavouritesScreenPreview() {
     CitiWayTheme {
-        ScreenWrapper(
-            rememberNavController(),
-            rememberDrawerState(DrawerValue.Closed),
-            true
-        ) { nav, paddingValues ->
-            FavouritesScreen(nav, paddingValues)
-        }
+        FavouritesContent(
+            paddingValues = PaddingValues(),
+            navController = rememberNavController(),
+        )
     }
 }
 
@@ -60,10 +60,10 @@ fun FavouritesScreenPreview() {
 @Composable
 fun DestinationSelectionScreenPreview() {
     CitiWayTheme {
-        val drawerState = rememberDrawerState(DrawerValue.Closed)
-        ScreenWrapper(rememberNavController(), drawerState, true) { nav, paddingValues ->
-            DestinationSelectionScreen(nav, paddingValues)
-        }
+        DestinationSelectionContent(
+            paddingValues = PaddingValues(),
+            navController = rememberNavController(),
+        )
     }
 }
 
@@ -72,10 +72,10 @@ fun DestinationSelectionScreenPreview() {
 @Composable
 fun HelpScreenPreview() {
     CitiWayTheme {
-        val drawerState = rememberDrawerState(DrawerValue.Closed)
-        ScreenWrapper(rememberNavController(), drawerState, true) { nav, paddingValues ->
-            HelpScreen(nav, paddingValues)
-        }
+        HelpContent(
+            paddingValues = PaddingValues(),
+            navController = rememberNavController(), // Or specific callbacks like onLinkClicked
+        )
     }
 }
 
@@ -84,10 +84,10 @@ fun HelpScreenPreview() {
 @Composable
 fun JourneySelectionScreenPreview() {
     CitiWayTheme {
-        val drawerState = rememberDrawerState(DrawerValue.Closed)
-        ScreenWrapper(rememberNavController(), drawerState, true) { nav, paddingValues ->
-            JourneySelectionScreen(nav, paddingValues)
-        }
+        JourneySelectionContent(
+            paddingValues = PaddingValues(),
+            navController = rememberNavController(),
+        )
     }
 }
 
@@ -96,10 +96,10 @@ fun JourneySelectionScreenPreview() {
 @Composable
 fun JourneySummaryScreenPreview() {
     CitiWayTheme {
-        val drawerState = rememberDrawerState(DrawerValue.Closed)
-        ScreenWrapper(rememberNavController(), drawerState, true) { nav, paddingValues ->
-            JourneySummaryScreen(nav, paddingValues)
-        }
+        JourneySummaryContent(
+            paddingValues = PaddingValues(),
+            navController = rememberNavController(),
+        )
     }
 }
 
@@ -108,22 +108,25 @@ fun JourneySummaryScreenPreview() {
 @Composable
 fun ProgressTrackerScreenPreview() {
     CitiWayTheme {
-        val drawerState = rememberDrawerState(DrawerValue.Closed)
-        ScreenWrapper(rememberNavController(), drawerState, true) { nav, paddingValues ->
-            ProgressTrackerScreen(nav, paddingValues)
-        }
+        ProgressTrackerContent(
+            paddingValues = PaddingValues(),
+            navController = rememberNavController(), // Or callbacks like onCancelJourney
+        )
     }
 }
 
-// Route History Screen Preview
-@Preview(showBackground = true, name = "Route History Screen")
+// Journey History Screen Preview
+@Preview(
+    showBackground = true,
+    name = "Journey History Screen"
+) // Changed from Route History to match your naming
 @Composable
 fun JourneyHistoryScreenPreview() {
     CitiWayTheme {
-        val drawerState = rememberDrawerState(DrawerValue.Closed)
-        ScreenWrapper(rememberNavController(), drawerState, true) { nav, paddingValues ->
-            JourneyHistoryScreen(nav, paddingValues)
-        }
+        JourneyHistoryContent(
+            paddingValues = PaddingValues(),
+            navController = rememberNavController(),
+        )
     }
 }
 
@@ -132,10 +135,10 @@ fun JourneyHistoryScreenPreview() {
 @Composable
 fun SchedulesScreenPreview() {
     CitiWayTheme {
-        val drawerState = rememberDrawerState(DrawerValue.Closed)
-        ScreenWrapper(rememberNavController(), drawerState, true) { nav, paddingValues ->
-            SchedulesScreen(nav, paddingValues)
-        }
+        SchedulesContent(
+            paddingValues = PaddingValues(),
+            navController = rememberNavController(), // Or callbacks like onScheduleSelected
+        )
     }
 }
 
@@ -144,9 +147,11 @@ fun SchedulesScreenPreview() {
 @Composable
 fun StartLocationScreenPreview() {
     CitiWayTheme {
-        val drawerState = rememberDrawerState(DrawerValue.Closed)
-        ScreenWrapper(rememberNavController(), drawerState, true) { nav, paddingValues ->
-            StartLocationSelectionScreen(nav, paddingValues)
-        }
+        StartLocationSelectionContent(
+            state = StartLocationSelectionState(),
+            paddingValues = PaddingValues(),
+            navController = rememberNavController(),
+            onConfirmLocation = {}
+        )
     }
 }

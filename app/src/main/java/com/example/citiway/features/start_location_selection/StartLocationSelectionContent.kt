@@ -43,19 +43,23 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun StartLocationSelectionContent(
-    navController: NavController,
+    state: StartLocationSelectionState,
     paddingValues: PaddingValues,
+    navController: NavController,
     onConfirmLocation: (LatLng) -> Unit = {}
 ) {
-    val viewModel: StartLocationSelectionVewModel = viewModel()
-
-    // These state variables hold the current, up-to-date data for the UI, ensuring
-    // the screen automatically refreshes whenever the data in the ViewModel changes.
-    val searchText by viewModel.searchText.collectAsState()
-    val selectedLocation by viewModel.selectedLocation.collectAsState()
-    val userLocation by viewModel.userLocation.collectAsState()
-    val predictions by viewModel.predictions.collectAsState()
-    val showPredictions by viewModel.showPredictions.collectAsState()
+    /* These state variables hold the current, up-to-date data for the UI, ensuring
+    * the screen automatically refreshes whenever the data in the ViewModel changes.
+    * searchText - text query the user types
+    * userLocation - LatLng value of user's current location
+    * predictions - List of autocomplete suggestions from Google Places API
+    * showPredictions - Controls visibility of the dropdown suggestion list
+    */
+    val searchText = state::searchText
+    val selectedLocation = state::selectedLocation
+    val userLocation = state::userLocation
+    val predictions = state::predictions
+    val showPredictions = state::showPredictions
 
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -63,11 +67,9 @@ fun StartLocationSelectionContent(
     val capeTownLocation = LatLng(-33.9249, 18.4241)
 
     /*
-     * Google Places API Setup:
-     * placesClient - Main interface for Google Places API calls
      * geocoder - Android's built-in service for converting coordinates to addresses
+     * placesClient - Main interface for Google Places API calls
      */
-    val placesClient = remember { Places.createClient(context) }
     val geocoder = remember { Geocoder(context, Locale.getDefault()) }
 
     // Set up camera position state - this controls what the user sees on the map
@@ -86,57 +88,12 @@ fun StartLocationSelectionContent(
         Manifest.permission.ACCESS_FINE_LOCATION
     )
 
-    /*
-     * Places Search Functionality:
-     * This function handles real-time search as the user types.
-     * Key features:
-     * 1. Only searches after 2+ characters to avoid too many API calls
-     * 2. LocationBias restricts results to Cape Town area for relevance
-     * 3. setCountries("ZA") ensures only South African locations appear
-     * 4. Automatically shows/hides dropdown based on results
-     */
-    fun searchPlaces(query: String) {
-        if (query.length > 2) {
-            val token = AutocompleteSessionToken.newInstance()
-            val request = FindAutocompletePredictionsRequest.builder()
-                .setSessionToken(token)
-                .setQuery(query)
-                .setLocationBias(
-                    RectangularBounds.newInstance(
-                    LatLng(-34.3, 18.0), // Southwest Cape Town area
-                    LatLng(-33.5, 18.9)  // Northeast Cape Town area
-                ))
-                .setCountries("ZA")
-                .build()
+//    TODO: Use ViewModel's searchPlaces() function
 
-            placesClient.findAutocompletePredictions(request)
-                .addOnSuccessListener { response ->
-                    predictions = response.autocompletePredictions
-                    showPredictions = true
-                }
-                .addOnFailureListener { exception ->
-                    predictions = emptyList()
-                    showPredictions = false
-                }
-        } else {
-            predictions = emptyList()
-            showPredictions = false
-        }
-    }
 
-    /*
-     * Place Selection Handler:
-     * When user taps on a search suggestion, this function:
-     * 1. Fetches detailed place information including coordinates
-     * 2. Updates the search text with a clean location name
-     * 3. Sets the marker position on the map
-     * 4. Moves camera to the selected location
-     * 5. Hides the suggestions dropdown
-     *
-     * We only request essential fields to minimize API costs and data usage
-     */
+    // TODO: Use ViewModels selectPlace() method
     fun selectPlace(prediction: AutocompletePrediction) {
-        val placeFields = listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG, Place.Field.ADDRESS)
+        val placeFields = listOf(Place.Field.ID, Place.Field.DISPLAY_NAME, Place.Field.LOCATION, Place.Field.FORMATTED_ADDRESS)
         val request = FetchPlaceRequest.newInstance(prediction.placeId, placeFields)
 
         placesClient.fetchPlace(request)
@@ -157,7 +114,6 @@ fun StartLocationSelectionContent(
                 // Handle error silently - user can try again or use map tap
             }
     }
-
     /*
      * Reverse Geocoding Functionality:
      * Converts map tap coordinates back into human-readable addresses.
@@ -165,19 +121,7 @@ fun StartLocationSelectionContent(
      * If geocoding fails, we fall back to a generic "Selected Location" text.
      * This provides immediate feedback when users tap anywhere on the map.
      */
-    fun reverseGeocode(latLng: LatLng) {
-        scope.launch {
-            try {
-                val addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
-                if (addresses?.isNotEmpty() == true) {
-                    val address = addresses[0]
-                    searchText = address.getAddressLine(0) ?: "Selected Location"
-                }
-            } catch (e: Exception) {
-                searchText = "Selected Location"
-            }
-        }
-    }
+    // TODO: Use ViewModel's reverseGeocode function
 
     /*
      * Getting User's Current Location:
@@ -185,42 +129,7 @@ fun StartLocationSelectionContent(
      * to get the device's last known location. It's more efficient than GPS
      * as it uses cached location data from network/GPS/sensors.
      */
-    fun getCurrentLocation() {
-        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
-
-        try {
-            /*
-             * Location Retrieval Process:
-             * 1. lastLocation gives us cached location (faster than real-time GPS)
-             * 2. addOnSuccessListener handles async response when location is found
-             * 3. We convert Android Location to Google Maps LatLng format
-             * 4. Update both userLocation (for tracking) and selectedLocation (for UI)
-             * 5. Reverse geocode to show user their current address
-             * 6. Move camera to user's position with 15f zoom (street level view)
-             *
-             * Note: Location data is NOT saved to device storage - it's only kept
-             * in memory during this screen session for privacy reasons.
-             */
-            fusedLocationClient.lastLocation
-                .addOnSuccessListener { location ->
-                    location?.let {
-                        val currentLatLng = LatLng(it.latitude, it.longitude)
-                        userLocation = currentLatLng
-                        selectedLocation = currentLatLng
-
-                        // Show user their current address in search field
-                        reverseGeocode(currentLatLng)
-
-                        // Moving camera to user's location with a closer zoom level
-                        cameraPositionState.move(
-                            CameraUpdateFactory.newLatLngZoom(currentLatLng, 15f)
-                        )
-                    }
-                }
-        } catch (e: SecurityException) {
-            // Handling cases where location access is denied  ** WIP, will do.
-        }
-    }
+    // TODO: Use ViewModel's getCurrentLocation function
 
     /*
      * Permission Status Monitoring:
@@ -236,6 +145,7 @@ fun StartLocationSelectionContent(
         }
     }
 
+    // ========= CONTENT ===========
     Column(
         modifier = Modifier
             .fillMaxSize()

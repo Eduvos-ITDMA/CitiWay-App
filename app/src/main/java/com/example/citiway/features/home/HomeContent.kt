@@ -1,7 +1,5 @@
 package com.example.citiway.features.home
 
-
-// HomeContent.kt
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -39,12 +37,12 @@ import com.example.citiway.core.ui.components.Space
 import com.example.citiway.core.ui.components.Title
 import com.example.citiway.core.ui.components.VerticalSpace
 import com.example.citiway.core.ui.previews.PreviewApp
-import com.example.citiway.data.CompletedJourney
-import com.example.citiway.features.shared.ScreenState
+import com.example.citiway.data.local.CompletedJourney
+import com.example.citiway.features.shared.CompletedJourneysState
 
 @Composable
 fun HomeContent(
-    state: ScreenState,
+    state: CompletedJourneysState,
     paddingValues: PaddingValues,
     navController: NavController,
     onToggleFavourite: (id: String) -> Unit

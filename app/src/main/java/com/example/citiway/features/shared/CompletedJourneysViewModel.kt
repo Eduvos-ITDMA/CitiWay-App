@@ -2,14 +2,14 @@ package com.example.citiway.features.shared
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.citiway.data.CompletedJourney
+import com.example.citiway.data.local.CompletedJourney
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
-data class ScreenState(
+data class CompletedJourneysState(
     val journeys: List<CompletedJourney> = emptyList(),
     val recentJourneys: List<CompletedJourney> = emptyList(),
     val favouriteJourneys: List<CompletedJourney> = emptyList()
@@ -21,8 +21,8 @@ class CompletedJourneysViewModel : ViewModel() {
     private val _journeys = MutableStateFlow<List<CompletedJourney>>(emptyList())
 
     // State flow for main state data class
-    private val _screenState = MutableStateFlow(ScreenState())
-    val screenState: StateFlow<ScreenState> = _screenState
+    private val _screenState = MutableStateFlow(CompletedJourneysState())
+    val screenState: StateFlow<CompletedJourneysState> = _screenState
 
     init {
         viewModelScope.launch {

@@ -6,7 +6,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.navigation.compose.rememberNavController
 import com.example.citiway.CitiWayApp
 import com.example.citiway.core.navigation.routes.HOME_ROUTE
-import com.example.citiway.ui.theme.CitiWayTheme
+import com.example.citiway.core.ui.theme.CitiWayTheme
 
 @Preview(showBackground = true)
 @Composable
