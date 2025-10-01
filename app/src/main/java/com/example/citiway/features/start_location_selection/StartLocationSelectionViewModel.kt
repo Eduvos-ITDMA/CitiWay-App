@@ -2,7 +2,9 @@ package com.example.citiway.features.start_location_selection
 
 import android.app.Application
 import android.location.Geocoder
+import android.os.Build
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.application
 import androidx.lifecycle.viewModelScope
 import com.example.citiway.BuildConfig
 import com.google.android.gms.location.LocationServices
@@ -25,6 +27,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import java.util.Locale
 
 data class StartLocationSelectionState(
@@ -58,7 +61,16 @@ class StartLocationSelectionViewModel(application: Application) : AndroidViewMod
     private val _screenState = MutableStateFlow(StartLocationSelectionState())
     val screenState: StateFlow<StartLocationSelectionState> = _screenState
 
-    private val scope = CoroutineScope(Dispatchers.Main)
+    val actions = StartLocationSelectionActions(
+        this::setSelectedLocation,
+        this::updateSearchText,
+        this::setUserLocation,
+        this::toggleShowPredictions,
+        this::searchPlaces,
+        this::selectPlace,
+        this::reverseGeocode,
+        this::getCurrentLocation
+    )
 
     /*
     * autocompleteSessionToken - session token for billing - regenerated after fetchPlaces() call
@@ -71,6 +83,7 @@ class StartLocationSelectionViewModel(application: Application) : AndroidViewMod
     private val geocoder = Geocoder(application, Locale.getDefault())
     val cameraPositionState =
         CameraPositionState(CameraPosition.fromLatLngZoom(DefaultLocations.CAPE_TOWN, 12f))
+    private val scope = CoroutineScope(Dispatchers.Main)
 
     fun updateSearchText(text: String) {
         _screenState.update { currentState ->
@@ -172,30 +185,53 @@ class StartLocationSelectionViewModel(application: Application) : AndroidViewMod
                     // Adjust map camera
                     cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
                 }
-            } catch (exception: Exception) {
+            } catch (e: Exception) {
                 // TODO: Handle fetchPlace failure
             }
         }
     }
 
-    // Reverse geocode to get address from LatLng
+    /*
+    * Reverse geocode to get address from LatLng
+    * If geocoding fails, we fall back to a generic "Selected Location" text.
+    */
     fun reverseGeocode(latLng: LatLng) {
         scope.launch {
             try {
-                val addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
-                if (addresses?.isNotEmpty() == true) {
-                    val address = addresses[0]
-                    _searchText.value = address.getAddressLine(0) ?: "Selected Location"
+                // requires API level 31 (TIRAMISU)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1) { addresses ->
+                        val address = addresses.firstOrNull()
+                        if (address != null) {
+                            updateSearchText(address.getAddressLine(0) ?: "Selected Location")
+                        } else {
+                            updateSearchText("Selected Location")
+                        }
+                    }
+                } else {
+                    // fallback for older APIs
+                    @Suppress("DEPRECATION")
+                    // Prevent blocking main thread with old getFromLocation() method
+                    val addresses = withContext(Dispatchers.IO) {
+                        geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
+                    }
+                    if (addresses?.isNotEmpty() == true) {
+                        val address = addresses[0]
+                        updateSearchText(address.getAddressLine(0) ?: "Selected Location")
+                    } else {
+                        updateSearchText("Selected Location")
+                    }
                 }
             } catch (e: Exception) {
-                _searchText.value = "Selected Location"
+                updateSearchText("Selected Location")
             }
         }
     }
 
     // Get current user location
     fun getCurrentLocation() {
-        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+        // TODO: Use Hilt to inject fusedLocationClient in the future
+        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(application)
 
         scope.launch {
             try {/*
@@ -206,20 +242,20 @@ class StartLocationSelectionViewModel(application: Application) : AndroidViewMod
              * 4. Update both userLocation (for tracking) and selectedLocation (for UI)
              * 5. Reverse geocode to show user their current address
              * 6. Move camera to user's position with 15f zoom (street level view)
-             *
-             * Note: Location data is NOT saved to device storage - it's only kept
-             * in memory during this screen session for privacy reasons.
              */
                 val location = fusedLocationClient.lastLocation.await()
-                location?.let {
-                    val latLng = LatLng(it.latitude, it.longitude)
-                    _userLocation.value = latLng
-                    _selectedLocation.value = latLng
-                    reverseGeocode(latLng)
-                    // Camera move can be handled separately
+                val latLng = LatLng(location.latitude, location.longitude)
+                _screenState.update { currentState ->
+                    currentState.copy(userLocation = latLng, selectedLocation = latLng)
                 }
+
+                reverseGeocode(latLng)
+                cameraPositionState.move(
+                    CameraUpdateFactory.newLatLngZoom(latLng, 15f)
+                )
             } catch (e: SecurityException) {
-                // Handle permission issues
+                // TODO: Handle permission issues
             }
         }
     }
+}

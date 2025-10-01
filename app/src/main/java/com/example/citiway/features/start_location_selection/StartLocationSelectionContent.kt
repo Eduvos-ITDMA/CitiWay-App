@@ -1,149 +1,51 @@
 package com.example.citiway.features.start_location_selection
 
+import android.Manifest
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.google.android.gms.maps.model.CameraPosition
+import com.example.citiway.core.navigation.routes.Screen
+import com.google.accompanist.permissions.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
-import android.Manifest
-import com.google.accompanist.permissions.*
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.libraries.places.api.Places
-import com.google.android.libraries.places.api.model.AutocompletePrediction
-import com.google.android.libraries.places.api.model.AutocompleteSessionToken
-import com.google.android.libraries.places.api.model.Place
-import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
-import com.google.android.libraries.places.api.net.FetchPlaceRequest
-import android.location.Geocoder
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.citiway.core.navigation.routes.Screen
-import com.google.android.libraries.places.api.model.RectangularBounds
-import kotlinx.coroutines.launch
-import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun StartLocationSelectionContent(
-    state: StartLocationSelectionState,
     paddingValues: PaddingValues,
+    state: StartLocationSelectionState,
+    actions: StartLocationSelectionActions,
+    onPermissionRequest: () -> Unit,
     navController: NavController,
-    onConfirmLocation: (LatLng) -> Unit = {}
 ) {
     /* These state variables hold the current, up-to-date data for the UI, ensuring
     * the screen automatically refreshes whenever the data in the ViewModel changes.
-    * searchText - text query the user types
-    * userLocation - LatLng value of user's current location
-    * predictions - List of autocomplete suggestions from Google Places API
-    * showPredictions - Controls visibility of the dropdown suggestion list
+    *    searchText - text query the user types
+    *    userLocation - LatLng value of user's current location
+    *    predictions - List of autocomplete suggestions from Google Places API
+    *    showPredictions - Controls visibility of the dropdown suggestion list
     */
     val searchText = state::searchText
     val selectedLocation = state::selectedLocation
     val userLocation = state::userLocation
     val predictions = state::predictions
     val showPredictions = state::showPredictions
-
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-    // Start with Cape Town as default location on the map
-    val capeTownLocation = LatLng(-33.9249, 18.4241)
-
-    /*
-     * geocoder - Android's built-in service for converting coordinates to addresses
-     * placesClient - Main interface for Google Places API calls
-     */
-    val geocoder = remember { Geocoder(context, Locale.getDefault()) }
-
-    // Set up camera position state - this controls what the user sees on the map
-    val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(capeTownLocation, 12f)
-    }
-
-    /*
-     * Location Permission Management:
-     * We're using Accompanist permissions library to handle location access.
-     * This creates a permission state that tracks whether the user has granted
-     * ACCESS_FINE_LOCATION permission. The state automatically updates when
-     * permission status changes.
-     */
-    val locationPermissionState = rememberPermissionState(
-        Manifest.permission.ACCESS_FINE_LOCATION
-    )
-
-//    TODO: Use ViewModel's searchPlaces() function
-
-
-    // TODO: Use ViewModels selectPlace() method
-    fun selectPlace(prediction: AutocompletePrediction) {
-        val placeFields = listOf(Place.Field.ID, Place.Field.DISPLAY_NAME, Place.Field.LOCATION, Place.Field.FORMATTED_ADDRESS)
-        val request = FetchPlaceRequest.newInstance(prediction.placeId, placeFields)
-
-        placesClient.fetchPlace(request)
-            .addOnSuccessListener { response ->
-                val place = response.place
-                place.latLng?.let { latLng ->
-                    selectedLocation = latLng
-                    searchText = place.name ?: prediction.getPrimaryText(null).toString()
-                    showPredictions = false
-
-                    // Move camera to selected location with street-level zoom
-                    cameraPositionState.move(
-                        CameraUpdateFactory.newLatLngZoom(latLng, 15f)
-                    )
-                }
-            }
-            .addOnFailureListener { exception ->
-                // Handle error silently - user can try again or use map tap
-            }
-    }
-    /*
-     * Reverse Geocoding Functionality:
-     * Converts map tap coordinates back into human-readable addresses.
-     * This runs in a coroutine scope to avoid blocking the UI thread.
-     * If geocoding fails, we fall back to a generic "Selected Location" text.
-     * This provides immediate feedback when users tap anywhere on the map.
-     */
-    // TODO: Use ViewModel's reverseGeocode function
-
-    /*
-     * Getting User's Current Location:
-     * This function uses Google Play Services' FusedLocationProviderClient
-     * to get the device's last known location. It's more efficient than GPS
-     * as it uses cached location data from network/GPS/sensors.
-     */
-    // TODO: Use ViewModel's getCurrentLocation function
-
-    /*
-     * Permission Status Monitoring:
-     * LaunchedEffect with locationPermissionState.status as key means this block
-     * runs whenever permission status changes (granted/denied/requested).
-     * This ensures we automatically get location as soon as user grants permission.
-     */
-    LaunchedEffect(locationPermissionState.status) {
-        when {
-            locationPermissionState.status.isGranted -> {
-                getCurrentLocation()
-            }
-        }
-    }
 
     // ========= CONTENT ===========
     Column(
@@ -180,7 +82,11 @@ fun StartLocationSelectionContent(
                     searchPlaces(it)
                 },
                 placeholder = {
-                    Text("Search for your location", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f), fontSize = 14.sp)
+                    Text(
+                        "Search for your location",
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                        fontSize = 14.sp
+                    )
                 },
                 trailingIcon = {
                     IconButton(onClick = { searchPlaces(searchText) }) {
@@ -247,7 +153,8 @@ fun StartLocationSelectionContent(
                                 )
                                 // Show simplified secondary text - removes postal codes for cleaner display
                                 val secondaryText = prediction.getSecondaryText(null).toString()
-                                val cleanText = secondaryText.split(",").take(2).joinToString(", ") // Only take first 2 parts
+                                val cleanText = secondaryText.split(",").take(2)
+                                    .joinToString(", ") // Only take first 2 parts
                                 Text(
                                     text = cleanText,
                                     fontSize = 14.sp,
@@ -278,8 +185,10 @@ fun StartLocationSelectionContent(
                 text = when {
                     locationPermissionState.status.isGranted && userLocation != null ->
                         "📍 Current location found"
+
                     locationPermissionState.status.isGranted ->
                         "📍 Getting your location..."
+
                     else -> "📍 Tap map to select your location"
                 },
                 color = MaterialTheme.colorScheme.primary,
