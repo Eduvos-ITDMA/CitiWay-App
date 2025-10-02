@@ -6,23 +6,43 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.citiway.core.navigation.routes.Screen
 import com.example.citiway.core.util.ScreenWrapper
 import com.example.citiway.features.shared.CompletedJourneysViewModel
+import com.example.citiway.features.shared.LocationSelectionActions
+import com.example.citiway.features.shared.LocationSelectionViewModel
+
+data class HomeActions(
+    val onToggleFavourite: (String) -> Unit,
+    val onSchedulesLinkClick: () -> Unit,
+    val onMapIconClick: () -> Unit,
+    val locationSelectionActions: LocationSelectionActions
+)
 
 @Composable
 fun HomeRoute(
     navController: NavController,
     drawerState: DrawerState,
-    viewModel: CompletedJourneysViewModel = viewModel()
+    completedJourneysViewModel: CompletedJourneysViewModel = viewModel(),
+    locationSelectionViewModel: LocationSelectionViewModel = viewModel()
 ) {
-    val state by viewModel.screenState.collectAsStateWithLifecycle()
+    val completedJourneysState by completedJourneysViewModel.screenState.collectAsStateWithLifecycle()
+    val locationSelectionState by locationSelectionViewModel.screenState.collectAsStateWithLifecycle()
 
-    ScreenWrapper(navController, drawerState, true) {paddingValues ->
+    val actions = HomeActions(
+        completedJourneysViewModel::toggleFavourite,
+        { navController.navigate(Screen.Schedules.route) },
+
+        { navController.navigate(Screen.DestinationSelection.route) },
+        locationSelectionViewModel.actions
+    )
+
+    ScreenWrapper(navController, drawerState, true) { paddingValues ->
         HomeContent(
-            state = state,
+            completedJourneysState = completedJourneysState,
+            locationSelectionState = locationSelectionState,
             paddingValues = paddingValues,
-            navController,
-            viewModel::toggleFavourite
+            actions = actions
         )
     }
 }

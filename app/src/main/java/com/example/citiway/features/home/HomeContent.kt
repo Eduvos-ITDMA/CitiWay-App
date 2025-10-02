@@ -15,6 +15,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -39,13 +40,14 @@ import com.example.citiway.core.ui.components.VerticalSpace
 import com.example.citiway.core.ui.previews.PreviewApp
 import com.example.citiway.data.local.CompletedJourney
 import com.example.citiway.features.shared.CompletedJourneysState
+import com.example.citiway.features.shared.LocationSelectionState
 
 @Composable
 fun HomeContent(
-    state: CompletedJourneysState,
+    completedJourneysState: CompletedJourneysState,
+    locationSelectionState: LocationSelectionState,
     paddingValues: PaddingValues,
-    navController: NavController,
-    onToggleFavourite: (id: String) -> Unit
+    actions: HomeActions
 ) {
     Column(
         modifier = Modifier
@@ -55,22 +57,19 @@ fun HomeContent(
             .padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val recentJourneys = state.recentJourneys
-        val favouriteJourneys = state.favouriteJourneys
-
         HeaderSection()
         VerticalSpace(24)
 
-        DestinationSearchBar()
+        DestinationSearchBar(locationSelectionState, actions)
         VerticalSpace(24)
 
-        CompletedTripsSection(recentJourneys, onToggleFavourite, "Recent Trips")
+        CompletedTripsSection(completedJourneysState.recentJourneys, actions.onToggleFavourite, "Recent Trips")
         VerticalSpace(24)
 
-        CompletedTripsSection(favouriteJourneys, onToggleFavourite, "Favourite Trips")
+        CompletedTripsSection(completedJourneysState.favouriteJourneys, actions.onToggleFavourite, "Favourite Trips")
         VerticalSpace(24)
 
-        SchedulesLink(navController)
+        SchedulesLink(actions.onSchedulesLinkClick)
         Space(1f)
     }
 }
@@ -91,15 +90,18 @@ private fun HeaderSection() {
 }
 
 @Composable
-fun DestinationSearchBar() {
+fun DestinationSearchBar(locationSelectionState: LocationSelectionState, actions: HomeActions) {
     LocationSearchField(
         icon = { modifier ->
             Icon(
                 painterResource(R.drawable.ic_map),
                 contentDescription = "Open Map",
-                modifier = modifier
+                modifier = modifier.clickable { actions.onMapIconClick() }
             )
-        }, placeholder = "Where to?"
+        },
+        state = locationSelectionState,
+        actions = actions.locationSelectionActions,
+        placeholder = "Where to?"
     )
 }
 
@@ -136,15 +138,13 @@ fun CompletedTripsSection(
 }
 
 @Composable
-fun SchedulesLink(navController: NavController) {
+fun SchedulesLink(onSchedulesLinkClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp)
             .padding(end = 12.dp)
-            .clickable {
-                navController.navigate(Screen.Schedules.route)
-            },
+            .clickable {onSchedulesLinkClick()},
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {

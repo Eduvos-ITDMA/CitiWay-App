@@ -1,5 +1,6 @@
 package com.example.citiway.features.destination_selection
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -84,8 +85,7 @@ fun DestinationSelectionContent(
             .padding(horizontal = 16.dp),
     ) {
         Title("Where are you?")
-
-        Spacer(modifier = Modifier.height(16.dp))
+        VerticalSpace(16)
 
         /*
          * Search bar:
@@ -139,15 +139,9 @@ fun DestinationSelectionContent(
             )
 
             /*
-             * Search Suggestions Dropdown:
-             * This card appears below the search field when suggestions are available.
-             * Features:
-             * 1. LazyColumn for efficient scrolling of large suggestion lists
-             * 2. heightIn limits dropdown size to prevent screen overflow
-             * 3. Clean text formatting - only shows relevant address parts
-             * 4. Clickable items that trigger place selection
-             * 5. Dividers between items for better visual separation
-             * 6. Card elevation provides visual hierarchy over map
+             * Search suggestions dropdown card that appears below the search field
+             * when suggestions are available.
+             * `heightIn` limits dropdown size to prevent screen overflow
              */
             if (showPredictions && predictions.isNotEmpty()) {
                 Card(

@@ -9,6 +9,7 @@ import com.example.citiway.features.SplashScreen
 import com.example.citiway.features.destination_selection.DestinationSelectionContent
 import com.example.citiway.features.favourites.FavouritesContent
 import com.example.citiway.features.help.HelpContent
+import com.example.citiway.features.home.HomeActions
 import com.example.citiway.features.home.HomeContent
 import com.example.citiway.features.journey_history.JourneyHistoryContent
 import com.example.citiway.features.journey_selection.JourneySelectionContent
@@ -21,17 +22,36 @@ import com.example.citiway.features.shared.LocationSelectionState
 import com.example.citiway.features.start_location_selection.StartLocationSelectionContent
 import com.google.maps.android.compose.rememberCameraPositionState
 
+private val mockStartLocationActions = LocationSelectionActions(
+    setSelectedLocation = {},
+    setSearchText = {},
+    setUserLocation = {},
+    toggleShowPredictions = {},
+    searchPlaces = {},
+    selectPlace = {},
+    reverseGeocode = {},
+    getCurrentLocation = {},
+    onLocationPermissionsStatusChanged = {}
+)
+
 
 // Home Screen Preview
 @Preview(showBackground = true, name = "Home Screen")
 @Composable
 fun HomeScreenPreview() {
+    val mockHomeActions = HomeActions(
+        onToggleFavourite = {},
+        onSchedulesLinkClick = {},
+        onMapIconClick = {},
+        locationSelectionActions = mockStartLocationActions
+    )
+
     CitiWayTheme {
         HomeContent(
-            state = CompletedJourneysState(),
+            completedJourneysState = CompletedJourneysState(),
+            locationSelectionState = LocationSelectionState(),
             paddingValues = PaddingValues(),
-            navController = rememberNavController(),
-            onToggleFavourite = {}
+            actions = mockHomeActions
         )
     }
 }
@@ -62,18 +82,6 @@ fun FavouritesScreenPreview() {
 @Composable
 fun DestinationSelectionScreenPreview() {
     CitiWayTheme {
-        val mockStartLocationActions = LocationSelectionActions(
-            setSelectedLocation = {},
-            setSearchText = {},
-            setUserLocation = {},
-            toggleShowPredictions = {},
-            searchPlaces = {},
-            selectPlace = {},
-            reverseGeocode = {},
-            getCurrentLocation = {},
-            onLocationPermissionsStatusChanged = {}
-        )
-
         CitiWayTheme {
             DestinationSelectionContent(
                 paddingValues = PaddingValues(),
@@ -165,18 +173,6 @@ fun SchedulesScreenPreview() {
 @Preview(showBackground = true, name = "Start Location Screen")
 @Composable
 fun StartLocationScreenPreview() {
-    val mockStartLocationActions = LocationSelectionActions(
-        setSelectedLocation = {},
-        setSearchText = {},
-        setUserLocation = {},
-        toggleShowPredictions = {},
-        searchPlaces = {},
-        selectPlace = {},
-        reverseGeocode = {},
-        getCurrentLocation = {},
-        onLocationPermissionsStatusChanged = {}
-    )
-
     CitiWayTheme {
         StartLocationSelectionContent(
             paddingValues = PaddingValues(),
