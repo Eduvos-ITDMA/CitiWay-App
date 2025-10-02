@@ -48,7 +48,7 @@ class DrawerViewModel(application: Application) : AndroidViewModel(application) 
     val locationEnabled = settingsManager.locationEnabledFlow.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
-        initialValue = true
+        initialValue = false
     )
 
     /**

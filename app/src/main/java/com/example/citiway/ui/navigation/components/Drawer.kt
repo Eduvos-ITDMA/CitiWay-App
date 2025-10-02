@@ -69,8 +69,9 @@ private fun DrawerContent(
 
     // Show dialog when permission is needed
     var showPermissionDialog by remember { mutableStateOf(false) }
+    var showPermissionInfoDialog by remember { mutableStateOf(false) }
 
-    // FIXED: Create handler first, THEN use it in the callback
+    // Create handler first, THEN use it in the callback
     val locationPermissionHandler = rememberLocationPermissionHandler { granted ->
         if (granted) {
             // Permission was granted! Update the toggle
@@ -81,6 +82,19 @@ private fun DrawerContent(
         }
     }
 
+
+    // Synced stored preference with actual permission status
+    // This runs every time the drawer opens or permission status changes
+    LaunchedEffect(drawerState.isOpen, locationPermissionHandler.hasPermission) {
+        if (drawerState.isOpen) {
+            // If stored preference says ON but permission is actually denied
+            if (locationEnabled && !locationPermissionHandler.hasPermission) {
+                // Fix the mismatch - turn off the stored preference
+                viewModel.toggleLocation(false)
+            }
+        }
+    }
+
     // Now you can safely check shouldShowRationale
     LaunchedEffect(locationPermissionHandler.shouldShowRationale) {
         if (locationPermissionHandler.shouldShowRationale) {
@@ -88,6 +102,33 @@ private fun DrawerContent(
         }
     }
 
+    // Dialog explaining why we can't revoke permissions
+    if (showPermissionInfoDialog) {
+        AlertDialog(
+            onDismissRequest = { showPermissionInfoDialog = false },
+            title = { Text("About Location Permission") },
+            text = {
+                Text("For security reasons, apps cannot remove their own permissions.\n\n" +
+                        "Turning this off will disable location features in the app, but the system permission will remain granted.\n\n" +
+                        "To fully revoke permission, go to:\nSettings → Apps → CitiWay → Permissions → Location → Deny")
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    locationPermissionHandler.openSettings()
+                    showPermissionInfoDialog = false
+                }) {
+                    Text("Open Settings")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showPermissionInfoDialog = false }) {
+                    Text("Got it")
+                }
+            }
+        )
+    }
+
+    // When it gets blocked after 2 denials
     if (showPermissionDialog) {
         AlertDialog(
             onDismissRequest = { showPermissionDialog = false },
@@ -162,10 +203,18 @@ private fun DrawerContent(
         HorizontalDivider()
 
         // Location with toggle
+        // Toggle now represents "use location" not "has permission"
+        // The toggle can be ON only if BOTH preference is enabled AND permission is granted
         DrawerMenuItemWithSwitch(
             title = "Location",
-            subtitle = "Turn Location on",
-            checked = locationEnabled,
+            subtitle = if (locationEnabled && locationPermissionHandler.hasPermission) {
+                "Location services active"
+            } else if (!locationEnabled && locationPermissionHandler.hasPermission) {
+                "Location disabled in app (permission granted)"
+            } else {
+                "Turn Location on"
+            },
+            checked = locationEnabled && locationPermissionHandler.hasPermission,
             onCheckedChange = { enabled ->
                 if (enabled) {
                     // User wants to enable location
@@ -174,17 +223,24 @@ private fun DrawerContent(
                         viewModel.toggleLocation(true)
                     } else {
                         // Need to request permission
+                        // Android blocks the location request if user denies 2 times and the pop-up won't show,
+                        // instead you'll need to manually go into settings. Done for security.
                         if (locationPermissionHandler.shouldShowRationale) {
                             // Show explanation dialog
-                            showPermissionDialog = false
+                            showPermissionDialog = true
                         } else {
-                            // Request permission directly
+                            // Request permission directly - Android's system popup will appear
                             locationPermissionHandler.requestPermission()
                         }
                     }
                 } else {
-                    // User wants to disable location
+                    // User wants to disable location manually, clear preference
                     viewModel.toggleLocation(false)
+
+                    // Show info about system permissions if they still have permission granted
+                    if (locationPermissionHandler.hasPermission) {
+                        showPermissionInfoDialog = true
+                    }
                 }
             }
         )
