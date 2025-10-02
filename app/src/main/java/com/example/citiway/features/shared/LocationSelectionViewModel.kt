@@ -3,6 +3,7 @@ package com.example.citiway.features.shared
 import android.app.Application
 import android.location.Geocoder
 import android.os.Build
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.application
 import androidx.lifecycle.viewModelScope
@@ -114,12 +115,14 @@ class LocationSelectionViewModel(application: Application) : AndroidViewModel(ap
     }
 
     fun toggleShowPredictions(show: Boolean) {
+        Log.d("show predictions (toggleShowPredictions)", show.toString())
         _screenState.update { currentState ->
             currentState.copy(showPredictions = show)
         }
     }
 
     fun setPredictions(predictions: List<AutocompletePrediction> = emptyList()) {
+        Log.d("show predictions (setPrediction)", predictions.isNotEmpty().toString())
         _screenState.update { currentState ->
             currentState.copy(showPredictions = predictions.isNotEmpty(), predictions = predictions)
         }
@@ -150,6 +153,7 @@ class LocationSelectionViewModel(application: Application) : AndroidViewModel(ap
                         countries = listOf("ZA")
                     }
 
+                    Log.d("predictions response", response.autocompletePredictions.toString())
                     setPredictions(response.autocompletePredictions)
                 } catch (e: Exception) {
                     setPredictions()

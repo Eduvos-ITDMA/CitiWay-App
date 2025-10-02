@@ -101,6 +101,7 @@ fun DestinationSearchBar(locationSelectionState: LocationSelectionState, actions
         },
         state = locationSelectionState,
         actions = actions.locationSelectionActions,
+        onSelectPrediction = actions.onSelectPrediction,
         placeholder = "Where to?"
     )
 }

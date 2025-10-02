@@ -11,11 +11,13 @@ import com.example.citiway.core.util.ScreenWrapper
 import com.example.citiway.features.shared.CompletedJourneysViewModel
 import com.example.citiway.features.shared.LocationSelectionActions
 import com.example.citiway.features.shared.LocationSelectionViewModel
+import com.google.android.libraries.places.api.model.AutocompletePrediction
 
 data class HomeActions(
     val onToggleFavourite: (String) -> Unit,
     val onSchedulesLinkClick: () -> Unit,
     val onMapIconClick: () -> Unit,
+    val onSelectPrediction: (AutocompletePrediction) -> Unit,
     val locationSelectionActions: LocationSelectionActions
 )
 
@@ -32,8 +34,8 @@ fun HomeRoute(
     val actions = HomeActions(
         completedJourneysViewModel::toggleFavourite,
         { navController.navigate(Screen.Schedules.route) },
-
         { navController.navigate(Screen.DestinationSelection.route) },
+        { navController.navigate(Screen.StartLocationSelection.route) }, // TODO: set up journey selection flow
         locationSelectionViewModel.actions
     )
 

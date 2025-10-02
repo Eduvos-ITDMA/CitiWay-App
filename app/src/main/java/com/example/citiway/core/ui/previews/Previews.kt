@@ -43,6 +43,7 @@ fun HomeScreenPreview() {
         onToggleFavourite = {},
         onSchedulesLinkClick = {},
         onMapIconClick = {},
+        onSelectPrediction = {},
         locationSelectionActions = mockStartLocationActions
     )
 
