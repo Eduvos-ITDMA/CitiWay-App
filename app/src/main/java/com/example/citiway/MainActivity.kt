@@ -17,6 +17,10 @@ import com.example.citiway.ui.navigation.graphs.SetupNavGraph
 import com.example.citiway.ui.navigation.routes.HOME_ROUTE
 import com.example.citiway.ui.theme.CitiWayTheme
 import com.example.citiway.viewmodel.DrawerViewModel
+import com.example.citiway.core.ui.components.Drawer
+import com.example.citiway.core.navigation.graphs.SetupNavGraph
+import com.example.citiway.core.navigation.routes.HOME_ROUTE
+import com.example.citiway.core.ui.theme.CitiWayTheme
 import com.google.android.libraries.places.api.Places
 
 class MainActivity : ComponentActivity() {
