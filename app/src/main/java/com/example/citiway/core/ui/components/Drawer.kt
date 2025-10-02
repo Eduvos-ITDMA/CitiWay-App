@@ -15,8 +15,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
-import com.example.citiway.viewmodel.DrawerViewModel
-import com.example.citiway.ui.navigation.routes.Screen
+import com.example.citiway.features.shared.DrawerViewModel
+import com.example.citiway.core.navigation.routes.Screen
 import com.example.citiway.utils.rememberLocationPermissionHandler
 
 @Composable
