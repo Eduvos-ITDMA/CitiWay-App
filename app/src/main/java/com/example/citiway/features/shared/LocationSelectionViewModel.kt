@@ -3,6 +3,7 @@ package com.example.citiway.features.shared
 import android.app.Application
 import android.location.Geocoder
 import android.os.Build
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.application
 import androidx.lifecycle.viewModelScope
@@ -68,7 +69,7 @@ class LocationSelectionViewModel(application: Application) : AndroidViewModel(ap
 
     val actions = LocationSelectionActions(
         this::setSelectedLocation,
-        this::updateSearchText,
+        this::setSearchText,
         this::setUserLocation,
         this::toggleShowPredictions,
         this::searchPlaces,
@@ -82,16 +83,20 @@ class LocationSelectionViewModel(application: Application) : AndroidViewModel(ap
     * autocompleteSessionToken - session token for billing - regenerated after fetchPlaces() call
     * placesClient - Main interface for Google Places API calls
     * geocoder - Android's built-in service for converting coordinates to addresses
+    * locationBounds - Rectangular bounds tht determines the area within which we accept location predictions
     * cameraPositionState - controls what the user sees on the map
     */
     private var autocompleteSessionToken = AutocompleteSessionToken.newInstance()
     private val placesClient: PlacesClient = Places.createClient(application)
     private val geocoder = Geocoder(application, Locale.getDefault())
+    private val locationBounds = RectangularBounds.newInstance(
+        DefaultLocations.SOUTHWEST_BOUND, DefaultLocations.NORTHEAST_BOUND
+    )
     val cameraPositionState =
         CameraPositionState(CameraPosition.fromLatLngZoom(DefaultLocations.CAPE_TOWN, 12f))
     private val scope = CoroutineScope(Dispatchers.Main)
 
-    fun updateSearchText(text: String) {
+    fun setSearchText(text: String) {
         _screenState.update { currentState ->
             currentState.copy(searchText = text)
         }
@@ -110,14 +115,16 @@ class LocationSelectionViewModel(application: Application) : AndroidViewModel(ap
     }
 
     fun toggleShowPredictions(show: Boolean) {
+        Log.d("show predictions (toggleShowPredictions)", show.toString())
         _screenState.update { currentState ->
             currentState.copy(showPredictions = show)
         }
     }
 
     fun setPredictions(predictions: List<AutocompletePrediction> = emptyList()) {
+        Log.d("show predictions (setPrediction)", predictions.isNotEmpty().toString())
         _screenState.update { currentState ->
-            currentState.copy(showPredictions = predictions.isEmpty(), predictions = predictions)
+            currentState.copy(showPredictions = predictions.isNotEmpty(), predictions = predictions)
         }
     }
 
@@ -138,18 +145,15 @@ class LocationSelectionViewModel(application: Application) : AndroidViewModel(ap
     fun searchPlaces(queryText: String) {
         if (queryText.length > 2) {
             viewModelScope.launch {
-                val bounds = RectangularBounds.newInstance(
-                    DefaultLocations.SOUTHWEST_BOUND, DefaultLocations.NORTHEAST_BOUND
-                )
-
                 try {
                     val response = placesClient.awaitFindAutocompletePredictions {
                         sessionToken = autocompleteSessionToken
-                        locationBias = bounds
-                        query = query
+                        locationBias = locationBounds
+                        query = queryText
                         countries = listOf("ZA")
                     }
 
+                    Log.d("predictions response", response.autocompletePredictions.toString())
                     setPredictions(response.autocompletePredictions)
                 } catch (e: Exception) {
                     setPredictions()
@@ -182,6 +186,7 @@ class LocationSelectionViewModel(application: Application) : AndroidViewModel(ap
                 }
 
                 val place = response.place
+                autocompleteSessionToken = AutocompleteSessionToken.newInstance()
 
                 // Update state with place info
                 place.location?.let { latLng ->
@@ -215,9 +220,9 @@ class LocationSelectionViewModel(application: Application) : AndroidViewModel(ap
                     geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1) { addresses ->
                         val address = addresses.firstOrNull()
                         if (address != null) {
-                            updateSearchText(address.getAddressLine(0) ?: "Selected Location")
+                            setSearchText(address.getAddressLine(0) ?: "Selected Location")
                         } else {
-                            updateSearchText("Selected Location")
+                            setSearchText("Selected Location")
                         }
                     }
                 } else {
@@ -229,13 +234,13 @@ class LocationSelectionViewModel(application: Application) : AndroidViewModel(ap
                     }
                     if (addresses?.isNotEmpty() == true) {
                         val address = addresses[0]
-                        updateSearchText(address.getAddressLine(0) ?: "Selected Location")
+                        setSearchText(address.getAddressLine(0) ?: "Selected Location")
                     } else {
-                        updateSearchText("Selected Location")
+                        setSearchText("Selected Location")
                     }
                 }
             } catch (e: Exception) {
-                updateSearchText("Selected Location")
+                setSearchText("Selected Location")
             }
         }
     }
