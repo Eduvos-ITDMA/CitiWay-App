@@ -1,7 +1,19 @@
 package com.example.citiway.features.start_location_selection
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -10,8 +22,20 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -19,12 +43,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-import com.example.citiway.core.navigation.routes.Screen
 import com.example.citiway.core.ui.components.HorizontalSpace
 import com.example.citiway.core.ui.components.Title
 import com.example.citiway.core.ui.components.VerticalSpace
-import com.google.accompanist.permissions.*
+import com.example.citiway.features.shared.LocationSelectionActions
+import com.example.citiway.features.shared.LocationSelectionState
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
@@ -38,19 +62,13 @@ import com.google.maps.android.compose.MarkerState
 @Composable
 fun StartLocationSelectionContent(
     paddingValues: PaddingValues,
-    state: StartLocationSelectionState,
-    actions: StartLocationSelectionActions,
+    state: LocationSelectionState,
+    actions: LocationSelectionActions,
     onPermissionRequest: () -> Unit,
     cameraPositionState: CameraPositionState,
     onConfirmLocation: (LatLng) -> Unit
 ) {
-    /* These state variables hold the current, up-to-date data for the UI, ensuring
-    * the screen automatically refreshes whenever the data in the ViewModel changes.
-    *    searchText - text query the user types
-    *    userLocation - LatLng value of user's current location
-    *    predictions - List of autocomplete suggestions from Google Places API
-    *    showPredictions - Controls visibility of the dropdown suggestion list
-    */
+    // State Variables from StartLocationViewModel. Same as in destination_selection
     val searchText = state.searchText
     val selectedLocation = state.selectedLocation
     val userLocation = state.userLocation
@@ -62,16 +80,16 @@ fun StartLocationSelectionContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
             .padding(paddingValues)
+            .padding(horizontal = 16.dp),
     ) {
         Title("Where are you?")
 
         Spacer(modifier = Modifier.height(16.dp))
 
         /*
-         * Enhanced Search Field with Autocomplete:
-         * This search field now provides real-time suggestions as users type.
-         * Key improvements:
+         * Search bar:
          * 1. IconButton makes search icon clickable for manual search
          * 2. singleLine prevents unwanted line breaks
          * 3. KeyboardOptions sets IME action to "Search"

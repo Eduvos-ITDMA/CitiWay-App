@@ -4,12 +4,13 @@ import android.Manifest
 import androidx.compose.material3.DrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.citiway.core.navigation.routes.Screen
 import com.example.citiway.core.util.ScreenWrapper
+import com.example.citiway.features.shared.LocationSelectionViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -20,9 +21,9 @@ import com.google.android.gms.maps.model.LatLng
 fun StartLocationSelectionRoute(
     navController: NavController,
     drawerState: DrawerState,
-    viewModel: StartLocationSelectionViewModel = viewModel()
+    viewModel: LocationSelectionViewModel = viewModel()
 ) {
-    val state by viewModel.screenState.collectAsState()
+    val state by viewModel.screenState.collectAsStateWithLifecycle()
     val actions = viewModel.actions
 
     /*
@@ -43,8 +44,8 @@ fun StartLocationSelectionRoute(
     }
 
     val onConfirmLocation: (LatLng) -> Unit = { location ->
-        // TODO: store selected location in shared view model
-       navController.navigate(Screen.JourneySelection.route)
+        // TODO: store selected location in shared view model instance (singleton with Hilt)
+        navController.navigate(Screen.JourneySelection.route)
     }
 
     ScreenWrapper(navController, drawerState, true) { paddingValues ->

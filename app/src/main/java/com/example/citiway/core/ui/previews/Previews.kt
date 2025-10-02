@@ -16,9 +16,9 @@ import com.example.citiway.features.journey_summary.JourneySummaryContent
 import com.example.citiway.features.progress_tracker.ProgressTrackerContent
 import com.example.citiway.features.schedules.SchedulesContent
 import com.example.citiway.features.shared.CompletedJourneysState
-import com.example.citiway.features.start_location_selection.StartLocationSelectionActions
+import com.example.citiway.features.shared.LocationSelectionActions
+import com.example.citiway.features.shared.LocationSelectionState
 import com.example.citiway.features.start_location_selection.StartLocationSelectionContent
-import com.example.citiway.features.start_location_selection.StartLocationSelectionState
 import com.google.maps.android.compose.rememberCameraPositionState
 
 
@@ -62,10 +62,27 @@ fun FavouritesScreenPreview() {
 @Composable
 fun DestinationSelectionScreenPreview() {
     CitiWayTheme {
-        DestinationSelectionContent(
-            paddingValues = PaddingValues(),
-            navController = rememberNavController(),
+        val mockStartLocationActions = LocationSelectionActions(
+            setSelectedLocation = {},
+            setSearchText = {},
+            setUserLocation = {},
+            toggleShowPredictions = {},
+            searchPlaces = {},
+            selectPlace = {},
+            reverseGeocode = {},
+            getCurrentLocation = {},
+            onLocationPermissionsStatusChanged = {}
         )
+
+        CitiWayTheme {
+            DestinationSelectionContent(
+                paddingValues = PaddingValues(),
+                state = LocationSelectionState(),
+                actions = mockStartLocationActions,
+                cameraPositionState = rememberCameraPositionState(),
+                onConfirmLocation = {}
+            )
+        }
     }
 }
 
@@ -148,7 +165,7 @@ fun SchedulesScreenPreview() {
 @Preview(showBackground = true, name = "Start Location Screen")
 @Composable
 fun StartLocationScreenPreview() {
-    val MockStartLocationActions = StartLocationSelectionActions(
+    val mockStartLocationActions = LocationSelectionActions(
         setSelectedLocation = {},
         setSearchText = {},
         setUserLocation = {},
@@ -163,8 +180,8 @@ fun StartLocationScreenPreview() {
     CitiWayTheme {
         StartLocationSelectionContent(
             paddingValues = PaddingValues(),
-            state = StartLocationSelectionState(),
-            actions = MockStartLocationActions,
+            state = LocationSelectionState(),
+            actions = mockStartLocationActions,
             onPermissionRequest = {},
             cameraPositionState = rememberCameraPositionState(),
             onConfirmLocation = {}

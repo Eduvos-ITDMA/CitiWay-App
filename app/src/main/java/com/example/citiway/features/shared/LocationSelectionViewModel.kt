@@ -1,4 +1,4 @@
-package com.example.citiway.features.start_location_selection
+package com.example.citiway.features.shared
 
 import android.app.Application
 import android.location.Geocoder
@@ -30,7 +30,7 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.util.Locale
 
-data class StartLocationSelectionState(
+data class LocationSelectionState(
     val searchText: String = "",
     val selectedLocation: LatLng? = null,
     val userLocation: LatLng? = null,
@@ -39,7 +39,7 @@ data class StartLocationSelectionState(
     val isLocationPermissionGranted: Boolean = false
 )
 
-data class StartLocationSelectionActions(
+data class LocationSelectionActions(
     val setSelectedLocation: (LatLng?) -> Unit,
     val setSearchText: (String) -> Unit,
     val setUserLocation: (LatLng?) -> Unit,
@@ -59,14 +59,14 @@ object DefaultLocations {
         LatLng(BuildConfig.NORTHEAST_CAPE_TOWN_LAT, BuildConfig.NORTHEAST_CAPE_TOWN_LNG)
 }
 
-class StartLocationSelectionViewModel(application: Application) : AndroidViewModel(application) {
+class LocationSelectionViewModel(application: Application) : AndroidViewModel(application) {
     /*
     * TODO: Track if location is enabled. If turned off, functions will have to behave differently
     */
-    private val _screenState = MutableStateFlow(StartLocationSelectionState())
-    val screenState: StateFlow<StartLocationSelectionState> = _screenState
+    private val _screenState = MutableStateFlow(LocationSelectionState())
+    val screenState: StateFlow<LocationSelectionState> = _screenState
 
-    val actions = StartLocationSelectionActions(
+    val actions = LocationSelectionActions(
         this::setSelectedLocation,
         this::updateSearchText,
         this::setUserLocation,
