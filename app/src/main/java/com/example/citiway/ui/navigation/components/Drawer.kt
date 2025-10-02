@@ -16,6 +16,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import com.example.citiway.viewmodel.DrawerViewModel
+import com.example.citiway.ui.navigation.routes.Screen
 
 @Composable
 fun Drawer(
@@ -111,7 +112,7 @@ private fun DrawerContent(
                 scope.launch {
                     drawerState.close()
                 }
-                navController.navigate("journey_history")
+                navController.navigate(Screen.JourneyHistory.route)
             }
         )
 
@@ -145,8 +146,7 @@ private fun DrawerContent(
                 scope.launch {
                     drawerState.close()
                 }
-                // Add navigation when you have the screen
-                // navController.navigate("help")
+                navController.navigate(Screen.Help.route)
             }
         )
 

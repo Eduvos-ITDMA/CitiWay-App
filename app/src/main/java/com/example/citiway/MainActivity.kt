@@ -39,7 +39,7 @@ class MainActivity : ComponentActivity() {
             val darkModeEnabled by drawerViewModel.darkModeEnabled.collectAsState()
 
             // Apply theme based on user's preference from drawer toggle, not *system settings*
-            CitiWayTheme {
+            CitiWayTheme (darkTheme = darkModeEnabled) {
                 // Setting up navigation
                 val navController = rememberNavController()
 
