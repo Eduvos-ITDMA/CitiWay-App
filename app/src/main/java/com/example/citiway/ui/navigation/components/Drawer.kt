@@ -17,6 +17,7 @@ import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import com.example.citiway.viewmodel.DrawerViewModel
 import com.example.citiway.ui.navigation.routes.Screen
+import com.example.citiway.utils.rememberLocationPermissionHandler
 
 @Composable
 fun Drawer(
@@ -65,6 +66,33 @@ private fun DrawerContent(
     val locationEnabled by viewModel.locationEnabled.collectAsState()
     val myCitiEnabled by viewModel.myCitiEnabled.collectAsState()
     val scope = rememberCoroutineScope()
+
+    // Add permission handler
+    val locationPermissionHandler = rememberLocationPermissionHandler()
+
+    // Show dialog when permission is needed
+    var showPermissionDialog by remember { mutableStateOf(false) }
+
+    if (showPermissionDialog) {
+        AlertDialog(
+            onDismissRequest = { showPermissionDialog = false },
+            title = { Text("Location Permission Required") },
+            text = { Text("This app needs location permission to show nearby routes and stops. Please grant permission in settings.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    locationPermissionHandler.openSettings()
+                    showPermissionDialog = false
+                }) {
+                    Text("Open Settings")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showPermissionDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
 
     Column(
         modifier = Modifier
@@ -123,7 +151,27 @@ private fun DrawerContent(
             title = "Location",
             subtitle = "Turn Location on",
             checked = locationEnabled,
-            onCheckedChange = { viewModel.toggleLocation(it) }
+            onCheckedChange = { enabled ->
+                if (enabled) {
+                    // User wants to enable location
+                    if (locationPermissionHandler.hasPermission) {
+                        // Already has permission, just save the preference
+                        viewModel.toggleLocation(true)
+                    } else {
+                        // Need to request permission
+                        if (locationPermissionHandler.shouldShowRationale) {
+                            // Show explanation dialog
+                            showPermissionDialog = true
+                        } else {
+                            // Request permission directly
+                            locationPermissionHandler.requestPermission()
+                        }
+                    }
+                } else {
+                    // User wants to disable location
+                    viewModel.toggleLocation(false)
+                }
+            }
         )
 
         HorizontalDivider()
