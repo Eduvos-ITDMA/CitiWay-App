@@ -67,11 +67,26 @@ private fun DrawerContent(
     val myCitiEnabled by viewModel.myCitiEnabled.collectAsState()
     val scope = rememberCoroutineScope()
 
-    // Add permission handler
-    val locationPermissionHandler = rememberLocationPermissionHandler()
-
     // Show dialog when permission is needed
     var showPermissionDialog by remember { mutableStateOf(false) }
+
+    // FIXED: Create handler first, THEN use it in the callback
+    val locationPermissionHandler = rememberLocationPermissionHandler { granted ->
+        if (granted) {
+            // Permission was granted! Update the toggle
+            viewModel.toggleLocation(true)
+        } else {
+            // Permission denied - keep toggle off
+            viewModel.toggleLocation(false)
+        }
+    }
+
+    // Now you can safely check shouldShowRationale
+    LaunchedEffect(locationPermissionHandler.shouldShowRationale) {
+        if (locationPermissionHandler.shouldShowRationale) {
+            showPermissionDialog = true
+        }
+    }
 
     if (showPermissionDialog) {
         AlertDialog(
@@ -161,7 +176,7 @@ private fun DrawerContent(
                         // Need to request permission
                         if (locationPermissionHandler.shouldShowRationale) {
                             // Show explanation dialog
-                            showPermissionDialog = true
+                            showPermissionDialog = false
                         } else {
                             // Request permission directly
                             locationPermissionHandler.requestPermission()
