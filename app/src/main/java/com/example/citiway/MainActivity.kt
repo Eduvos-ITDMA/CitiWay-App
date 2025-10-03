@@ -4,16 +4,16 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.citiway.ui.navigation.NavStackLogger
-import com.example.citiway.ui.navigation.components.Drawer
-import com.example.citiway.ui.navigation.graphs.SetupNavGraph
-import com.example.citiway.ui.theme.CitiWayTheme
+import com.example.citiway.core.navigation.graphs.SetupNavGraph
+import com.example.citiway.core.navigation.routes.HOME_ROUTE
+import com.example.citiway.core.ui.theme.CitiWayTheme
+import com.example.citiway.features.shared.DrawerViewModel
 import com.google.android.libraries.places.api.Places
 
 class MainActivity : ComponentActivity() {
@@ -22,13 +22,22 @@ class MainActivity : ComponentActivity() {
 
         // Initialize Places SDK
         if (!Places.isInitialized()) {
-            Places.initialize(applicationContext, "AIzaSyD71E9VvLNwHYV5ESHN_vrODGkzX2MPOs4")
+            Places.initializeWithNewPlacesApiEnabled(applicationContext, BuildConfig.MAPS_API_KEY)
         }
 
         enableEdgeToEdge()
         setContent {
-            CitiWayTheme {
-                // Set up navigation
+
+            // Initializing DrawerViewModel to manage app settings (theme, location, etc.)
+            val drawerViewModel: DrawerViewModel = viewModel()
+
+            // Collect dark mode state from DataStore
+            // This makes theme independent of system settings and persists across app restarts
+            val darkModeEnabled by drawerViewModel.darkModeEnabled.collectAsState()
+
+            // Apply theme based on user's preference from drawer toggle, not *system settings*
+            CitiWayTheme(darkTheme = darkModeEnabled) {
+                // Setting up navigation
                 val navController = rememberNavController()
 
                 CitiWayApp(navController)
@@ -38,18 +47,11 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun CitiWayApp(navController: NavHostController) {
-    val drawerState = rememberDrawerState(DrawerValue.Closed)
-    NavStackLogger(navController)
-    Drawer(drawerState) {
-        SetupNavGraph(navController = navController, drawerState = drawerState)
-    }
-}
+fun CitiWayApp(navController: NavHostController, startRoute: String = HOME_ROUTE) {
+    // No more drawerState needed. The menu is now part of TopBar
 
-@Preview
-@Composable
-fun PreviewApp() {
-    CitiWayTheme {
-        CitiWayApp(navController = rememberNavController())
-    }
+    //    NavStackLogger(navController)
+
+    // Direct navigation setup - no drawer wrapper needed
+    SetupNavGraph(navController, startRoute)
 }
