@@ -1,11 +1,9 @@
 package com.example.citiway.features.start_location_selection
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -26,13 +24,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.citiway.core.ui.components.HorizontalSpace
 import com.example.citiway.core.ui.components.LocationSearchField
 import com.example.citiway.core.ui.components.Title
 import com.example.citiway.core.ui.components.VerticalSpace
+import com.example.citiway.core.util.StartLocationScreenPreview
 import com.example.citiway.features.shared.LocationSelectionActions
 import com.example.citiway.features.shared.LocationSelectionState
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -86,45 +84,35 @@ fun StartLocationSelectionContent(
             onSelectPrediction = actions.selectPlace,
             placeholder = "Your location"
         )
-        VerticalSpace(8)
 
-        // Location permission section - showing different states and providing access to location services
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.SpaceAround,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Displaying different messages based on permission status and location availability
-            Text(
-                text = when {
-                    isLocationPermissionGranted && userLocation != null -> "📍 Current location found"
-                    isLocationPermissionGranted -> "📍 Getting your location..."
-                    else -> "📍 Tap map to select your location"
-                },
-                color = MaterialTheme.colorScheme.primary,
-                fontSize = 14.sp
-            )
-
-            // Location button - only shown when permission hasn't been granted
-            if (!isLocationPermissionGranted) {
-                TextButton(onClick = onPermissionRequest) {
-                    Icon(
-                        imageVector = Icons.Default.LocationOn,
-                        contentDescription = "Use my location",
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    HorizontalSpace(4)
-                    Text(
-                        text = "Use my location",
-                        color = MaterialTheme.colorScheme.primary,
-                        fontSize = 14.sp
-                    )
-                }
+        // Location button - only shown when permission hasn't been granted
+        if (!isLocationPermissionGranted) {
+            TextButton(onClick = onPermissionRequest, contentPadding = PaddingValues(0.dp)) {
+                Icon(
+                    imageVector = Icons.Default.LocationOn,
+                    contentDescription = "Use my location",
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(18.dp)
+                )
+                HorizontalSpace(4)
+                Text(
+                    text = "Use my location",
+                    color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.bodyLarge
+                )
             }
         }
+        VerticalSpace(10)
+        Text(
+            text = when {
+                isLocationPermissionGranted && userLocation != null -> "📍 Current location found"
+                isLocationPermissionGranted -> "📍 Getting your location..."
+                else -> "📍 Tap map to select your location"
+            },
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
 
         VerticalSpace(10)
 
@@ -190,12 +178,17 @@ fun StartLocationSelectionContent(
                 Text(
                     text = if (selectedLocation != null) "Confirm Location" else "Select Location",
                     color = Color.White,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium
+                    style = MaterialTheme.typography.labelLarge
                 )
             }
         }
 
         VerticalSpace(16)
     }
+}
+
+@Preview
+@Composable
+fun Preview() {
+    StartLocationScreenPreview()
 }

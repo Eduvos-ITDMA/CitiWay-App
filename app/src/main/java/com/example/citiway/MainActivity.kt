@@ -30,7 +30,7 @@ class MainActivity : ComponentActivity() {
 
         // Initialize Places SDK
         if (!Places.isInitialized()) {
-            Places.initialize(applicationContext, "AIzaSyD71E9VvLNwHYV5ESHN_vrODGkzX2MPOs4")
+            Places.initializeWithNewPlacesApiEnabled(applicationContext, BuildConfig.MAPS_API_KEY)
         }
 
         enableEdgeToEdge()
