@@ -1,4 +1,5 @@
 [versions]
+datastorePreferences = "1.1.7"
 accompanistPermissions = "0.37.3"
 agp = "8.11.2"
 kotlin = "2.2.20"
@@ -12,13 +13,16 @@ activityCompose = "1.11.0"
 composeBom = "2025.09.01"
 mapsCompose = "6.11.0"
 material3 = "1.4.0"
+materialIcons = "1.7.5"
 navigationCompose = "2.9.5"
 places = "5.0.0"
 playServicesLocation = "21.3.0"
 playServicesMaps = "19.2.0"
 
 [libraries]
+androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
+androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIcons" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-material-icons-core = { module = "androidx.compose.material:material-icons-core" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }

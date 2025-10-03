@@ -1,6 +1,5 @@
 package com.example.citiway.core.navigation.graphs
 
-import androidx.compose.material3.DrawerState
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -12,24 +11,24 @@ import com.example.citiway.features.journey_selection.JourneySelectionRoute
 import com.example.citiway.features.start_location_selection.StartLocationSelectionRoute
 
 fun NavGraphBuilder.journeySelectionGraph(
-    navController: NavController, drawerState: DrawerState
+    navController: NavController
 ) {
     navigation(
         startDestination = Screen.DestinationSelection.route, route = JOURNEY_SELECTION_ROUTE
     ) {
         // Destination Selection screen
         composable(Screen.DestinationSelection.route) {
-            DestinationSelectionRoute(navController, drawerState)
+            DestinationSelectionRoute(navController,)
         }
 
         // Start Location Selection screen
         composable(Screen.StartLocationSelection.route) {
-            StartLocationSelectionRoute(navController, drawerState)
+            StartLocationSelectionRoute(navController)
         }
 
         // Journey Selection screen
         composable(Screen.JourneySelection.route) {
-            JourneySelectionRoute(navController, drawerState)
+            JourneySelectionRoute(navController)
         }
     }
 }

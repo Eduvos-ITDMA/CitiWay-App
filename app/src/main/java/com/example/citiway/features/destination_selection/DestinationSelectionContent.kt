@@ -1,44 +1,31 @@
 package com.example.citiway.features.destination_selection
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.citiway.core.ui.components.LocationSearchField
 import com.example.citiway.core.ui.components.Title
 import com.example.citiway.core.ui.components.VerticalSpace
 import com.example.citiway.features.shared.LocationSelectionActions
@@ -61,18 +48,8 @@ fun DestinationSelectionContent(
     cameraPositionState: CameraPositionState,
     onConfirmLocation: (LatLng) -> Unit
 ) {
-    /* These state variables hold the current, up-to-date data for the UI, ensuring
-    * the screen automatically refreshes whenever the data in the ViewModel changes.
-    *    searchText - text query the user types
-    *    userLocation - LatLng value of user's current location
-    *    predictions - List of autocomplete suggestions from Google Places API
-    *    showPredictions - Controls visibility of the dropdown suggestion list
-    */
-    val searchText = state.searchText
     val selectedLocation = state.selectedLocation
     val userLocation = state.userLocation
-    val predictions = state.predictions
-    val showPredictions = state.showPredictions
     val isLocationPermissionGranted = state.isLocationPermissionGranted
 
     // ========= CONTENT ===========
@@ -85,115 +62,22 @@ fun DestinationSelectionContent(
     ) {
         Title("Where are you?")
 
-        Spacer(modifier = Modifier.height(16.dp))
+        VerticalSpace(16)
 
-        /*
-         * Search bar:
-         * 1. IconButton makes search icon clickable for manual search
-         * 2. singleLine prevents unwanted line breaks
-         * 3. KeyboardOptions sets IME action to "Search"
-         * 4. KeyboardActions handles "Enter" key press
-         * 5. onValueChange triggers search automatically as user types
-         */
-        Column {
-            OutlinedTextField(
-                value = state.searchText,
-                onValueChange = { query ->
-                    actions.setSearchText(query)
-                    actions.searchPlaces(query)
-                },
-                placeholder = {
-                    Text(
-                        "Search for your location",
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                        fontSize = 14.sp
-                    )
-                },
-                trailingIcon = {
-                    IconButton(onClick = { actions.searchPlaces(state.searchText) }) {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = "Search",
-                            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
-                },
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Search
-                ),
-                keyboardActions = KeyboardActions(
-                    onSearch = {
-                        actions.searchPlaces(searchText)
-                    }
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
-                    focusedBorderColor = MaterialTheme.colorScheme.primary
+        LocationSearchField(
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = "Search",
+                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                    modifier = Modifier.size(20.dp)
                 )
-            )
-
-            /*
-             * Search Suggestions Dropdown:
-             * This card appears below the search field when suggestions are available.
-             * Features:
-             * 1. LazyColumn for efficient scrolling of large suggestion lists
-             * 2. heightIn limits dropdown size to prevent screen overflow
-             * 3. Clean text formatting - only shows relevant address parts
-             * 4. Clickable items that trigger place selection
-             * 5. Dividers between items for better visual separation
-             * 6. Card elevation provides visual hierarchy over map
-             */
-            if (showPredictions && predictions.isNotEmpty()) {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-                ) {
-                    LazyColumn(
-                        modifier = Modifier.heightIn(max = 200.dp)
-                    ) {
-                        items(predictions) { prediction ->
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable { actions.selectPlace(prediction) }
-                                    .padding(16.dp)
-                            ) {
-                                Text(
-                                    text = prediction.getPrimaryText(null).toString(),
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.Medium,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                                // Show simplified secondary text - removes postal codes for cleaner display
-                                val secondaryText = prediction.getSecondaryText(null).toString()
-                                val cleanText = secondaryText.split(",").take(2)
-                                    .joinToString(", ") // Only take first 2 parts
-                                Text(
-                                    text = cleanText,
-                                    fontSize = 14.sp,
-                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                                )
-                            }
-                            if (prediction != predictions.last()) {
-                                HorizontalDivider(
-                                    color = MaterialTheme.colorScheme.onSurface.copy(
-                                        alpha = 0.1f
-                                    )
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        }
+            },
+            state = state,
+            actions = actions,
+            onSelectPrediction = actions.selectPlace,
+            placeholder = "Where to?"
+        )
 
         VerticalSpace(14)
 
