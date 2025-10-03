@@ -1,23 +1,56 @@
 package com.example.citiway.core.ui.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import kotlinx.coroutines.launch
-import com.example.citiway.features.shared.DrawerViewModel
 import com.example.citiway.core.navigation.routes.Screen
+import com.example.citiway.features.shared.DrawerViewModel
 import com.example.citiway.utils.rememberLocationPermissionHandler
+import kotlinx.coroutines.launch
 
 @Composable
 fun Drawer(
@@ -34,8 +67,9 @@ fun Drawer(
                 ModalDrawerSheet(
                     modifier = Modifier
                         .fillMaxWidth(0.75f)
-                        .fillMaxHeight(0.85f) // Only 85% of screen height
-                        .padding(top = 48.dp) // Padding from top to avoid camera cutout
+                        .fillMaxHeight()
+                        .windowInsetsPadding(WindowInsets.statusBars),
+                    drawerShape = RoundedCornerShape(topEnd = 16.dp)
                 ) {
                     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
                         DrawerContent(
@@ -108,9 +142,11 @@ private fun DrawerContent(
             onDismissRequest = { showPermissionInfoDialog = false },
             title = { Text("About Location Permission") },
             text = {
-                Text("For security reasons, apps cannot remove their own permissions.\n\n" +
-                        "Turning this off will disable location features in the app, but the system permission will remain granted.\n\n" +
-                        "To fully revoke permission, go to:\nSettings → Apps → CitiWay → Permissions → Location → Deny")
+                Text(
+                    "For security reasons, apps cannot remove their own permissions.\n\n" +
+                            "Turning this off will disable location features in the app, but the system permission will remain granted.\n\n" +
+                            "To fully revoke permission, go to:\nSettings → Apps → CitiWay → Permissions → Location → Deny"
+                )
             },
             confirmButton = {
                 TextButton(onClick = {
@@ -153,26 +189,24 @@ private fun DrawerContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(vertical = 16.dp)
+            .padding(vertical = 16.dp, horizontal = 8.dp)
     ) {
         // Header with Go Back
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
+                .fillMaxWidth(),
             horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            TextButton(onClick = {
+            IconButton(onClick = {
                 scope.launch {
                     drawerState.close()
                 }
             }) {
-                Text("Go Back")
-                Spacer(modifier = Modifier.width(4.dp))
                 Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Go Back"
+                    imageVector = Icons.Outlined.Close, // 'X' icon
+                    contentDescription = "Close Drawer",
+                    modifier = Modifier.fillMaxSize()
                 )
             }
         }
