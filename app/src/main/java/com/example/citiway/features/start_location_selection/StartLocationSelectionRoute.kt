@@ -1,7 +1,6 @@
 package com.example.citiway.features.start_location_selection
 
 import android.Manifest
-import androidx.compose.material3.DrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -20,7 +19,6 @@ import com.google.android.gms.maps.model.LatLng
 @Composable
 fun StartLocationSelectionRoute(
     navController: NavController,
-    drawerState: DrawerState,
     viewModel: LocationSelectionViewModel = viewModel()
 ) {
     val state by viewModel.screenState.collectAsStateWithLifecycle()
@@ -48,7 +46,7 @@ fun StartLocationSelectionRoute(
         navController.navigate(Screen.JourneySelection.route)
     }
 
-    ScreenWrapper(navController, drawerState, true) { paddingValues ->
+    ScreenWrapper(navController, true, { paddingValues ->
         StartLocationSelectionContent(
             paddingValues = paddingValues,
             state = state,
@@ -57,5 +55,5 @@ fun StartLocationSelectionRoute(
             cameraPositionState = viewModel.cameraPositionState,
             onConfirmLocation = onConfirmLocation
         )
-    }
+    })
 }

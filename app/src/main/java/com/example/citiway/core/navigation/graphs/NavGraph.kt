@@ -22,7 +22,7 @@ import com.example.citiway.core.navigation.routes.ScreenToGraphMap
 @Composable
 fun SetupNavGraph(
     navController: NavHostController,
-    drawerState: DrawerState,
+
     startRoute: String = HOME_ROUTE
 ) {
     // Determine start graph
@@ -37,10 +37,10 @@ fun SetupNavGraph(
     NavHost(
         navController = navController, startDestination = startGraph, route = ROOT_ROUTE
     ) {
-        topLevelDestinations(navController, drawerState)
-        homeNavGraph(navController, drawerState)
-        journeySelectionGraph(navController, drawerState)
-        tripsNavGraph(navController, drawerState)
+        topLevelDestinations(navController)
+        homeNavGraph(navController)
+        journeySelectionGraph(navController)
+        tripsNavGraph(navController)
     }
 
 
