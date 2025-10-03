@@ -163,9 +163,10 @@ fun JourneyHistoryScreenPreview() {
 @Composable
 fun SchedulesScreenPreview() {
     CitiWayTheme {
+        ->
         SchedulesContent(
             paddingValues = PaddingValues(),
-            navController = rememberNavController(), // Or callbacks like onScheduleSelected
+//            navController = rememberNavController(), // Or callbacks like onScheduleSelected
         )
     }
 }

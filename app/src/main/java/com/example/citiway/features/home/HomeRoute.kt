@@ -1,6 +1,5 @@
 package com.example.citiway.features.home
 
-import androidx.compose.material3.DrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -13,6 +12,8 @@ import com.example.citiway.features.shared.LocationSelectionActions
 import com.example.citiway.features.shared.LocationSelectionViewModel
 import com.google.android.libraries.places.api.model.AutocompletePrediction
 
+
+
 data class HomeActions(
     val onToggleFavourite: (String) -> Unit,
     val onSchedulesLinkClick: () -> Unit,
@@ -24,7 +25,7 @@ data class HomeActions(
 @Composable
 fun HomeRoute(
     navController: NavController,
-    drawerState: DrawerState,
+    viewModel: CompletedJourneysViewModel = viewModel(),
     completedJourneysViewModel: CompletedJourneysViewModel = viewModel(),
     locationSelectionViewModel: LocationSelectionViewModel = viewModel()
 ) {
@@ -39,12 +40,12 @@ fun HomeRoute(
         locationSelectionViewModel.actions
     )
 
-    ScreenWrapper(navController, drawerState, true) { paddingValues ->
+    ScreenWrapper(navController, true, { paddingValues ->
         HomeContent(
             completedJourneysState = completedJourneysState,
             locationSelectionState = locationSelectionState,
             paddingValues = paddingValues,
             actions = actions
         )
-    }
+    })
 }
