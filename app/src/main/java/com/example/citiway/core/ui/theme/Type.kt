@@ -100,21 +100,21 @@ val Typography = Typography(
     labelLarge = TextStyle(
         fontFamily = defaultFontFamily,
         fontWeight = FontWeight.Medium,
-        fontSize = 14.sp,
+        fontSize = 16.sp,
         lineHeight = 20.sp,
         letterSpacing = 0.1.sp
     ),
     labelMedium = TextStyle(
         fontFamily = defaultFontFamily,
         fontWeight = FontWeight.Medium,
-        fontSize = 12.sp,
+        fontSize = 14.sp,
         lineHeight = 16.sp,
         letterSpacing = 0.5.sp
     ),
     labelSmall = TextStyle(
         fontFamily = defaultFontFamily,
         fontWeight = FontWeight.Medium,
-        fontSize = 11.sp,
+        fontSize = 12.sp,
         lineHeight = 16.sp,
         letterSpacing = 0.5.sp
     )

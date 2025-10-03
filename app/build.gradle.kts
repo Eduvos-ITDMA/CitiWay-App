@@ -57,8 +57,8 @@ dependencies {
     implementation(libs.play.services.maps)
     implementation(libs.play.services.location)
     implementation(libs.places)
-    implementation("androidx.compose.material:material-icons-extended:1.7.5")
-    implementation("androidx.datastore:datastore-preferences:1.0.0") // Dark mode, will put into libs.versions.toml at a later stage
+    implementation(libs.androidx.material.icons.extended)
+    implementation(libs.androidx.datastore.preferences)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
