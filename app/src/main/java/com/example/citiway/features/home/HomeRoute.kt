@@ -1,6 +1,5 @@
 package com.example.citiway.features.home
 
-import androidx.compose.material3.DrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -24,9 +23,7 @@ data class HomeActions(
 @Composable
 fun HomeRoute(
     navController: NavController,
-    drawerState: DrawerState,
-    completedJourneysViewModel: CompletedJourneysViewModel = viewModel(),
-    locationSelectionViewModel: LocationSelectionViewModel = viewModel()
+    viewModel: CompletedJourneysViewModel = viewModel()
 ) {
     val completedJourneysState by completedJourneysViewModel.screenState.collectAsStateWithLifecycle()
     val locationSelectionState by locationSelectionViewModel.screenState.collectAsStateWithLifecycle()
@@ -39,12 +36,12 @@ fun HomeRoute(
         locationSelectionViewModel.actions
     )
 
-    ScreenWrapper(navController, drawerState, true) { paddingValues ->
+    ScreenWrapper(navController, true, { paddingValues ->
         HomeContent(
             completedJourneysState = completedJourneysState,
             locationSelectionState = locationSelectionState,
             paddingValues = paddingValues,
             actions = actions
         )
-    }
+    })
 }

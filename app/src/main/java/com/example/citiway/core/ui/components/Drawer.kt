@@ -1,119 +1,104 @@
 package com.example.citiway.core.ui.components
 
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import kotlinx.coroutines.launch
-import com.example.citiway.features.shared.DrawerViewModel
 import com.example.citiway.core.navigation.routes.Screen
+import com.example.citiway.features.shared.DrawerViewModel
 import com.example.citiway.utils.rememberLocationPermissionHandler
 
+/**
+ * ModernSettingsMenu Component
+ *
+ * Composable function rendering an overlay settings menu that appears from the top-right
+ * of the screen. Managing various app settings including location permissions, theme preferences,
+ * and navigation to other screens.
+ *
+ * Key Features:
+ * - Location permission handling with Android's security model
+ * - Theme toggling between dark and light modes
+ * - MyCiTi card integration for discounted pricing
+ * - Navigation to Journey History and Help sections ** We can add more maybe favorites etc....
+ */
+
 @Composable
-fun Drawer(
-    drawerState: DrawerState,
+fun ModernSettingsMenu(
+    expanded: Boolean,
+    onDismiss: () -> Unit,
     navController: NavController,
-    content: @Composable () -> Unit
+    modifier: Modifier = Modifier
 ) {
+    // Getting shared ViewModel managing app-wide settings state
     val viewModel: DrawerViewModel = viewModel()
-
-    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-        ModalNavigationDrawer(
-            drawerState = drawerState,
-            drawerContent = {
-                ModalDrawerSheet(
-                    modifier = Modifier
-                        .fillMaxWidth(0.75f)
-                        .fillMaxHeight(0.85f) // Only 85% of screen height
-                        .padding(top = 48.dp) // Padding from top to avoid camera cutout
-                ) {
-                    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-                        DrawerContent(
-                            navController = navController,
-                            drawerState = drawerState,
-                            viewModel = viewModel
-                        )
-                    }
-                }
-            },
-            gesturesEnabled = drawerState.isOpen,
-            content = {
-                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-                    content()
-                }
-            }
-        )
-    }
-}
-
-@Composable
-private fun DrawerContent(
-    navController: NavController,
-    drawerState: DrawerState,
-    viewModel: DrawerViewModel
-) {
     val darkModeEnabled by viewModel.darkModeEnabled.collectAsState()
     val locationEnabled by viewModel.locationEnabled.collectAsState()
     val myCitiEnabled by viewModel.myCitiEnabled.collectAsState()
-    val scope = rememberCoroutineScope()
 
-    // Show dialog when permission is needed
+    // Managing dialog visibility states for permission flows
     var showPermissionDialog by remember { mutableStateOf(false) }
     var showPermissionInfoDialog by remember { mutableStateOf(false) }
 
-    // Create handler first, THEN use it in the callback
+    // Creating handler first, then using it in the callback
+    // This handler manages location permission requests and tracks current permission status
     val locationPermissionHandler = rememberLocationPermissionHandler { granted ->
         if (granted) {
-            // Permission was granted! Update the toggle
+            // Permission was granted - updating the toggle to reflect active location services
             viewModel.toggleLocation(true)
         } else {
-            // Permission denied - keep toggle off
+            // Permission denied - keeping toggle off to maintain consistency
             viewModel.toggleLocation(false)
         }
     }
 
-
-    // Synced stored preference with actual permission status
-    // This runs every time the drawer opens or permission status changes
-    LaunchedEffect(drawerState.isOpen, locationPermissionHandler.hasPermission) {
-        if (drawerState.isOpen) {
+    // Syncing stored preference with actual permission status
+    // Running every time the menu opens or permission status changes
+    LaunchedEffect(expanded, locationPermissionHandler.hasPermission) {
+        if (expanded) {
             // If stored preference says ON but permission is actually denied
             if (locationEnabled && !locationPermissionHandler.hasPermission) {
-                // Fix the mismatch - turn off the stored preference
+                // Fixing the mismatch - turning off the stored preference
                 viewModel.toggleLocation(false)
             }
         }
     }
 
-    // Now you can safely check shouldShowRationale
+    // Monitoring permission rationale state to show educational dialog
+    // Android requires explaining why permission is needed after initial denial
     LaunchedEffect(locationPermissionHandler.shouldShowRationale) {
         if (locationPermissionHandler.shouldShowRationale) {
             showPermissionDialog = true
         }
     }
 
-    // Dialog explaining why we can't revoke permissions
+    // Dialog explaining why apps cannot revoke their own permissions
+    // Showing users how to manually revoke permissions in system settings
     if (showPermissionInfoDialog) {
         AlertDialog(
             onDismissRequest = { showPermissionInfoDialog = false },
             title = { Text("About Location Permission") },
             text = {
-                Text("For security reasons, apps cannot remove their own permissions.\n\n" +
-                        "Turning this off will disable location features in the app, but the system permission will remain granted.\n\n" +
-                        "To fully revoke permission, go to:\nSettings → Apps → CitiWay → Permissions → Location → Deny")
+                Text(
+                    "For security reasons, apps cannot remove their own permissions.\n\n" +
+                            "Turning this off will disable location features in the app, but the system permission will remain granted.\n\n" +
+                            "To fully revoke permission, go to:\nSettings → Apps → CitiWay → Permissions → Location → Deny"
+                )
             },
             confirmButton = {
                 TextButton(onClick = {
+                    // Opening system settings to allow manual permission management
                     locationPermissionHandler.openSettings()
                     showPermissionInfoDialog = false
                 }) {
@@ -128,7 +113,8 @@ private fun DrawerContent(
         )
     }
 
-    // When it gets blocked after 2 denials
+    // Dialog appearing when permission gets blocked after 2 denials
+    // Android blocks the permission popup for security after repeated denials
     if (showPermissionDialog) {
         AlertDialog(
             onDismissRequest = { showPermissionDialog = false },
@@ -136,6 +122,7 @@ private fun DrawerContent(
             text = { Text("This app needs location permission to show nearby routes and stops. Please grant permission in settings.") },
             confirmButton = {
                 TextButton(onClick = {
+                    // Directing user to system settings to manually grant permission
                     locationPermissionHandler.openSettings()
                     showPermissionDialog = false
                 }) {
@@ -150,173 +137,215 @@ private fun DrawerContent(
         )
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(vertical = 16.dp)
-    ) {
-        // Header with Go Back
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            horizontalArrangement = Arrangement.End,
-            verticalAlignment = Alignment.CenterVertically
+    // Rendering custom popup aligned to top-right corner
+    // Using Popup instead of DropdownMenu for better control over positioning
+    if (expanded) {
+        Popup(
+            alignment = Alignment.TopEnd,
+            onDismissRequest = onDismiss,
+            properties = PopupProperties(focusable = true) // Enabling focus for proper dismissal behavior
         ) {
-            TextButton(onClick = {
-                scope.launch {
-                    drawerState.close()
-                }
-            }) {
-                Text("Go Back")
-                Spacer(modifier = Modifier.width(4.dp))
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Go Back"
-                )
-            }
-        }
+            Surface(
+                modifier = Modifier
+                    .padding(end = 8.dp) // Align below top bar
+                    .width(300.dp)
+                    .heightIn(max = 700.dp),
+                shape = RoundedCornerShape(12.dp),
+                color = MaterialTheme.colorScheme.surface,
+                tonalElevation = 3.dp,
+                shadowElevation = 8.dp
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp)
+                ) {
+                    // Header with close button integrated into the card
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Settings",
+                            style = MaterialTheme.typography.titleLarge,
+                            modifier = Modifier.padding(start = 8.dp)
+                        )
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Settings Header
-        Text(
-            text = "Settings",
-            style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-        )
-
-        HorizontalDivider()
-
-        // Journey History
-        DrawerMenuItem(
-            title = "Journey History",
-            subtitle = "Access Journey History",
-            onClick = {
-                scope.launch {
-                    drawerState.close()
-                }
-                navController.navigate(Screen.JourneyHistory.route)
-            }
-        )
-
-        HorizontalDivider()
-
-        // Location with toggle
-        // Toggle now represents "use location" not "has permission"
-        // The toggle can be ON only if BOTH preference is enabled AND permission is granted
-        DrawerMenuItemWithSwitch(
-            title = "Location",
-            subtitle = if (locationEnabled && locationPermissionHandler.hasPermission) {
-                "Location services active"
-            } else if (!locationEnabled && locationPermissionHandler.hasPermission) {
-                "Location disabled in app (permission granted)"
-            } else {
-                "Turn Location on"
-            },
-            checked = locationEnabled && locationPermissionHandler.hasPermission,
-            onCheckedChange = { enabled ->
-                if (enabled) {
-                    // User wants to enable location
-                    if (locationPermissionHandler.hasPermission) {
-                        // Already has permission, just save the preference
-                        viewModel.toggleLocation(true)
-                    } else {
-                        // Need to request permission
-                        // Android blocks the location request if user denies 2 times and the pop-up won't show,
-                        // instead you'll need to manually go into settings. Done for security.
-                        if (locationPermissionHandler.shouldShowRationale) {
-                            // Show explanation dialog
-                            showPermissionDialog = true
-                        } else {
-                            // Request permission directly - Android's system popup will appear
-                            locationPermissionHandler.requestPermission()
+                        // Close button replacing the hamburger icon when menu is expanded
+                        IconButton(onClick = onDismiss) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Close Menu",
+                                modifier = Modifier.size(28.dp)
+                            )
                         }
                     }
-                } else {
-                    // User wants to disable location manually, clear preference
-                    viewModel.toggleLocation(false)
 
-                    // Show info about system permissions if they still have permission granted
-                    if (locationPermissionHandler.hasPermission) {
-                        showPermissionInfoDialog = true
-                    }
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+
+                    // Journey History navigation item
+                    // Clicking navigates to journey history screen and closes menu
+                    MenuItemClickable(
+                        title = "Journey History",
+                        subtitle = "Access Journey History",
+                        onClick = {
+                            onDismiss()
+                            navController.navigate(Screen.JourneyHistory.route)
+                        }
+                    )
+
+                    HorizontalDivider()
+
+                    // Location toggle with complex permission handling
+                    // Toggle represents "use location" not just "has permission"
+                    // Can only be ON if both preference is enabled AND permission is granted
+                    MenuItemWithSwitch(
+                        title = "Location",
+                        subtitle = if (locationEnabled && locationPermissionHandler.hasPermission) {
+                            "Location services active"
+                        } else if (!locationEnabled && locationPermissionHandler.hasPermission) {
+                            "Location disabled in app"
+                        } else {
+                            "Turn Location on"
+                        },
+                        checked = locationEnabled && locationPermissionHandler.hasPermission,
+                        onCheckedChange = { enabled ->
+                            if (enabled) {
+                                // User wants to enable location
+                                if (locationPermissionHandler.hasPermission) {
+                                    // Already has permission - just saving the preference
+                                    viewModel.toggleLocation(true)
+                                } else {
+                                    // Need to request permission
+                                    // Android blocks location request if user denies 2 times
+                                    // Instead of showing popup, must manually go to settings (done for security)
+                                    if (locationPermissionHandler.shouldShowRationale) {
+                                        // Showing explanation dialog
+                                        showPermissionDialog = true
+                                    } else {
+                                        // Requesting permission directly - Android's system popup will appear
+                                        locationPermissionHandler.requestPermission()
+                                    }
+                                }
+                            } else {
+                                // User wants to disable location manually - clearing preference
+                                viewModel.toggleLocation(false)
+
+                                // Showing info about system permissions if they still have permission granted
+                                if (locationPermissionHandler.hasPermission) {
+                                    showPermissionInfoDialog = true
+                                }
+                            }
+                        }
+                    )
+
+                    HorizontalDivider()
+
+                    // MyCiTi card integration toggle
+                    // Enabling shows discounted pricing for card members throughout the app
+                    MenuItemWithSwitch(
+                        title = "MyCiTi myConnect",
+                        subtitle = "Card Member - Discounted pricing",
+                        checked = myCitiEnabled,
+                        onCheckedChange = { viewModel.toggleMyCiti(it) }
+                    )
+
+                    HorizontalDivider()
+
+                    // Help & FAQ navigation item
+                    // Clicking navigates to help screen and closes menu
+                    MenuItemClickable(
+                        title = "Help & FAQ",
+                        subtitle = "Access Our Helpline",
+                        onClick = {
+                            onDismiss()
+                            navController.navigate(Screen.Help.route)
+                        }
+                    )
+
+                    HorizontalDivider()
+
+                    // Theme toggle for dark/light mode switching
+                    // Persisting preference across app sessions
+                    MenuItemWithSwitch(
+                        title = "Theme",
+                        subtitle = "Switch to Dark/Light Mode",
+                        checked = darkModeEnabled,
+                        onCheckedChange = { viewModel.toggleDarkMode(it) }
+                    )
                 }
             }
-        )
-
-        HorizontalDivider()
-
-        // MyCiTi Connection with toggle
-        DrawerMenuItemWithSwitch(
-            title = "MyCiTi Connection",
-            subtitle = "Card Member\nAccess discounted pricing\nwhile utilizing MyCiTi services",
-            checked = myCitiEnabled,
-            onCheckedChange = { viewModel.toggleMyCiti(it) }
-        )
-
-        HorizontalDivider()
-
-        // Help & FAQ
-        DrawerMenuItem(
-            title = "Help & FAQ",
-            subtitle = "Access Our Helpline",
-            onClick = {
-                scope.launch {
-                    drawerState.close()
-                }
-                navController.navigate(Screen.Help.route)
-            }
-        )
-
-        HorizontalDivider()
-
-        // Theme with toggle
-        DrawerMenuItemWithSwitch(
-            title = "Theme",
-            subtitle = "Switch to Dark/Light Mode",
-            checked = darkModeEnabled,
-            onCheckedChange = { viewModel.toggleDarkMode(it) }
-        )
+        }
     }
 }
 
+/**
+ * MenuItemClickable
+ *
+ * Reusable composable rendering a clickable menu item with title, subtitle,
+ * and a trailing arrow icon. Using Surface for ripple effect on click.
+ *
+ * @param title Main text displayed prominently
+ * @param subtitle Supporting text displayed below title in muted color
+ * @param onClick Callback invoked when item is clicked
+ */
+
 @Composable
-private fun DrawerMenuItem(
+private fun MenuItemClickable(
     title: String,
     subtitle: String,
     onClick: () -> Unit
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically
+    Surface(
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth()
     ) {
-        Column(
-            modifier = Modifier.weight(1f)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.bodyLarge
-            )
-            Text(
-                text = subtitle,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            // Trailing arrow indicating navigation action
+            Icon(
+                imageVector = Icons.Default.KeyboardArrowRight,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
-        Icon(
-            imageVector = Icons.Default.KeyboardArrowRight,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant
-        )
     }
 }
 
+/**
+ * MenuItemWithSwitch
+ *
+ * Reusable composable rendering a menu item with title, subtitle, and a toggle switch.
+ * Used for settings that can be enabled/disabled.
+ *
+ * @param title Main text displayed prominently
+ * @param subtitle Supporting text describing current state or toggle purpose
+ * @param checked Current state of the switch
+ * @param onCheckedChange Callback invoked when switch state changes
+ */
+
 @Composable
-private fun DrawerMenuItemWithSwitch(
+private fun MenuItemWithSwitch(
     title: String,
     subtitle: String,
     checked: Boolean,
@@ -325,7 +354,7 @@ private fun DrawerMenuItemWithSwitch(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(
@@ -341,6 +370,7 @@ private fun DrawerMenuItemWithSwitch(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
+        // Switch allowing immediate toggling of setting
         Switch(
             checked = checked,
             onCheckedChange = onCheckedChange
