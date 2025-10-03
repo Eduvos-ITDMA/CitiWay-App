@@ -1,4 +1,4 @@
-package com.example.citiway.core.ui.previews
+package com.example.citiway.core.util
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable

@@ -15,7 +15,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,19 +24,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import com.example.citiway.R
-import com.example.citiway.core.navigation.routes.Screen
 import com.example.citiway.core.ui.components.CompletedJourneyCardWithButton
 import com.example.citiway.core.ui.components.Heading
 import com.example.citiway.core.ui.components.LocationSearchField
 import com.example.citiway.core.ui.components.Space
 import com.example.citiway.core.ui.components.Title
 import com.example.citiway.core.ui.components.VerticalSpace
-import com.example.citiway.core.ui.previews.PreviewApp
 import com.example.citiway.data.local.CompletedJourney
 import com.example.citiway.features.shared.CompletedJourneysState
 import com.example.citiway.features.shared.LocationSelectionState
@@ -63,10 +58,18 @@ fun HomeContent(
         DestinationSearchBar(locationSelectionState, actions)
         VerticalSpace(24)
 
-        CompletedTripsSection(completedJourneysState.recentJourneys, actions.onToggleFavourite, "Recent Trips")
+        CompletedTripsSection(
+            completedJourneysState.recentJourneys,
+            actions.onToggleFavourite,
+            "Recent Trips"
+        )
         VerticalSpace(24)
 
-        CompletedTripsSection(completedJourneysState.favouriteJourneys, actions.onToggleFavourite, "Favourite Trips")
+        CompletedTripsSection(
+            completedJourneysState.favouriteJourneys,
+            actions.onToggleFavourite,
+            "Favourite Trips"
+        )
         VerticalSpace(24)
 
         SchedulesLink(actions.onSchedulesLinkClick)
@@ -145,7 +148,7 @@ fun SchedulesLink(onSchedulesLinkClick: () -> Unit) {
             .fillMaxWidth()
             .padding(vertical = 4.dp)
             .padding(end = 12.dp)
-            .clickable {onSchedulesLinkClick()},
+            .clickable { onSchedulesLinkClick() },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -162,10 +165,4 @@ fun SchedulesLink(onSchedulesLinkClick: () -> Unit) {
             modifier = Modifier.size(20.dp)
         )
     }
-}
-
-@Preview
-@Composable
-fun CommuterScreenPreview() {
-    PreviewApp(Screen.Home.route)
 }

@@ -18,14 +18,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CitiWay">
 
-
-        <!-- Google Maps API * Will restrict on final Submission -->
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyD71E9VvLNwHYV5ESHN_vrODGkzX2MPOs4" />
-
-
-
         <activity
             android:name=".MainActivity"
             android:exported="true"
