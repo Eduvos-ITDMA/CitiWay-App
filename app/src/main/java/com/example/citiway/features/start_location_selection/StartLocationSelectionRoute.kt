@@ -73,12 +73,21 @@ fun StartLocationSelectionRoute(
         Manifest.permission.ACCESS_FINE_LOCATION
     )
 
+    // Track if permission request was just launched
+    var permissionJustRequested by remember { mutableStateOf(false) }
+
     // DUAL CHECK: Monitor BOTH system permission AND DataStore preference
     LaunchedEffect(locationPermissionState.status.isGranted, locationEnabledInApp) {
         val systemGranted = locationPermissionState.status.isGranted
 
         // Update ViewModel with system permission status
         actions.onLocationPermissionsStatusChanged(systemGranted)
+
+        // Only sync DataStore if user just granted permission via our button
+        if (systemGranted && permissionJustRequested && !locationEnabledInApp) {
+            drawerViewModel.toggleLocation(true)
+            permissionJustRequested = false
+        }
 
         // Only fetch location if BOTH conditions are true
         if (systemGranted && locationEnabledInApp) {
@@ -119,7 +128,10 @@ fun StartLocationSelectionRoute(
             paddingValues = paddingValues,
             state = state,
             actions = actions,
-            onPermissionRequest = { locationPermissionState.launchPermissionRequest() },
+            onPermissionRequest = {
+                permissionJustRequested = true  // Setting a flag before requesting
+                locationPermissionState.launchPermissionRequest()
+            },
             cameraPositionState = viewModel.cameraPositionState,
             onConfirmLocation = onConfirmLocation,
             locationEnabledInApp = locationEnabledInApp

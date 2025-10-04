@@ -88,7 +88,12 @@ fun StartLocationSelectionContent(
 
         // Location button - only shown when BOTH permissions aren't granted
         if (!isLocationPermissionGranted || !locationEnabledInApp) {
-            TextButton(onClick = onPermissionRequest, contentPadding = PaddingValues(0.dp)) {
+            TextButton(
+                onClick = {
+                    onPermissionRequest()
+                },
+                contentPadding = PaddingValues(0.dp)
+            ) {
                 Icon(
                     imageVector = Icons.Default.LocationOn,
                     contentDescription = "Use my location",
@@ -103,7 +108,7 @@ fun StartLocationSelectionContent(
                 )
             }
         }
-        VerticalSpace(10)
+        VerticalSpace(8)
         Text(
             text = when {
                 // BOTH must be true AND location found
@@ -113,7 +118,7 @@ fun StartLocationSelectionContent(
                 isLocationPermissionGranted && locationEnabledInApp && userLocation == null ->
                     "📍 Getting your location..."
                 // Either permission is missing
-                else -> "📍 Tap map to select your location"
+                else -> "📍 Tap map to select location"
             },
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.bodyMedium,
