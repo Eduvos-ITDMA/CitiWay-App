@@ -1,6 +1,5 @@
 package com.example.citiway.features.help
 
-
 // HomeContent.kt
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -38,7 +37,11 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.material.icons.filled.ArrowForward
+import android.content.Intent
+import android.net.Uri
+import androidx.compose.ui.platform.LocalContext
+import android.widget.Toast
+
 
 
 @Composable
@@ -103,7 +106,7 @@ fun FAQItem(
                 modifier = Modifier.padding(start = 0.dp, end = 0.dp),
 
             )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(15.dp))//spacer between questions
     }
 }
 @Composable
@@ -175,8 +178,10 @@ fun ShadowedFAQ(
 }
 @Composable
 fun ContactForm() {
+    val context = LocalContext.current
     var email by remember { mutableStateOf(TextFieldValue("")) }
     var message by remember { mutableStateOf(TextFieldValue("")) }
+    val isSubmitEnabled = email.text.isNotBlank() && message.text.isNotBlank()
     Column (modifier=Modifier.fillMaxWidth().padding(horizontal=40.dp)){
         Text(
             text = "Can’t see your Question?",
@@ -235,7 +240,20 @@ fun ContactForm() {
             contentAlignment = Alignment.Center
         ) {
             Button(
-                onClick = { /* handle click */ },
+                onClick = {
+                    val intent = Intent(Intent.ACTION_SENDTO).apply {
+                        data = Uri.parse("mailto:")//
+                        putExtra(Intent.EXTRA_EMAIL, arrayOf("citiwayapp@gmail.com"))
+                        putExtra(Intent.EXTRA_SUBJECT, "App Feedback")
+                        putExtra(Intent.EXTRA_TEXT, "Issue: \n${message.text}")
+                    }
+                    try {
+                        context.startActivity(Intent.createChooser(intent, "Send Email"))
+                    } catch (e: Exception) {
+                        Toast.makeText(context, "No email app found on your device.", Toast.LENGTH_LONG).show()
+                    }
+                },
+                enabled = isSubmitEnabled,
                 modifier = Modifier
                     .fillMaxWidth(0.5f)
                     .height(48.dp),
