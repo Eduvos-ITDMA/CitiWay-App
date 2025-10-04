@@ -11,7 +11,7 @@ import com.example.citiway.core.util.ScreenWrapper
 fun SchedulesRoute(
     navController: NavController,
 ) {
-    ScreenWrapper(navController, drawerState, true) {paddingValues ->
+    ScreenWrapper(navController, true) {paddingValues ->
          SchedulesContent(
             paddingValues = paddingValues,
         )
