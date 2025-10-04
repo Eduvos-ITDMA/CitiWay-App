@@ -60,7 +60,7 @@ fun DestinationSelectionContent(
             .padding(paddingValues)
             .padding(horizontal = 16.dp),
     ) {
-        Title("Where are you?")
+        Title("Enter Destination")
 
         VerticalSpace(16)
 
@@ -76,7 +76,7 @@ fun DestinationSelectionContent(
             state = state,
             actions = actions,
             onSelectPrediction = actions.selectPlace,
-            placeholder = "Where to?"
+            placeholder = "Where are you going?"
         )
 
         VerticalSpace(14)

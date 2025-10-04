@@ -66,7 +66,7 @@ fun StartLocationSelectionContent(
             .padding(paddingValues)
             .padding(horizontal = 16.dp),
     ) {
-        Title("Where are you?")
+        Title("Enter Location")
 
         VerticalSpace(16)
 
@@ -82,7 +82,7 @@ fun StartLocationSelectionContent(
             state = state,
             actions = actions,
             onSelectPrediction = actions.selectPlace,
-            placeholder = "Your location"
+            placeholder = "Where are you?"
         )
 
         // Location button - only shown when permission hasn't been granted

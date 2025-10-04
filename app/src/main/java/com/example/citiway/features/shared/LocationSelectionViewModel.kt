@@ -5,6 +5,8 @@ import android.location.Geocoder
 import android.os.Build
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.application
 import androidx.lifecycle.viewModelScope
 import com.example.citiway.BuildConfig
@@ -37,7 +39,8 @@ data class LocationSelectionState(
     val userLocation: LatLng? = null,
     val predictions: List<AutocompletePrediction> = emptyList(),
     val showPredictions: Boolean = false,
-    val isLocationPermissionGranted: Boolean = false
+    val isLocationPermissionGranted: Boolean = false,
+    val isAppLocationEnabled: Boolean = false
 )
 
 data class LocationSelectionActions(
@@ -60,12 +63,26 @@ object DefaultLocations {
         LatLng(BuildConfig.NORTHEAST_CAPE_TOWN_LAT, BuildConfig.NORTHEAST_CAPE_TOWN_LNG)
 }
 
-class LocationSelectionViewModel(application: Application) : AndroidViewModel(application) {
-    /*
-    * TODO: Track if location is enabled. If turned off, functions will have to behave differently
-    */
+class LocationSelectionViewModel(
+    application: Application,
+    private val drawerViewModel: DrawerViewModel
+) : AndroidViewModel(application) {
+
     private val _screenState = MutableStateFlow(LocationSelectionState())
     val screenState: StateFlow<LocationSelectionState> = _screenState
+
+    init {
+        // Observe DataStore preference changes from DrawerViewModel
+        viewModelScope.launch {
+            try {
+                drawerViewModel.locationEnabled.collect { enabled ->
+                    _screenState.update { it.copy(isAppLocationEnabled = enabled) }
+                }
+            } catch (e: Exception) {
+                Log.e("LocationSelectionVM", "Error collecting location enabled", e)
+            }
+        }
+    }
 
     val actions = LocationSelectionActions(
         this::setSelectedLocation,
@@ -260,7 +277,12 @@ class LocationSelectionViewModel(application: Application) : AndroidViewModel(ap
              * 5. Reverse geocode to show user their current address
              * 6. Move camera to user's position with 15f zoom (street level view)
              */
-                if (!_screenState.value.isLocationPermissionGranted) {
+                val currentState = _screenState.value
+
+                // DUAL CHECK: Both system permission AND app preference must be enabled
+                if (!currentState.isLocationPermissionGranted || !currentState.isAppLocationEnabled) {
+                    Log.d("LocationSelection",
+                        "Location disabled - System: ${currentState.isLocationPermissionGranted}, App: ${currentState.isAppLocationEnabled}")
                     return@launch
                 }
 
@@ -278,5 +300,18 @@ class LocationSelectionViewModel(application: Application) : AndroidViewModel(ap
                 // TODO: Handle permission issues
             }
         }
+    }
+}
+
+class LocationSelectionViewModelFactory(
+    private val application: Application,
+    private val drawerViewModel: DrawerViewModel
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(LocationSelectionViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return LocationSelectionViewModel(application, drawerViewModel) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
