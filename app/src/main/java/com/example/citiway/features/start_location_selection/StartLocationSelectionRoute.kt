@@ -50,14 +50,18 @@ fun StartLocationSelectionRoute(
 ) {
 
 
-    // Create LocationSelectionViewModel with factory, passing the drawerViewModel
+// Creating LocationSelectionViewModel with factory, passing the drawerViewModel
     val context = LocalContext.current
-    // Get activity-scoped DrawerViewModel (shared across all screens)
+
+    // Getting activity-scoped DrawerViewModel (shared across all screens)
     val drawerViewModel: DrawerViewModel = viewModel(
         viewModelStoreOwner = context as ComponentActivity
     )
-    // ADD THIS LINE - collect the locationEnabled state from DrawerViewModel
+
+    // Collecting the locationEnabled state from DrawerViewModel
     val locationEnabledInApp by drawerViewModel.locationEnabled.collectAsState()
+
+    // Setting up LocationSelectionViewModel with application context
     val viewModel: LocationSelectionViewModel = viewModel(
         factory = LocationSelectionViewModelFactory(
             application = context.applicationContext as Application,
@@ -68,34 +72,35 @@ fun StartLocationSelectionRoute(
     val state by viewModel.screenState.collectAsStateWithLifecycle()
     val actions = viewModel.actions
 
-    // Track system-level permission
+    // Tracking system-level location permission
     val locationPermissionState = rememberPermissionState(
         Manifest.permission.ACCESS_FINE_LOCATION
     )
 
-    // Track if permission request was just launched
+    // Tracking whether user just clicked "Use my location" button
     var permissionJustRequested by remember { mutableStateOf(false) }
 
-    // DUAL CHECK: Monitor BOTH system permission AND DataStore preference
+    // DUAL CHECK: Monitoring BOTH system permission AND DataStore preference
     LaunchedEffect(locationPermissionState.status.isGranted, locationEnabledInApp) {
         val systemGranted = locationPermissionState.status.isGranted
 
-        // Update ViewModel with system permission status
+        // Updating ViewModel with current system permission status
         actions.onLocationPermissionsStatusChanged(systemGranted)
 
-        // Only sync DataStore if user just granted permission via our button
+        // Syncing DataStore only when user actively granted permission via our button
+        // This prevents overriding if user intentionally disabled location in app settings
         if (systemGranted && permissionJustRequested && !locationEnabledInApp) {
             drawerViewModel.toggleLocation(true)
             permissionJustRequested = false
         }
 
-        // Only fetch location if BOTH conditions are true
+        // Fetching location only when BOTH conditions are true
         if (systemGranted && locationEnabledInApp) {
             actions.getCurrentLocation()
         }
     }
 
-    // Show dialog if mismatch: app enabled but system denied
+    // Detecting mismatch: app enabled but system permission denied
     var showPermissionMismatchDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(locationEnabledInApp, locationPermissionState.status.isGranted) {
@@ -104,6 +109,7 @@ fun StartLocationSelectionRoute(
         }
     }
 
+    // Showing dialog when permissions are mismatched
     if (showPermissionMismatchDialog) {
         LocationPermissionDialog(
             onDismiss = { showPermissionMismatchDialog = false },
@@ -112,13 +118,14 @@ fun StartLocationSelectionRoute(
                 showPermissionMismatchDialog = false
             },
             onEnableLater = {
-                // Turn off DataStore preference to match system state
+                // Turning off DataStore preference to match system state
                 drawerViewModel.toggleLocation(false)
                 showPermissionMismatchDialog = false
             }
         )
     }
 
+    // Navigating to journey selection once location is confirmed
     val onConfirmLocation: (LatLng) -> Unit = { location ->
         navController.navigate(Screen.JourneySelection.route)
     }
@@ -129,7 +136,11 @@ fun StartLocationSelectionRoute(
             state = state,
             actions = actions,
             onPermissionRequest = {
-                permissionJustRequested = true  // Setting a flag before requesting
+                // Marking that user initiated the request so we can distinguish between:
+                // 1. User actively clicking "Use my location" (should sync DataStore to true)
+                // 2. System permission existing from before but app setting disabled (should NOT override user's choice)
+                // This prevents us from automatically re-enabling location if user intentionally disabled it in app settings. No lies to user.
+                permissionJustRequested = true
                 locationPermissionState.launchPermissionRequest()
             },
             cameraPositionState = viewModel.cameraPositionState,
@@ -167,6 +178,7 @@ private fun LocationPermissionDialog(
             Column(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
+                // Explaining why we need location access
                 Text(
                     text = "CitiWay uses your location to help you find routes and navigate.",
                     style = MaterialTheme.typography.bodyMedium,
@@ -184,21 +196,25 @@ private fun LocationPermissionDialog(
                     fontWeight = FontWeight.Bold
                 )
 
+                // Showing user they can enable now for immediate access
                 OptionItem(
                     icon = Icons.Default.Check,
                     text = "Enable location access now for the best experience"
                 )
 
+                // Letting user know they can enable from device settings later
                 OptionItem(
                     icon = Icons.Default.Settings,
                     text = "Enable it later from your device settings"
                 )
 
+                // Informing user about in-app toggle control
                 OptionItem(
                     icon = Icons.Default.Lock,
                     text = "Toggle location usage anytime in the app settings"
                 )
 
+                // Reassuring user they have full control over permissions
                 Text(
                     text = "You can always revoke location permissions from your device settings or disable location usage within the app.",
                     style = MaterialTheme.typography.bodySmall,
@@ -209,6 +225,7 @@ private fun LocationPermissionDialog(
             }
         },
         confirmButton = {
+            // Primary action - requesting system permission now
             Button(
                 onClick = onEnableNow,
                 modifier = Modifier.fillMaxWidth()
@@ -223,6 +240,7 @@ private fun LocationPermissionDialog(
             }
         },
         dismissButton = {
+            // Secondary action - dismissing and turning off app setting to match system state
             TextButton(
                 onClick = onEnableLater,
                 modifier = Modifier.fillMaxWidth()
@@ -240,6 +258,7 @@ private fun OptionItem(
     icon: ImageVector,
     text: String
 ) {
+    // Displaying individual option with icon and descriptive text
     Row(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.Top,
