@@ -51,7 +51,8 @@ fun StartLocationSelectionContent(
     actions: LocationSelectionActions,
     onPermissionRequest: () -> Unit,
     cameraPositionState: CameraPositionState,
-    onConfirmLocation: (LatLng) -> Unit
+    onConfirmLocation: (LatLng) -> Unit,
+    locationEnabledInApp: Boolean
 ) {
     // State Variables from StartLocationViewModel. Same as in destination_selection
     val selectedLocation = state.selectedLocation
@@ -85,8 +86,8 @@ fun StartLocationSelectionContent(
             placeholder = "Where are you?"
         )
 
-        // Location button - only shown when permission hasn't been granted
-        if (!isLocationPermissionGranted) {
+        // Location button - only shown when BOTH permissions aren't granted
+        if (!isLocationPermissionGranted || !locationEnabledInApp) {
             TextButton(onClick = onPermissionRequest, contentPadding = PaddingValues(0.dp)) {
                 Icon(
                     imageVector = Icons.Default.LocationOn,
@@ -105,8 +106,13 @@ fun StartLocationSelectionContent(
         VerticalSpace(10)
         Text(
             text = when {
-                isLocationPermissionGranted && userLocation != null -> "📍 Current location found"
-                isLocationPermissionGranted -> "📍 Getting your location..."
+                // BOTH must be true AND location found
+                isLocationPermissionGranted && locationEnabledInApp && userLocation != null ->
+                    "📍 Current location found"
+                // BOTH are true but still loading location
+                isLocationPermissionGranted && locationEnabledInApp && userLocation == null ->
+                    "📍 Getting your location..."
+                // Either permission is missing
                 else -> "📍 Tap map to select your location"
             },
             color = MaterialTheme.colorScheme.onSurfaceVariant,

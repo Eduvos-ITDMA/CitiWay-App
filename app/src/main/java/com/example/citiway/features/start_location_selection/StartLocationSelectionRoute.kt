@@ -26,6 +26,21 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.android.gms.maps.model.LatLng
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -81,28 +96,16 @@ fun StartLocationSelectionRoute(
     }
 
     if (showPermissionMismatchDialog) {
-        AlertDialog(
-            onDismissRequest = { showPermissionMismatchDialog = false },
-            title = { Text("Location Permission Needed") },
-            text = {
-                Text("Location is enabled in app settings, but system permission is denied. Grant permission to use location features.")
+        LocationPermissionDialog(
+            onDismiss = { showPermissionMismatchDialog = false },
+            onEnableNow = {
+                locationPermissionState.launchPermissionRequest()
+                showPermissionMismatchDialog = false
             },
-            confirmButton = {
-                TextButton(onClick = {
-                    locationPermissionState.launchPermissionRequest()
-                    showPermissionMismatchDialog = false
-                }) {
-                    Text("Grant Permission")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = {
-                    // Turn off DataStore preference to match system state
-                    drawerViewModel.toggleLocation(false)
-                    showPermissionMismatchDialog = false
-                }) {
-                    Text("Keep Disabled")
-                }
+            onEnableLater = {
+                // Turn off DataStore preference to match system state
+                drawerViewModel.toggleLocation(false)
+                showPermissionMismatchDialog = false
             }
         )
     }
@@ -118,7 +121,128 @@ fun StartLocationSelectionRoute(
             actions = actions,
             onPermissionRequest = { locationPermissionState.launchPermissionRequest() },
             cameraPositionState = viewModel.cameraPositionState,
-            onConfirmLocation = onConfirmLocation
+            onConfirmLocation = onConfirmLocation,
+            locationEnabledInApp = locationEnabledInApp
         )
     })
+}
+
+@Composable
+private fun LocationPermissionDialog(
+    onDismiss: () -> Unit,
+    onEnableNow: () -> Unit,
+    onEnableLater: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        icon = {
+            Icon(
+                imageVector = Icons.Default.LocationOn,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(48.dp)
+            )
+        },
+        title = {
+            Text(
+                text = "Location Access",
+                style = MaterialTheme.typography.headlineSmall,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
+        },
+        text = {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(
+                    text = "CitiWay uses your location to help you find routes and navigate.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 8.dp),
+                    color = MaterialTheme.colorScheme.outlineVariant
+                )
+
+                Text(
+                    text = "Your Options:",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold
+                )
+
+                OptionItem(
+                    icon = Icons.Default.Check,
+                    text = "Enable location access now for the best experience"
+                )
+
+                OptionItem(
+                    icon = Icons.Default.Settings,
+                    text = "Enable it later from your device settings"
+                )
+
+                OptionItem(
+                    icon = Icons.Default.Lock,
+                    text = "Toggle location usage anytime in the app settings"
+                )
+
+                Text(
+                    text = "You can always revoke location permissions from your device settings or disable location usage within the app.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontStyle = FontStyle.Italic,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = onEnableNow,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(
+                    imageVector = Icons.Default.LocationOn,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Enable Now")
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = onEnableLater,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Maybe Later")
+            }
+        },
+        containerColor = MaterialTheme.colorScheme.surface,
+        shape = RoundedCornerShape(20.dp)
+    )
+}
+
+@Composable
+private fun OptionItem(
+    icon: ImageVector,
+    text: String
+) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.Top,
+        modifier = Modifier.padding(vertical = 4.dp)
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(20.dp)
+        )
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+    }
 }
