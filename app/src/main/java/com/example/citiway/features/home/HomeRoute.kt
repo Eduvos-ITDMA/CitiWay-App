@@ -12,8 +12,6 @@ import com.example.citiway.features.shared.LocationSelectionActions
 import com.example.citiway.features.shared.LocationSelectionViewModel
 import com.google.android.libraries.places.api.model.AutocompletePrediction
 
-
-
 data class HomeActions(
     val onToggleFavourite: (String) -> Unit,
     val onSchedulesLinkClick: () -> Unit,
@@ -25,7 +23,6 @@ data class HomeActions(
 @Composable
 fun HomeRoute(
     navController: NavController,
-    viewModel: CompletedJourneysViewModel = viewModel(),
     completedJourneysViewModel: CompletedJourneysViewModel = viewModel(),
     locationSelectionViewModel: LocationSelectionViewModel = viewModel()
 ) {

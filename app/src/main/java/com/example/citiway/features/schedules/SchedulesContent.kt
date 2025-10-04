@@ -23,7 +23,6 @@ import androidx.core.net.toUri
 import com.example.citiway.core.navigation.routes.Screen
 import com.example.citiway.core.ui.components.Title
 import com.example.citiway.core.ui.components.VerticalSpace
-import com.example.citiway.core.ui.previews.PreviewApp
 @Composable
 fun SchedulesContent(
     paddingValues: PaddingValues,
@@ -145,26 +144,3 @@ fun PrasaSchedules() {
         )
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-@Preview
-@Composable
-fun SchedulesScreenPreview() {
-    PreviewApp(Screen.Schedules.route)
-    }
-
