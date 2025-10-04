@@ -1,5 +1,6 @@
 package com.example.citiway.core.ui.components
 
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,6 +12,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
@@ -41,8 +43,10 @@ fun ModernSettingsMenu(
     navController: NavController,
     modifier: Modifier = Modifier
 ) {
-    // Getting shared ViewModel managing app-wide settings state
-    val viewModel: DrawerViewModel = viewModel()
+    val context = LocalContext.current
+    val viewModel: DrawerViewModel = viewModel(
+        viewModelStoreOwner = context as ComponentActivity
+    )
     val darkModeEnabled by viewModel.darkModeEnabled.collectAsState()
     val locationEnabled by viewModel.locationEnabled.collectAsState()
     val myCitiEnabled by viewModel.myCitiEnabled.collectAsState()

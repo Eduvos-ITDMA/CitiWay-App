@@ -37,7 +37,7 @@ import androidx.navigation.NavController
  * Data class representing a favorite route
  *
  * In the future, this will be populated from:
- * - API calls to get user's saved favorite routes test
+ * - API calls to get user's saved favorite routes
  * - Local database (Room) for offline storage
  * - User preferences/settings
  *

@@ -11,6 +11,11 @@ import com.example.citiway.features.shared.CompletedJourneysViewModel
 import com.example.citiway.features.shared.LocationSelectionActions
 import com.example.citiway.features.shared.LocationSelectionViewModel
 import com.google.android.libraries.places.api.model.AutocompletePrediction
+import android.app.Application
+import androidx.activity.ComponentActivity
+import androidx.compose.ui.platform.LocalContext
+import com.example.citiway.features.shared.DrawerViewModel
+import com.example.citiway.features.shared.LocationSelectionViewModelFactory
 
 data class HomeActions(
     val onToggleFavourite: (String) -> Unit,
@@ -23,9 +28,23 @@ data class HomeActions(
 @Composable
 fun HomeRoute(
     navController: NavController,
-    completedJourneysViewModel: CompletedJourneysViewModel = viewModel(),
-    locationSelectionViewModel: LocationSelectionViewModel = viewModel()
+    completedJourneysViewModel: CompletedJourneysViewModel = viewModel()
 ) {
+    val context = LocalContext.current
+
+    // Get activity-scoped DrawerViewModel (shared across app)
+    val drawerViewModel: DrawerViewModel = viewModel(
+        viewModelStoreOwner = context as ComponentActivity
+    )
+
+    // Create LocationSelectionViewModel with factory
+    val locationSelectionViewModel: LocationSelectionViewModel = viewModel(
+        factory = LocationSelectionViewModelFactory(
+            application = context.applicationContext as Application,
+            drawerViewModel = drawerViewModel
+        )
+    )
+
     val completedJourneysState by completedJourneysViewModel.screenState.collectAsStateWithLifecycle()
     val locationSelectionState by locationSelectionViewModel.screenState.collectAsStateWithLifecycle()
 
@@ -33,7 +52,7 @@ fun HomeRoute(
         completedJourneysViewModel::toggleFavourite,
         { navController.navigate(Screen.Schedules.route) },
         { navController.navigate(Screen.DestinationSelection.route) },
-        { navController.navigate(Screen.StartLocationSelection.route) }, // TODO: set up journey selection flow
+        { navController.navigate(Screen.StartLocationSelection.route) },
         locationSelectionViewModel.actions
     )
 
