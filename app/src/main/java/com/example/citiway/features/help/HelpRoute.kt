@@ -11,9 +11,9 @@ fun HelpRoute(
 //    val state by viewModel.screenState.collectAsState()
 
     ScreenWrapper(navController, true, { paddingValues ->
-        // HelpContent(
-        //    state = state,
-        //    paddingValues = paddingValues
-        //)
+         HelpContent(
+//            state = state,
+            paddingValues = paddingValues
+        )
     })
 }

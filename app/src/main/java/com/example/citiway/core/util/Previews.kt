@@ -102,7 +102,7 @@ fun HelpScreenPreview() {
     CitiWayTheme {
         HelpContent(
             paddingValues = PaddingValues(),
-            navController = rememberNavController(), // Or specific callbacks like onLinkClicked
+//            navController = rememberNavController(), // Or specific callbacks like onLinkClicked
         )
     }
 }
