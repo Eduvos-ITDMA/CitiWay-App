@@ -7,7 +7,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.citiway.core.navigation.routes.Screen
 import com.example.citiway.core.util.ScreenWrapper
-import com.example.citiway.features.shared.LocationSelectionViewModel
+import com.example.citiway.features.shared.MapViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.android.gms.maps.model.LatLng
 import android.app.Application
@@ -29,15 +29,15 @@ fun DestinationSelectionRoute(
         viewModelStoreOwner = context as ComponentActivity
     )
 
-    val locationSelectionViewModel: LocationSelectionViewModel = viewModel(
+    val mapViewModel: MapViewModel = viewModel(
         factory = LocationSelectionViewModelFactory(
             application = context.applicationContext as Application,
             drawerViewModel = drawerViewModel
         )
     )
 
-    val state by locationSelectionViewModel.screenState.collectAsStateWithLifecycle()
-    val actions = locationSelectionViewModel.actions
+    val state by mapViewModel.screenState.collectAsStateWithLifecycle()
+    val actions = mapViewModel.actions
 
     val onConfirmLocation: (LatLng) -> Unit = { location ->
         // TODO: store selected location in shared view model
@@ -49,7 +49,7 @@ fun DestinationSelectionRoute(
             paddingValues = paddingValues,
             state = state,
             actions = actions,
-            cameraPositionState = locationSelectionViewModel.cameraPositionState,
+            cameraPositionState = mapViewModel.cameraPositionState,
             onConfirmLocation = onConfirmLocation
         )
     }

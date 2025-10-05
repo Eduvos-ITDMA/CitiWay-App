@@ -1,18 +1,10 @@
-package com.example.citiway.features.shared
+package com.example.citiway.data.remote
 
 import android.app.Application
 import android.location.Geocoder
 import android.os.Build
-import android.util.Log
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.application
-import androidx.lifecycle.viewModelScope
 import com.example.citiway.BuildConfig
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.AutocompletePrediction
@@ -22,133 +14,50 @@ import com.google.android.libraries.places.api.model.RectangularBounds
 import com.google.android.libraries.places.api.net.PlacesClient
 import com.google.android.libraries.places.api.net.kotlin.awaitFetchPlace
 import com.google.android.libraries.places.api.net.kotlin.awaitFindAutocompletePredictions
-import com.google.maps.android.compose.CameraPositionState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.util.Locale
 
-data class LocationSelectionState(
-    val searchText: String = "",
-    val selectedLocation: LatLng? = null,
-    val userLocation: LatLng? = null,
-    val predictions: List<AutocompletePrediction> = emptyList(),
-    val showPredictions: Boolean = false,
-    val isLocationPermissionGranted: Boolean = false,
-    val isAppLocationEnabled: Boolean = false
-)
-
-data class LocationSelectionActions(
-    val setSelectedLocation: (LatLng?) -> Unit,
-    val setSearchText: (String) -> Unit,
-    val setUserLocation: (LatLng?) -> Unit,
-    val toggleShowPredictions: (Boolean) -> Unit,
-    val searchPlaces: (String) -> Unit,
-    val selectPlace: (AutocompletePrediction) -> Unit,
-    val reverseGeocode: (LatLng) -> Unit,
-    val getCurrentLocation: () -> Unit,
-    val onLocationPermissionsStatusChanged: (Boolean) -> Unit
-)
-
-object DefaultLocations {
-    val CAPE_TOWN = LatLng(BuildConfig.CAPE_TOWN_LAT, BuildConfig.CAPE_TOWN_LNG)
-    val SOUTHWEST_BOUND =
-        LatLng(BuildConfig.SOUTHWEST_CAPE_TOWN_LAT, BuildConfig.SOUTHWEST_CAPE_TOWN_LNG)
-    val NORTHEAST_BOUND =
-        LatLng(BuildConfig.NORTHEAST_CAPE_TOWN_LAT, BuildConfig.NORTHEAST_CAPE_TOWN_LNG)
-}
-
-class LocationSelectionViewModel(
-    application: Application,
-    private val drawerViewModel: DrawerViewModel
-) : AndroidViewModel(application) {
-
-    private val _screenState = MutableStateFlow(LocationSelectionState())
-    val screenState: StateFlow<LocationSelectionState> = _screenState
-
-    init {
-        // Observe DataStore preference changes from DrawerViewModel
-        viewModelScope.launch {
-            try {
-                drawerViewModel.locationEnabled.collect { enabled ->
-                    _screenState.update { it.copy(isAppLocationEnabled = enabled) }
-                }
-            } catch (e: Exception) {
-                Log.e("LocationSelectionVM", "Error collecting location enabled", e)
-            }
-        }
-    }
-
-    val actions = LocationSelectionActions(
-        this::setSelectedLocation,
-        this::setSearchText,
-        this::setUserLocation,
-        this::toggleShowPredictions,
-        this::searchPlaces,
-        this::selectPlace,
-        this::reverseGeocode,
-        this::getCurrentLocation,
-        this::onLocationPermissionStatusChanged
-    )
-
+class PlacesManager(private val application: Application) {
     /*
     * autocompleteSessionToken - session token for billing - regenerated after fetchPlaces() call
     * placesClient - Main interface for Google Places API calls
     * geocoder - Android's built-in service for converting coordinates to addresses
     * locationBounds - Rectangular bounds tht determines the area within which we accept location predictions
-    * cameraPositionState - controls what the user sees on the map
     */
     private var autocompleteSessionToken = AutocompleteSessionToken.newInstance()
     private val placesClient: PlacesClient = Places.createClient(application)
     private val geocoder = Geocoder(application, Locale.getDefault())
     private val locationBounds = RectangularBounds.newInstance(
-        DefaultLocations.SOUTHWEST_BOUND, DefaultLocations.NORTHEAST_BOUND
+        LatLng(BuildConfig.SOUTHWEST_CAPE_TOWN_LAT, BuildConfig.SOUTHWEST_CAPE_TOWN_LNG),
+        LatLng(BuildConfig.NORTHEAST_CAPE_TOWN_LAT, BuildConfig.NORTHEAST_CAPE_TOWN_LNG)
     )
-    val cameraPositionState =
-        CameraPositionState(CameraPosition.fromLatLngZoom(DefaultLocations.CAPE_TOWN, 12f))
     private val scope = CoroutineScope(Dispatchers.Main)
 
-    fun setSearchText(text: String) {
-        _screenState.update { currentState ->
-            currentState.copy(searchText = text)
-        }
+    private val _selectedLocation = MutableStateFlow<LatLng?>(null)
+    val selectedLocation: StateFlow<LatLng?> = _selectedLocation
+    private val _userLocation = MutableStateFlow<LatLng?>(null)
+    val userLocation: StateFlow<LatLng?> = _userLocation
+    private val _predictions = MutableStateFlow<List<AutocompletePrediction>>(emptyList())
+    val predictions: MutableStateFlow<List<AutocompletePrediction>> = _predictions
+    private val _searchText = MutableStateFlow<String>("")
+    val searchText: MutableStateFlow<String> = _searchText
+
+    fun setSelectedLocation(location: LatLng) {
+        _selectedLocation.value = location
     }
 
-    fun setSelectedLocation(location: LatLng?) {
-        _screenState.update { currentState ->
-            currentState.copy(selectedLocation = location)
-        }
+    fun setSearchText(query: String) {
+        _searchText.value = query
     }
 
-    fun setUserLocation(location: LatLng?) {
-        _screenState.update { currentState ->
-            currentState.copy(userLocation = location)
-        }
-    }
-
-    fun toggleShowPredictions(show: Boolean) {
-        Log.d("show predictions (toggleShowPredictions)", show.toString())
-        _screenState.update { currentState ->
-            currentState.copy(showPredictions = show)
-        }
-    }
-
-    fun setPredictions(predictions: List<AutocompletePrediction> = emptyList()) {
-        Log.d("show predictions (setPrediction)", predictions.isNotEmpty().toString())
-        _screenState.update { currentState ->
-            currentState.copy(showPredictions = predictions.isNotEmpty(), predictions = predictions)
-        }
-    }
-
-    fun onLocationPermissionStatusChanged(isGranted: Boolean) {
-        _screenState.update { currentState ->
-            currentState.copy(isLocationPermissionGranted = isGranted)
-        }
+    fun setUserLocation(location: LatLng) {
+        _userLocation.value = location
     }
 
     /*
@@ -161,7 +70,7 @@ class LocationSelectionViewModel(
      */
     fun searchPlaces(queryText: String) {
         if (queryText.length > 2) {
-            viewModelScope.launch {
+            scope.launch {
                 try {
                     val response = placesClient.awaitFindAutocompletePredictions {
                         sessionToken = autocompleteSessionToken
@@ -170,10 +79,9 @@ class LocationSelectionViewModel(
                         countries = listOf("ZA")
                     }
 
-                    Log.d("predictions response", response.autocompletePredictions.toString())
-                    setPredictions(response.autocompletePredictions)
+                    _predictions.value = response.autocompletePredictions
                 } catch (e: Exception) {
-                    setPredictions()
+                    _predictions.value = emptyList()
                 }
             }
         }
@@ -188,7 +96,7 @@ class LocationSelectionViewModel(
      * 5. Hides the suggestions dropdown
      */
     fun selectPlace(prediction: AutocompletePrediction) {
-        viewModelScope.launch {
+        scope.launch {
             val placeFields = listOf(
                 Place.Field.ID,
                 Place.Field.DISPLAY_NAME,
@@ -207,17 +115,9 @@ class LocationSelectionViewModel(
 
                 // Update state with place info
                 place.location?.let { latLng ->
-                    _screenState.update { currentState ->
-                        currentState.copy(
-                            selectedLocation = latLng,
-                            searchText = place.displayName ?: prediction.getPrimaryText(null)
-                                .toString(),
-                            showPredictions = false
-                        )
-                    }
-
-                    // Adjust map camera
-                    cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
+                    _selectedLocation.value = latLng
+                    _searchText.value = place.displayName ?: prediction.getPrimaryText(null)
+                        .toString()
                 }
             } catch (e: Exception) {
                 // TODO: Handle fetchPlace failure
@@ -237,7 +137,7 @@ class LocationSelectionViewModel(
                     geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1) { addresses ->
                         val address = addresses.firstOrNull()
                         if (address != null) {
-                            setSearchText(address.getAddressLine(0) ?: "Selected Location")
+                            setSearchText((address.getAddressLine(0) ?: "Selected Location"))
                         } else {
                             setSearchText("Selected Location")
                         }
@@ -277,41 +177,18 @@ class LocationSelectionViewModel(
              * 5. Reverse geocode to show user their current address
              * 6. Move camera to user's position with 15f zoom (street level view)
              */
-                val currentState = _screenState.value
-
                 // DUAL CHECK: Both system permission AND app preference must be enabled
                 if (!currentState.isLocationPermissionGranted || !currentState.isAppLocationEnabled) {
-                    Log.d("LocationSelection",
-                        "Location disabled - System: ${currentState.isLocationPermissionGranted}, App: ${currentState.isAppLocationEnabled}")
                     return@launch
                 }
 
                 val location = fusedLocationClient.lastLocation.await()
                 val latLng = LatLng(location.latitude, location.longitude)
-                _screenState.update { currentState ->
-                    currentState.copy(userLocation = latLng, selectedLocation = latLng)
-                }
-
-                reverseGeocode(latLng)
-                cameraPositionState.move(
-                    CameraUpdateFactory.newLatLngZoom(latLng, 15f)
-                )
+                _userLocation.value = latLng
+                _selectedLocation.value = latLng
             } catch (e: SecurityException) {
                 // TODO: Handle permission issues
             }
         }
-    }
-}
-
-class LocationSelectionViewModelFactory(
-    private val application: Application,
-    private val drawerViewModel: DrawerViewModel
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(LocationSelectionViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return LocationSelectionViewModel(application, drawerViewModel) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

@@ -49,13 +49,15 @@ import androidx.compose.material.icons.filled.Autorenew
 import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import com.example.citiway.features.shared.MapActions
+import com.example.citiway.features.shared.MapState
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun StartLocationSelectionContent(
     paddingValues: PaddingValues,
-    state: LocationSelectionState,
-    actions: LocationSelectionActions,
+    state: MapState,
+    actions: MapActions,
     onPermissionRequest: () -> Unit,
     cameraPositionState: CameraPositionState,
     onConfirmLocation: (LatLng) -> Unit,
@@ -89,7 +91,7 @@ fun StartLocationSelectionContent(
             },
             state = state,
             actions = actions,
-            onSelectPrediction = actions.selectPlace,
+            onSelectPrediction = actions.selectPlace, // JourneyViewModel must decide what to do here
             placeholder = "Where are you?"
         )
 
@@ -162,9 +164,6 @@ fun StartLocationSelectionContent(
         VerticalSpace(10)
 
         /*
-         * onMapClick triggers reverse geocoding to show address in search field and
-         * Automatically hides search suggestions when map is tapped
-         *
          * TODO:
          * - Need to show loading states for location services and reverse geocoding during API calls.
          * - UX currently a bit janky and slow.
@@ -175,12 +174,7 @@ fun StartLocationSelectionContent(
                 .weight(1f) // Taking up remaining space in the column
                 .padding(horizontal = 16.dp),
             cameraPositionState = cameraPositionState,
-            onMapClick = { latLng ->
-                // When user taps the map, set location and get address
-                actions.setSelectedLocation(latLng)
-                actions.reverseGeocode(latLng)
-                actions.toggleShowPredictions(false)
-            },
+            onMapClick = actions.selectLocationOnMap,
             properties = MapProperties(
                 mapType = MapType.NORMAL,
                 isMyLocationEnabled = isLocationPermissionGranted
@@ -230,10 +224,4 @@ fun StartLocationSelectionContent(
 
         VerticalSpace(16)
     }
-}
-
-@Preview
-@Composable
-fun Preview() {
-    StartLocationScreenPreview()
 }

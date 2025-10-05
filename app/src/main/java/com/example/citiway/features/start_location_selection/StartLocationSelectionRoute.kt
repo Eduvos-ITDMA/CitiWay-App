@@ -20,7 +20,7 @@ import androidx.navigation.NavController
 import com.example.citiway.core.navigation.routes.Screen
 import com.example.citiway.core.util.ScreenWrapper
 import com.example.citiway.features.shared.DrawerViewModel
-import com.example.citiway.features.shared.LocationSelectionViewModel
+import com.example.citiway.features.shared.MapViewModel
 import com.example.citiway.features.shared.LocationSelectionViewModelFactory
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -62,7 +62,7 @@ fun StartLocationSelectionRoute(
     val locationEnabledInApp by drawerViewModel.locationEnabled.collectAsState()
 
     // Setting up LocationSelectionViewModel with application context
-    val viewModel: LocationSelectionViewModel = viewModel(
+    val viewModel: MapViewModel = viewModel(
         factory = LocationSelectionViewModelFactory(
             application = context.applicationContext as Application,
             drawerViewModel = drawerViewModel
