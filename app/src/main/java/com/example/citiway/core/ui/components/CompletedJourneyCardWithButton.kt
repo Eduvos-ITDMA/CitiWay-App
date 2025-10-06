@@ -27,11 +27,12 @@ fun CompletedJourneyCardWithButton(
     route: String,
     date: LocalDate,
     durationMin: Int,
-    icon: @Composable (Modifier) -> Unit
+    icon: @Composable (Modifier) -> Unit,
+    outlined: Boolean = false
 ) {
     Row {
         CompletedJourneyCard(route, date, durationMin)
         Spacer(modifier = Modifier.weight(0.05f))
-        RoundIconButton(icon, Modifier.align(Alignment.CenterVertically))
+        RoundIconButton(icon, Modifier.align(Alignment.CenterVertically), outlined)
     }
 }
