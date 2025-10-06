@@ -182,7 +182,9 @@ fun StartLocationScreenPreview() {
             actions = mockStartLocationActions,
             onPermissionRequest = {},
             cameraPositionState = rememberCameraPositionState(),
-            onConfirmLocation = {}
+            onConfirmLocation = {},
+            locationEnabledInApp = true
+
         )
     }
 }
