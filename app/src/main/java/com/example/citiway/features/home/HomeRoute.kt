@@ -1,21 +1,21 @@
 package com.example.citiway.features.home
 
+import android.app.Application
+import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.citiway.core.navigation.routes.Screen
 import com.example.citiway.core.util.ScreenWrapper
+import com.example.citiway.di.viewModelFactory
 import com.example.citiway.features.shared.CompletedJourneysViewModel
-import com.example.citiway.features.shared.LocationSelectionActions
-import com.example.citiway.features.shared.LocationSelectionViewModel
-import com.google.android.libraries.places.api.model.AutocompletePrediction
-import android.app.Application
-import androidx.activity.ComponentActivity
-import androidx.compose.ui.platform.LocalContext
 import com.example.citiway.features.shared.DrawerViewModel
-import com.example.citiway.features.shared.LocationSelectionViewModelFactory
+import com.example.citiway.features.shared.LocationSelectionActions
+import com.example.citiway.features.shared.MapViewModel
+import com.google.android.libraries.places.api.model.AutocompletePrediction
 
 data class HomeActions(
     val onToggleFavourite: (String) -> Unit,
@@ -38,22 +38,22 @@ fun HomeRoute(
     )
 
     // Create LocationSelectionViewModel with factory
-    val locationSelectionViewModel: LocationSelectionViewModel = viewModel(
-        factory = LocationSelectionViewModelFactory(
-            application = context.applicationContext as Application,
-            drawerViewModel = drawerViewModel
-        )
+    val mapViewModel = viewModel<MapViewModel>(
+        viewModelStoreOwner = context,
+        factory = viewModelFactory {
+            MapViewModel(context.applicationContext as Application, drawerViewModel)
+        }
     )
 
     val completedJourneysState by completedJourneysViewModel.screenState.collectAsStateWithLifecycle()
-    val locationSelectionState by locationSelectionViewModel.screenState.collectAsStateWithLifecycle()
+    val locationSelectionState by mapViewModel.screenState.collectAsStateWithLifecycle()
 
     val actions = HomeActions(
         completedJourneysViewModel::toggleFavourite,
         { navController.navigate(Screen.Schedules.route) },
         { navController.navigate(Screen.DestinationSelection.route) },
         { navController.navigate(Screen.StartLocationSelection.route) },
-        locationSelectionViewModel.actions
+        mapViewModel.actions
     )
 
     ScreenWrapper(navController, true, { paddingValues ->
