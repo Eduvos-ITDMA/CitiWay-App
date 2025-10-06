@@ -1,6 +1,5 @@
 package com.example.citiway.features.home
 
-import android.app.Application
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -8,12 +7,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.citiway.App
 import com.example.citiway.core.navigation.routes.Screen
-import com.example.citiway.core.util.ScreenWrapper
+import com.example.citiway.core.utils.ScreenWrapper
 import com.example.citiway.di.viewModelFactory
 import com.example.citiway.features.shared.CompletedJourneysViewModel
 import com.example.citiway.features.shared.DrawerViewModel
-import com.example.citiway.features.shared.LocationSelectionActions
+import com.example.citiway.features.shared.LocationType
+import com.example.citiway.features.shared.MapActions
 import com.example.citiway.features.shared.MapViewModel
 import com.google.android.libraries.places.api.model.AutocompletePrediction
 
@@ -22,7 +23,7 @@ data class HomeActions(
     val onSchedulesLinkClick: () -> Unit,
     val onMapIconClick: () -> Unit,
     val onSelectPrediction: (AutocompletePrediction) -> Unit,
-    val locationSelectionActions: LocationSelectionActions
+    val mapActions: MapActions
 )
 
 @Composable
@@ -41,12 +42,12 @@ fun HomeRoute(
     val mapViewModel = viewModel<MapViewModel>(
         viewModelStoreOwner = context,
         factory = viewModelFactory {
-            MapViewModel(context.applicationContext as Application, drawerViewModel)
+            MapViewModel(App.appModule.placesManager, locationType = LocationType.START)
         }
     )
 
     val completedJourneysState by completedJourneysViewModel.screenState.collectAsStateWithLifecycle()
-    val locationSelectionState by mapViewModel.screenState.collectAsStateWithLifecycle()
+    val mapState by mapViewModel.screenState.collectAsStateWithLifecycle()
 
     val actions = HomeActions(
         completedJourneysViewModel::toggleFavourite,
@@ -59,7 +60,7 @@ fun HomeRoute(
     ScreenWrapper(navController, true, { paddingValues ->
         HomeContent(
             completedJourneysState = completedJourneysState,
-            locationSelectionState = locationSelectionState,
+            mapState = mapState,
             paddingValues = paddingValues,
             actions = actions
         )

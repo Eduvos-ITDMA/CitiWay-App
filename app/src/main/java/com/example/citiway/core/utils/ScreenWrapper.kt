@@ -1,4 +1,4 @@
-package com.example.citiway.core.util
+package com.example.citiway.core.utils
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize

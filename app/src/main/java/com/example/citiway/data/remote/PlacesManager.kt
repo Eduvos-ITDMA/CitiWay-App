@@ -11,6 +11,7 @@ import com.google.android.libraries.places.api.model.AutocompletePrediction
 import com.google.android.libraries.places.api.model.AutocompleteSessionToken
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.model.RectangularBounds
+import com.google.android.libraries.places.api.net.FetchPlaceRequest
 import com.google.android.libraries.places.api.net.PlacesClient
 import com.google.android.libraries.places.api.net.kotlin.awaitFetchPlace
 import com.google.android.libraries.places.api.net.kotlin.awaitFindAutocompletePredictions
@@ -37,10 +38,18 @@ class PlacesManager(private val application: Application) {
         LatLng(BuildConfig.SOUTHWEST_CAPE_TOWN_LAT, BuildConfig.SOUTHWEST_CAPE_TOWN_LNG),
         LatLng(BuildConfig.NORTHEAST_CAPE_TOWN_LAT, BuildConfig.NORTHEAST_CAPE_TOWN_LNG)
     )
+    private val placeFields = listOf(
+        Place.Field.ID,
+        Place.Field.DISPLAY_NAME,
+        Place.Field.LOCATION,
+        Place.Field.FORMATTED_ADDRESS
+    )
+
     private val scope = CoroutineScope(Dispatchers.Main)
 
-    private val _selectedLocation = MutableStateFlow<LatLng?>(null)
-    val selectedLocation: StateFlow<LatLng?> = _selectedLocation
+    // Expose state flows
+    private val _selectedLocation = MutableStateFlow<SelectedLocation?>(null)
+    val selectedLocation: StateFlow<SelectedLocation?> = _selectedLocation
     private val _userLocation = MutableStateFlow<LatLng?>(null)
     val userLocation: StateFlow<LatLng?> = _userLocation
     private val _predictions = MutableStateFlow<List<AutocompletePrediction>>(emptyList())
@@ -48,7 +57,7 @@ class PlacesManager(private val application: Application) {
     private val _searchText = MutableStateFlow<String>("")
     val searchText: MutableStateFlow<String> = _searchText
 
-    fun setSelectedLocation(location: LatLng) {
+    fun setSelectedLocation(location: SelectedLocation) {
         _selectedLocation.value = location
     }
 
@@ -60,14 +69,7 @@ class PlacesManager(private val application: Application) {
         _userLocation.value = location
     }
 
-    /*
-     * This function handles real-time search as the user types.
-     * Key features:
-     * 1. Only searches after 2+ characters to avoid too many API calls
-     * 2. LocationBias restricts results to Cape Town area for relevance
-     * 3. setCountries("ZA") ensures only South African locations appear
-     * 4. Automatically shows/hides dropdown based on results
-     */
+    // This function requests a list of predictions from the Places API and updates the _predictions field
     fun searchPlaces(queryText: String) {
         if (queryText.length > 2) {
             scope.launch {
@@ -87,23 +89,10 @@ class PlacesManager(private val application: Application) {
         }
     }
 
-    /*
-     * When user taps on a search suggestion, this function:
-     * 1. Fetches detailed place information including coordinates
-     * 2. Updates the search text with a clean location name
-     * 3. Sets the marker position on the map
-     * 4. Moves camera to the selected location
-     * 5. Hides the suggestions dropdown
-     */
+    // When user taps on a search suggestion, this function fetches detailed place information and
+    // updates the search text with a clean location name. It also resets the AutocompleteSessionToken
     fun selectPlace(prediction: AutocompletePrediction) {
         scope.launch {
-            val placeFields = listOf(
-                Place.Field.ID,
-                Place.Field.DISPLAY_NAME,
-                Place.Field.LOCATION,
-                Place.Field.FORMATTED_ADDRESS
-            )
-
             try {
                 // Fetch detailed info on the selected location
                 val response = placesClient.awaitFetchPlace(prediction.placeId, placeFields) {
@@ -115,9 +104,10 @@ class PlacesManager(private val application: Application) {
 
                 // Update state with place info
                 place.location?.let { latLng ->
-                    _selectedLocation.value = latLng
-                    _searchText.value = place.displayName ?: prediction.getPrimaryText(null)
-                        .toString()
+                    val primaryText =
+                        place.displayName ?: prediction.getPrimaryText(null).toString()
+                    _selectedLocation.value = SelectedLocation(latLng, place.id ?: "", primaryText)
+                    _searchText.value = primaryText
                 }
             } catch (e: Exception) {
                 // TODO: Handle fetchPlace failure
@@ -162,33 +152,38 @@ class PlacesManager(private val application: Application) {
         }
     }
 
-    // Get current user location
-    fun getCurrentLocation() {
-        // TODO: Use Hilt to inject fusedLocationClient in the future
+    /**
+     * Sets the selectedLocation property to the device's current location using the
+     * fusedLocationClient
+     *
+     * IMPORTANT: Throws exception if location permission is not granted by the user. Even if
+     * location is disabled in the app via the toggle in the drawer, this function will still user
+     * the device's location. Therefore the responsibility is on the caller to check for location
+     * permission granted AND location is enabled in the app
+     */
+    fun useUserLocation() {
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(application)
 
         scope.launch {
-            try {/*
-             * Location Retrieval Process:
-             * 1. lastLocation gives us cached location (faster than real-time GPS)
-             * 2. addOnSuccessListener handles async response when location is found
-             * 3. We convert Android Location to Google Maps LatLng format
-             * 4. Update both userLocation (for tracking) and selectedLocation (for UI)
-             * 5. Reverse geocode to show user their current address
-             * 6. Move camera to user's position with 15f zoom (street level view)
-             */
-                // DUAL CHECK: Both system permission AND app preference must be enabled
-                if (!currentState.isLocationPermissionGranted || !currentState.isAppLocationEnabled) {
-                    return@launch
-                }
-
+            try {
                 val location = fusedLocationClient.lastLocation.await()
                 val latLng = LatLng(location.latitude, location.longitude)
+
+                val response = placesClient.awaitFetchPlace(latLng)
                 _userLocation.value = latLng
-                _selectedLocation.value = latLng
+                _selectedLocation.value = latLng // TODO: Use Google's API to reverse geocode into a PLACE
             } catch (e: SecurityException) {
-                // TODO: Handle permission issues
+                throw SecurityException(
+                    "Location permission not granted - user location cannot be used",
+                    e
+                )
             }
         }
     }
 }
+
+data class SelectedLocation(
+    val latLng: LatLng,
+    val placeId: String,
+    val primaryText: String
+)

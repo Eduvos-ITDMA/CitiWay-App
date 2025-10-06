@@ -1,6 +1,5 @@
 package com.example.citiway.core.ui.components
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,27 +28,35 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import com.example.citiway.features.shared.LocationSelectionActions
-import com.example.citiway.features.shared.LocationSelectionState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.citiway.App
+import com.example.citiway.data.remote.PlacesManager
 import com.google.android.libraries.places.api.model.AutocompletePrediction
 
 /**
  * A custom text input field designed for location searching, featuring an inline action icon.
  *
- * This composable provides a styled text field, typically used for entering
+// * This composable provides a styled text field, typically used for entering
  * location queries. It includes a placeholder and an icon slot on the right side
  * for actions.
  *
+ * @param modifier An optional [Modifier] to be applied to the `LocationSearchField` itself.
  * @param icon A composable lambda that defines the icon to be displayed on the right side of
  *             the text field. This lambda receives a [Modifier] that should be used to define
  *             an click action on the icon button. It is also intended that this composable
  *             specify its own `imageVector` on its Icon composable`.
- * @param modifier An optional [Modifier] to be applied to the `LocationSearchField` itself.
+ * @param onSelectPrediction The function to execute when a prediction from the dropdown is selected
+ * @param placesManager An instance of [PlacesManager] without a
+ * [com.google.maps.android.compose.CameraPositionState] instance
  * @param initialValue The initial text to be displayed in the text field. Defaults to an empty string.
  * @param placeholder The placeholder text to be displayed when the text field is empty.
  *                    Defaults to an empty string.
@@ -59,29 +66,27 @@ import com.google.android.libraries.places.api.model.AutocompletePrediction
 fun LocationSearchField(
     modifier: Modifier = Modifier,
     icon: @Composable (Modifier) -> Unit,
-    state: LocationSelectionState,
-    actions: LocationSelectionActions,
-    onSelectPrediction: (AutocompletePrediction) -> Unit,
+    onSelectPrediction: ((AutocompletePrediction) -> Unit)? = null,
+    placesManager: PlacesManager = App.appModule.placesManager,
     initialValue: String = "",
     placeholder: String = ""
 ) {
     // State variables
-    val searchText = state.searchText
-    val showPredictions = state.showPredictions
-    val predictions = state.predictions
+    val predictions by placesManager.predictions.collectAsStateWithLifecycle()
+    var showPredictions by remember { mutableStateOf(predictions.isNotEmpty()) }
+    val searchText by placesManager.searchText.collectAsStateWithLifecycle()
     val expanded = showPredictions && predictions.isNotEmpty()
-    Log.d("recomp predictions", expanded.toString())
 
     ExposedDropdownMenuBox(
         expanded = expanded,
-        onExpandedChange = actions.toggleShowPredictions,
+        onExpandedChange = { isExpanded -> showPredictions = isExpanded },
         modifier = modifier.fillMaxWidth()
     ) {
         OutlinedTextField(
             value = searchText,
             onValueChange = { query ->
-                actions.setSearchText(query)
-                actions.searchPlaces(query)
+                placesManager.setSearchText(query)
+                placesManager.searchPlaces(query)
             },
             placeholder = { Text(text = placeholder, style = MaterialTheme.typography.bodyLarge) },
             shape = RoundedCornerShape(20.dp),
@@ -120,12 +125,13 @@ fun LocationSearchField(
             ),
             keyboardActions = KeyboardActions(
                 onSearch = {
-                    actions.searchPlaces(searchText)
+                    placesManager.searchPlaces(searchText)
                 }),
             modifier = modifier
                 .fillMaxWidth()
                 .height(60.dp)
-                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable))
+                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable)
+        )
 
         /*
     * Search suggestions dropdown card that appears below the search field
@@ -133,7 +139,7 @@ fun LocationSearchField(
     */
         ExposedDropdownMenu(
             expanded = expanded,
-            onDismissRequest = { actions.toggleShowPredictions(false) },
+            onDismissRequest = { showPredictions = false },
             modifier = Modifier,
             containerColor = MaterialTheme.colorScheme.surface
         ) {
@@ -153,7 +159,13 @@ fun LocationSearchField(
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable { onSelectPrediction(prediction) }
+                                .clickable {
+                                    if (onSelectPrediction != null) {
+                                        onSelectPrediction(prediction)
+                                    } else {
+                                        placesManager.selectPlace(prediction)
+                                    }
+                                }
                                 .padding(8.dp)) {
                             Text(
                                 text = prediction.getPrimaryText(null).toString(),

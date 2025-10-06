@@ -1,13 +1,11 @@
 package com.example.citiway.core.ui.components
 
 import androidx.activity.ComponentActivity
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,8 +17,8 @@ import androidx.compose.ui.window.PopupProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.citiway.core.navigation.routes.Screen
+import com.example.citiway.core.utils.rememberLocationPermissionHandler
 import com.example.citiway.features.shared.DrawerViewModel
-import com.example.citiway.utils.rememberLocationPermissionHandler
 
 /**
  * ModernSettingsMenu Component
@@ -41,7 +39,6 @@ fun ModernSettingsMenu(
     expanded: Boolean,
     onDismiss: () -> Unit,
     navController: NavController,
-    modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
     val viewModel: DrawerViewModel = viewModel(
@@ -328,7 +325,7 @@ private fun MenuItemClickable(
             }
             // Trailing arrow indicating navigation action
             Icon(
-                imageVector = Icons.Default.KeyboardArrowRight,
+                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )

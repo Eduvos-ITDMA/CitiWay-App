@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 
 class JourneyViewModel: ViewModel() {
 
+    fun selectPlace()
 }
 
 enum class LocationType {

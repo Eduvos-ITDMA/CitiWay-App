@@ -1,4 +1,4 @@
-package com.example.citiway.core.util
+package com.example.citiway.core.utils
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
@@ -17,21 +17,13 @@ import com.example.citiway.features.journey_summary.JourneySummaryContent
 import com.example.citiway.features.progress_tracker.ProgressTrackerContent
 import com.example.citiway.features.schedules.SchedulesContent
 import com.example.citiway.features.shared.CompletedJourneysState
-import com.example.citiway.features.shared.LocationSelectionActions
-import com.example.citiway.features.shared.LocationSelectionState
+import com.example.citiway.features.shared.MapActions
+import com.example.citiway.features.shared.MapState
 import com.example.citiway.features.start_location_selection.StartLocationSelectionContent
 import com.google.maps.android.compose.rememberCameraPositionState
 
-private val mockStartLocationActions = LocationSelectionActions(
-    setSelectedLocation = {},
-    setSearchText = {},
-    setUserLocation = {},
-    toggleShowPredictions = {},
-    searchPlaces = {},
-    selectPlace = {},
-    reverseGeocode = {},
-    getCurrentLocation = {},
-    onLocationPermissionsStatusChanged = {}
+private val mockMapActions = MapActions(
+    selectLocationOnMap = {}
 )
 
 
@@ -44,13 +36,13 @@ fun HomeScreenPreview() {
         onSchedulesLinkClick = {},
         onMapIconClick = {},
         onSelectPrediction = {},
-        locationSelectionActions = mockStartLocationActions
+        mapActions = mockMapActions
     )
 
     CitiWayTheme {
         HomeContent(
             completedJourneysState = CompletedJourneysState(),
-            locationSelectionState = LocationSelectionState(),
+            mapState = MapState(),
             paddingValues = PaddingValues(),
             actions = mockHomeActions
         )
@@ -86,8 +78,8 @@ fun DestinationSelectionScreenPreview() {
         CitiWayTheme {
             DestinationSelectionContent(
                 paddingValues = PaddingValues(),
-                state = LocationSelectionState(),
-                actions = mockStartLocationActions,
+                state = MapState(),
+                actions = mockMapActions,
                 cameraPositionState = rememberCameraPositionState(),
                 onConfirmLocation = {}
             )
@@ -178,8 +170,8 @@ fun StartLocationScreenPreview() {
     CitiWayTheme {
         StartLocationSelectionContent(
             paddingValues = PaddingValues(),
-            state = LocationSelectionState(),
-            actions = mockStartLocationActions,
+            state = MapState(),
+            actions = mockMapActions,
             onPermissionRequest = {},
             cameraPositionState = rememberCameraPositionState(),
             onConfirmLocation = {},

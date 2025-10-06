@@ -26,11 +26,14 @@ data class MapActions(
 
 class MapViewModel(
     private val placesManager: PlacesManager,
-    private val drawerViewModel: DrawerViewModel,
     private val locationType: LocationType = LocationType.START
 ) : ViewModel() {
     private val _screenState = MutableStateFlow(MapState())
     val screenState: StateFlow<MapState> = _screenState
+
+    val actions = MapActions(
+        this::selectLocationOnMap
+    )
 
     val cameraPositionState =
         CameraPositionState(
@@ -62,16 +65,13 @@ class MapViewModel(
         }
     }
 
+    fun onLocationPermissionsStatusChanged(isGranted: Boolean){
+        _screenState.update { it.copy(isLocationPermissionGranted = isGranted) }
+    }
+
     fun selectLocationOnMap(location: LatLng) {
         placesManager.setSelectedLocation(location)
         placesManager.reverseGeocode(location)
         // TODO: Notify JourneyViewModel of selected location and pass in hostScreen
-    }
-
-
-    fun onLocationPermissionStatusChanged(isGranted: Boolean) {
-        _screenState.update { currentState ->
-            currentState.copy(isLocationPermissionGranted = isGranted)
-        }
     }
 }
