@@ -5,7 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.citiway.core.util.ScreenWrapper
+import com.example.citiway.core.utils.ScreenWrapper
 import com.example.citiway.features.shared.CompletedJourneysViewModel
 
 @Composable

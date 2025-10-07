@@ -35,12 +35,10 @@ import com.example.citiway.core.ui.components.Title
 import com.example.citiway.core.ui.components.VerticalSpace
 import com.example.citiway.data.local.CompletedJourney
 import com.example.citiway.features.shared.CompletedJourneysState
-import com.example.citiway.features.shared.LocationSelectionState
 
 @Composable
 fun HomeContent(
     completedJourneysState: CompletedJourneysState,
-    locationSelectionState: LocationSelectionState,
     paddingValues: PaddingValues,
     actions: HomeActions
 ) {
@@ -55,7 +53,7 @@ fun HomeContent(
         HeaderSection()
         VerticalSpace(24)
 
-        DestinationSearchBar(locationSelectionState, actions)
+        DestinationSearchBar(actions)
         VerticalSpace(24)
 
         CompletedTripsSection(
@@ -93,7 +91,7 @@ private fun HeaderSection() {
 }
 
 @Composable
-fun DestinationSearchBar(locationSelectionState: LocationSelectionState, actions: HomeActions) {
+fun DestinationSearchBar(actions: HomeActions) {
     LocationSearchField(
         icon = { modifier ->
             Icon(
@@ -102,8 +100,6 @@ fun DestinationSearchBar(locationSelectionState: LocationSelectionState, actions
                 modifier = modifier.clickable { actions.onMapIconClick() }
             )
         },
-        state = locationSelectionState,
-        actions = actions.locationSelectionActions,
         onSelectPrediction = actions.onSelectPrediction,
         placeholder = "Where to?"
     )

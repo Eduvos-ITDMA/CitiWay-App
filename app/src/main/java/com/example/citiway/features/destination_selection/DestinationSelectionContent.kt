@@ -28,9 +28,9 @@ import androidx.compose.ui.unit.sp
 import com.example.citiway.core.ui.components.LocationSearchField
 import com.example.citiway.core.ui.components.Title
 import com.example.citiway.core.ui.components.VerticalSpace
-import com.example.citiway.features.shared.LocationSelectionActions
-import com.example.citiway.features.shared.LocationSelectionState
-import com.google.android.gms.maps.model.LatLng
+import com.example.citiway.data.remote.SelectedLocation
+import com.example.citiway.features.shared.MapActions
+import com.example.citiway.features.shared.MapState
 import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
@@ -43,10 +43,10 @@ import com.google.maps.android.compose.MarkerState
 @Composable
 fun DestinationSelectionContent(
     paddingValues: PaddingValues,
-    state: LocationSelectionState,
-    actions: LocationSelectionActions,
+    state: MapState,
+    actions: MapActions,
     cameraPositionState: CameraPositionState,
-    onConfirmLocation: (LatLng) -> Unit
+    onConfirmLocation: (SelectedLocation) -> Unit
 ) {
     val selectedLocation = state.selectedLocation
     val userLocation = state.userLocation
@@ -73,9 +73,6 @@ fun DestinationSelectionContent(
                     modifier = Modifier.size(20.dp)
                 )
             },
-            state = state,
-            actions = actions,
-            onSelectPrediction = actions.selectPlace,
             placeholder = "Where are you going?"
         )
 
@@ -95,12 +92,7 @@ fun DestinationSelectionContent(
                 .weight(1f) // Taking up remaining space in the column
                 .padding(horizontal = 16.dp),
             cameraPositionState = cameraPositionState,
-            onMapClick = { latLng ->
-                // When user taps the map, set location and get address
-                actions.setSelectedLocation(latLng)
-                actions.reverseGeocode(latLng)
-                actions.toggleShowPredictions(false)
-            },
+            onMapClick = actions.selectLocationOnMap,
             properties = MapProperties(
                 mapType = MapType.NORMAL,
                 isMyLocationEnabled = isLocationPermissionGranted
@@ -113,8 +105,8 @@ fun DestinationSelectionContent(
             // Showing marker for selected location if one exists
             selectedLocation?.let { location ->
                 Marker(
-                    state = MarkerState(position = location),
-                    title = if (location == userLocation) "Your Current Location" else "Selected Location"
+                    state = MarkerState(position = location.latLng),
+                    title = if (location.latLng == userLocation) "Your Current Location" else "Selected Location"
                 )
             }
         }

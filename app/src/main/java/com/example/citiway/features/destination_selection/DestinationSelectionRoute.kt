@@ -1,47 +1,50 @@
 package com.example.citiway.features.destination_selection
 
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.citiway.core.navigation.routes.Screen
-import com.example.citiway.core.util.ScreenWrapper
-import com.example.citiway.features.shared.LocationSelectionViewModel
+import com.example.citiway.App
+import com.example.citiway.core.utils.ScreenWrapper
+import com.example.citiway.data.remote.SelectedLocation
+import com.example.citiway.di.viewModelFactory
+import com.example.citiway.features.shared.JourneyViewModel
+import com.example.citiway.features.shared.LocationType
+import com.example.citiway.features.shared.MapViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.android.gms.maps.model.LatLng
-import android.app.Application
-import androidx.activity.ComponentActivity
-import androidx.compose.ui.platform.LocalContext
-import com.example.citiway.features.shared.DrawerViewModel
-import com.example.citiway.features.shared.LocationSelectionViewModelFactory
-
-
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun DestinationSelectionRoute(
     navController: NavController,
 ) {
-    val context = LocalContext.current
+    val context = LocalActivity.current as ComponentActivity
 
-    val drawerViewModel: DrawerViewModel = viewModel(
-        viewModelStoreOwner = context as ComponentActivity
+    val mapViewModel: MapViewModel = viewModel(
+        factory = viewModelFactory {
+            MapViewModel(App.appModule.placesManager)
+        }
     )
 
-    val locationSelectionViewModel: LocationSelectionViewModel = viewModel(
-        factory = LocationSelectionViewModelFactory(
-            application = context.applicationContext as Application,
-            drawerViewModel = drawerViewModel
+    val journeyViewModel: JourneyViewModel = viewModel(
+        viewModelStoreOwner = context,
+        factory = viewModelFactory {
+            JourneyViewModel(navController)
+        })
+
+    val state by mapViewModel.screenState.collectAsStateWithLifecycle()
+    val actions = mapViewModel.actions
+
+    // Navigating to start location selection screen once location is confirmed
+    val onConfirmLocation: (SelectedLocation) -> Unit = { location ->
+        journeyViewModel.confirmLocationSelection(
+            location,
+            LocationType.START,
+            mapViewModel::clearSearch
         )
-    )
-
-    val state by locationSelectionViewModel.screenState.collectAsStateWithLifecycle()
-    val actions = locationSelectionViewModel.actions
-
-    val onConfirmLocation: (LatLng) -> Unit = { location ->
-        // TODO: store selected location in shared view model
-        navController.navigate(Screen.StartLocationSelection.route)
     }
 
     ScreenWrapper(navController, showBottomBar = true) { paddingValues ->
@@ -49,7 +52,7 @@ fun DestinationSelectionRoute(
             paddingValues = paddingValues,
             state = state,
             actions = actions,
-            cameraPositionState = locationSelectionViewModel.cameraPositionState,
+            cameraPositionState = mapViewModel.cameraPositionState,
             onConfirmLocation = onConfirmLocation
         )
     }
