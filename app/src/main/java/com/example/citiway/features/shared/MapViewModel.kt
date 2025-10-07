@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.citiway.BuildConfig
 import com.example.citiway.data.remote.PlacesManager
+import com.example.citiway.data.remote.SelectedLocation
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -15,7 +16,7 @@ import kotlinx.coroutines.launch
 
 data class MapState(
     val searchText: String = "",
-    val selectedLocation: LatLng? = null,
+    val selectedLocation: SelectedLocation? = null,
     val userLocation: LatLng? = null,
     val isLocationPermissionGranted: Boolean = false
 )
@@ -26,7 +27,6 @@ data class MapActions(
 
 class MapViewModel(
     private val placesManager: PlacesManager,
-    private val locationType: LocationType = LocationType.START
 ) : ViewModel() {
     private val _screenState = MutableStateFlow(MapState())
     val screenState: StateFlow<MapState> = _screenState
@@ -53,7 +53,12 @@ class MapViewModel(
                 }
 
                 if (location != null) {
-                    cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(location, 15f))
+                    cameraPositionState.move(
+                        CameraUpdateFactory.newLatLngZoom(
+                            location.latLng,
+                            15f
+                        )
+                    )
                 }
             }
 
@@ -65,13 +70,16 @@ class MapViewModel(
         }
     }
 
-    fun onLocationPermissionsStatusChanged(isGranted: Boolean){
-        _screenState.update { it.copy(isLocationPermissionGranted = isGranted) }
+    fun clearSearch() {
+        _screenState.update { it.copy(searchText = "") }
+        placesManager.clearSearch()
     }
 
     fun selectLocationOnMap(location: LatLng) {
-        placesManager.setSelectedLocation(location)
-        placesManager.reverseGeocode(location)
-        // TODO: Notify JourneyViewModel of selected location and pass in hostScreen
+        viewModelScope.launch {
+            val selectedLocation = placesManager.getPlaceFromLatLng(location)
+            placesManager.setSelectedLocation(selectedLocation)
+            placesManager.setSearchText(selectedLocation.primaryText)
+        }
     }
 }

@@ -28,9 +28,9 @@ import androidx.compose.ui.unit.sp
 import com.example.citiway.core.ui.components.LocationSearchField
 import com.example.citiway.core.ui.components.Title
 import com.example.citiway.core.ui.components.VerticalSpace
+import com.example.citiway.data.remote.SelectedLocation
 import com.example.citiway.features.shared.MapActions
 import com.example.citiway.features.shared.MapState
-import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
@@ -46,7 +46,7 @@ fun DestinationSelectionContent(
     state: MapState,
     actions: MapActions,
     cameraPositionState: CameraPositionState,
-    onConfirmLocation: (LatLng) -> Unit
+    onConfirmLocation: (SelectedLocation) -> Unit
 ) {
     val selectedLocation = state.selectedLocation
     val userLocation = state.userLocation
@@ -105,8 +105,8 @@ fun DestinationSelectionContent(
             // Showing marker for selected location if one exists
             selectedLocation?.let { location ->
                 Marker(
-                    state = MarkerState(position = location),
-                    title = if (location == userLocation) "Your Current Location" else "Selected Location"
+                    state = MarkerState(position = location.latLng),
+                    title = if (location.latLng == userLocation) "Your Current Location" else "Selected Location"
                 )
             }
         }

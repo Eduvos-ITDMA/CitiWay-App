@@ -1,4 +1,6 @@
 [versions]
+coilCompose = "2.7.0"
+converterGson = "3.0.0"
 datastorePreferences = "1.1.7"
 accompanistPermissions = "0.37.3"
 agp = "8.13.0"
@@ -19,6 +21,7 @@ places = "5.0.0"
 playServicesBasement = "18.9.0"
 playServicesLocation = "21.3.0"
 playServicesMaps = "19.2.0"
+retrofit = "3.0.0"
 secretsGradlePlugin = "2.0.1"
 
 [libraries]
@@ -28,6 +31,8 @@ androidx-material-icons-extended = { module = "androidx.compose.material:materia
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-material-icons-core = { module = "androidx.compose.material:material-icons-core" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
+converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -47,6 +52,7 @@ places = { module = "com.google.android.libraries.places:places", version.ref = 
 play-services-basement = { module = "com.google.android.gms:play-services-basement", version.ref = "playServicesBasement" }
 play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "playServicesLocation" }
 play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "playServicesMaps" }
+retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

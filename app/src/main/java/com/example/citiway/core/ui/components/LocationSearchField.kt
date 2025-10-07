@@ -66,7 +66,7 @@ import com.google.android.libraries.places.api.model.AutocompletePrediction
 fun LocationSearchField(
     modifier: Modifier = Modifier,
     icon: @Composable (Modifier) -> Unit,
-    onSelectPrediction: ((AutocompletePrediction) -> Unit)? = null,
+    onSelectPrediction: ((AutocompletePrediction, PlacesManager) -> Unit)? = null,
     placesManager: PlacesManager = App.appModule.placesManager,
     initialValue: String = "",
     placeholder: String = ""
@@ -161,7 +161,7 @@ fun LocationSearchField(
                                 .fillMaxWidth()
                                 .clickable {
                                     if (onSelectPrediction != null) {
-                                        onSelectPrediction(prediction)
+                                        onSelectPrediction(prediction, placesManager)
                                     } else {
                                         placesManager.selectPlace(prediction)
                                     }

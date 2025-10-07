@@ -13,19 +13,20 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.citiway.App
 import com.example.citiway.core.navigation.routes.Screen
+import com.example.citiway.core.ui.components.LocationPermissionDialog
 import com.example.citiway.core.utils.ScreenWrapper
+import com.example.citiway.data.remote.PlacesManager
+import com.example.citiway.data.remote.SelectedLocation
+import com.example.citiway.di.viewModelFactory
 import com.example.citiway.features.shared.DrawerViewModel
+import com.example.citiway.features.shared.JourneyViewModel
+import com.example.citiway.features.shared.LocationType
 import com.example.citiway.features.shared.MapViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
-import com.google.android.gms.maps.model.LatLng
-import com.example.citiway.App
-import com.example.citiway.core.ui.components.LocationPermissionDialog
-import com.example.citiway.data.remote.PlacesManager
-import com.example.citiway.di.viewModelFactory
-import com.example.citiway.features.shared.JourneyViewModel
 
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -48,7 +49,7 @@ fun StartLocationSelectionRoute(
     val journeyViewModel: JourneyViewModel = viewModel(
         viewModelStoreOwner = context,
         factory = viewModelFactory {
-            JourneyViewModel()
+            JourneyViewModel(navController)
         })
 
     // MapViewModel state and actions
@@ -76,6 +77,7 @@ fun StartLocationSelectionRoute(
         // Fetching location only when BOTH conditions are true
         if (systemGranted && locationEnabledInApp) {
             placesManager.useUserLocation()
+            navController.navigate(Screen.JourneySelection.route)
         } else if (locationEnabledInApp) {
             showPermissionMismatchDialog = true
         }
@@ -96,9 +98,8 @@ fun StartLocationSelectionRoute(
     }
 
     // Navigating to journey selection once location is confirmed
-    val onConfirmLocation: (LatLng) -> Unit = { location ->
-        journeyViewModel.
-        navController.navigate(Screen.JourneySelection.route)
+    val onConfirmLocation: (SelectedLocation) -> Unit = { location ->
+        journeyViewModel.confirmLocationSelection(location, LocationType.START, mapViewModel::clearSearch)
     }
 
     ScreenWrapper(navController, true, { paddingValues ->

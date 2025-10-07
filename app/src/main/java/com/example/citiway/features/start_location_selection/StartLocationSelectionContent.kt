@@ -1,9 +1,11 @@
 package com.example.citiway.features.start_location_selection
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -11,8 +13,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Autorenew
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -31,8 +36,10 @@ import com.example.citiway.core.ui.components.HorizontalSpace
 import com.example.citiway.core.ui.components.LocationSearchField
 import com.example.citiway.core.ui.components.Title
 import com.example.citiway.core.ui.components.VerticalSpace
+import com.example.citiway.data.remote.SelectedLocation
+import com.example.citiway.features.shared.MapActions
+import com.example.citiway.features.shared.MapState
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
@@ -40,13 +47,6 @@ import com.google.maps.android.compose.MapType
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
-import androidx.compose.material.icons.filled.MyLocation
-import androidx.compose.material.icons.filled.Autorenew
-import androidx.compose.material.icons.filled.TouchApp
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import com.example.citiway.features.shared.MapActions
-import com.example.citiway.features.shared.MapState
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
@@ -56,7 +56,7 @@ fun StartLocationSelectionContent(
     actions: MapActions,
     onPermissionRequest: () -> Unit,
     cameraPositionState: CameraPositionState,
-    onConfirmLocation: (LatLng) -> Unit,
+    onConfirmLocation: (SelectedLocation) -> Unit,
     locationEnabledInApp: Boolean
 ) {
     // State Variables from StartLocationViewModel. Same as in destination_selection
@@ -180,8 +180,8 @@ fun StartLocationSelectionContent(
             // Showing marker for selected location if one exists
             selectedLocation?.let { location ->
                 Marker(
-                    state = MarkerState(position = location),
-                    title = if (location == userLocation) "Your Current Location" else "Selected Location"
+                    state = MarkerState(position = location.latLng),
+                    title = if (location.latLng == userLocation) "Your Current Location" else "Selected Location"
                 )
             }
         }

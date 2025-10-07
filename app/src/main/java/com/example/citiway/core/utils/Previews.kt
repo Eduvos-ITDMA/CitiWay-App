@@ -20,6 +20,7 @@ import com.example.citiway.features.shared.CompletedJourneysState
 import com.example.citiway.features.shared.MapActions
 import com.example.citiway.features.shared.MapState
 import com.example.citiway.features.start_location_selection.StartLocationSelectionContent
+import com.google.android.libraries.places.api.model.kotlin.autocompletePrediction
 import com.google.maps.android.compose.rememberCameraPositionState
 
 private val mockMapActions = MapActions(
@@ -35,14 +36,12 @@ fun HomeScreenPreview() {
         onToggleFavourite = {},
         onSchedulesLinkClick = {},
         onMapIconClick = {},
-        onSelectPrediction = {},
-        mapActions = mockMapActions
+        onSelectPrediction = { prediction, placesManager -> },
     )
 
     CitiWayTheme {
         HomeContent(
             completedJourneysState = CompletedJourneysState(),
-            mapState = MapState(),
             paddingValues = PaddingValues(),
             actions = mockHomeActions
         )
@@ -106,7 +105,6 @@ fun JourneySelectionScreenPreview() {
     CitiWayTheme {
         JourneySelectionContent(
             paddingValues = PaddingValues(),
-            navController = rememberNavController(),
         )
     }
 }

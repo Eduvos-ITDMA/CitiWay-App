@@ -2,7 +2,6 @@ package com.example.citiway.data.remote
 
 import android.app.Application
 import android.location.Geocoder
-import android.os.Build
 import com.example.citiway.BuildConfig
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
@@ -11,7 +10,6 @@ import com.google.android.libraries.places.api.model.AutocompletePrediction
 import com.google.android.libraries.places.api.model.AutocompleteSessionToken
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.model.RectangularBounds
-import com.google.android.libraries.places.api.net.FetchPlaceRequest
 import com.google.android.libraries.places.api.net.PlacesClient
 import com.google.android.libraries.places.api.net.kotlin.awaitFetchPlace
 import com.google.android.libraries.places.api.net.kotlin.awaitFindAutocompletePredictions
@@ -21,10 +19,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
 import java.util.Locale
 
-class PlacesManager(private val application: Application) {
+class PlacesManager(
+    private val application: Application,
+    private val geocodingService: GeocodingService
+) {
     /*
     * autocompleteSessionToken - session token for billing - regenerated after fetchPlaces() call
     * placesClient - Main interface for Google Places API calls
@@ -54,7 +54,7 @@ class PlacesManager(private val application: Application) {
     val userLocation: StateFlow<LatLng?> = _userLocation
     private val _predictions = MutableStateFlow<List<AutocompletePrediction>>(emptyList())
     val predictions: MutableStateFlow<List<AutocompletePrediction>> = _predictions
-    private val _searchText = MutableStateFlow<String>("")
+    private val _searchText = MutableStateFlow("")
     val searchText: MutableStateFlow<String> = _searchText
 
     fun setSelectedLocation(location: SelectedLocation) {
@@ -65,8 +65,9 @@ class PlacesManager(private val application: Application) {
         _searchText.value = query
     }
 
-    fun setUserLocation(location: LatLng) {
-        _userLocation.value = location
+    fun clearSearch() {
+        _searchText.value = ""
+        _predictions.value = emptyList()
     }
 
     // This function requests a list of predictions from the Places API and updates the _predictions field
@@ -115,41 +116,35 @@ class PlacesManager(private val application: Application) {
         }
     }
 
-    /*
-    * Reverse geocode to get address from LatLng
-    * If geocoding fails, we fall back to a generic "Selected Location" text.
-    */
-    fun reverseGeocode(latLng: LatLng) {
-        scope.launch {
-            try {
-                // requires API level 31 (TIRAMISU)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1) { addresses ->
-                        val address = addresses.firstOrNull()
-                        if (address != null) {
-                            setSearchText((address.getAddressLine(0) ?: "Selected Location"))
-                        } else {
-                            setSearchText("Selected Location")
-                        }
-                    }
-                } else {
-                    // fallback for older APIs
-                    @Suppress("DEPRECATION")
-                    // Prevent blocking main thread with old getFromLocation() method
-                    val addresses = withContext(Dispatchers.IO) {
-                        geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
-                    }
-                    if (addresses?.isNotEmpty() == true) {
-                        val address = addresses[0]
-                        setSearchText(address.getAddressLine(0) ?: "Selected Location")
-                    } else {
-                        setSearchText("Selected Location")
-                    }
-                }
-            } catch (e: Exception) {
-                setSearchText("Selected Location")
-            }
+    // This function uses the GeocodingService retrofit API and Places API to convert
+    // a LatLng value to a SelectedLocation
+    suspend fun getPlaceFromLatLng(latLng: LatLng): SelectedLocation {
+        val latLngString = "${latLng.latitude},${latLng.longitude}"
+
+        // Get the Place ID via Reverse Geocoding (HTTP call)
+        val response = geocodingService.reverseGeocode(latLngString, BuildConfig.MAPS_API_KEY)
+
+        if (response.status != "OK" || response.results.isEmpty()) {
+            throw Exception("Reverse Geocoding failed: ${response.status}")
         }
+
+        // Use the first result's Place ID
+        val placeId =
+            response.results.first().placeId
+                ?: throw Exception("Place ID not found in response.")
+
+        // Fetch the full Place object using the native PlacesClient
+        val place = placesClient.awaitFetchPlace(placeId, placeFields) {
+            sessionToken = sessionToken
+        }.place
+
+        autocompleteSessionToken = AutocompleteSessionToken.newInstance()
+
+        return SelectedLocation(
+            latLng = latLng,
+            placeId = place.id ?: placeId,
+            primaryText = place.displayName ?: place.formattedAddress ?: "Map Click Location"
+        )
     }
 
     /**
@@ -169,9 +164,9 @@ class PlacesManager(private val application: Application) {
                 val location = fusedLocationClient.lastLocation.await()
                 val latLng = LatLng(location.latitude, location.longitude)
 
-                val response = placesClient.awaitFetchPlace(latLng)
+                val place = getPlaceFromLatLng(latLng)
                 _userLocation.value = latLng
-                _selectedLocation.value = latLng // TODO: Use Google's API to reverse geocode into a PLACE
+                _selectedLocation.value = place
             } catch (e: SecurityException) {
                 throw SecurityException(
                     "Location permission not granted - user location cannot be used",
