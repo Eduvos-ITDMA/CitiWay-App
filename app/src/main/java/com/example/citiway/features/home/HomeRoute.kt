@@ -23,6 +23,7 @@ data class HomeActions(
     val onSchedulesLinkClick: () -> Unit,
     val onMapIconClick: () -> Unit,
     val onSelectPrediction: (AutocompletePrediction, PlacesManager) -> Unit,
+    val onFavouritesTitleClick: () -> Unit,
 )
 
 @Composable
@@ -56,7 +57,8 @@ fun HomeRoute(
         completedJourneysViewModel::toggleFavourite,
         { navController.navigate(Screen.Schedules.route) },
         { navController.navigate(Screen.DestinationSelection.route) },
-        onSelectPrediction
+        onSelectPrediction,
+        onFavouritesTitleClick = {navController.navigate(Screen.Favourites.route)}
     )
 
     ScreenWrapper(navController, true, { paddingValues ->

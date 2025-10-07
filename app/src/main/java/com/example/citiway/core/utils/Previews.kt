@@ -37,6 +37,7 @@ fun HomeScreenPreview() {
         onSchedulesLinkClick = {},
         onMapIconClick = {},
         onSelectPrediction = { prediction, placesManager -> },
+        onFavouritesTitleClick = {},
     )
 
     CitiWayTheme {
@@ -64,7 +65,8 @@ fun FavouritesScreenPreview() {
     CitiWayTheme {
         FavouritesContent(
             paddingValues = PaddingValues(),
-            navController = rememberNavController(),
+            journeys = emptyList(),
+            onToggleFavourite = {}
         )
     }
 }

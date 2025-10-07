@@ -66,7 +66,8 @@ fun HomeContent(
         CompletedTripsSection(
             completedJourneysState.favouriteJourneys,
             actions.onToggleFavourite,
-            "Favourite Trips"
+            "Favourite Trips",
+            onTitleClick = actions.onFavouritesTitleClick
         )
         VerticalSpace(24)
 
@@ -109,10 +110,18 @@ fun DestinationSearchBar(actions: HomeActions) {
 fun CompletedTripsSection(
     journeys: List<CompletedJourney>,
     onToggleFavourite: (String) -> Unit,
-    title: String
+    title: String,
+    onTitleClick: (() -> Unit)? = null
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
-        Heading(title)
+        Heading(
+            title,
+            modifier = if (onTitleClick != null) {
+                Modifier.clickable { onTitleClick() }
+            } else {
+                Modifier
+            }
+        )
 
         VerticalSpace(12)
 

@@ -323,6 +323,20 @@ fun ModernSettingsMenu(
 
                     HorizontalDivider()
 
+                    // Favorites Page
+                    // Clicking navigates to favorites
+                    MenuItemClickable(
+                        title = "Favorites",
+                        subtitle = "Saved trips and preferred routes",
+                        onClick = {
+                            onDismiss()
+                            navController.navigate(Screen.Favourites.route)
+                        }
+                    )
+
+
+                    HorizontalDivider()
+
                     // MyCiTi card integration toggle
                     // Enabling shows discounted pricing for card members throughout the app
                     MenuItemWithSwitch(
