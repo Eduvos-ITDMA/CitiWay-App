@@ -19,9 +19,9 @@ fun Title(text: String){
 }
 
 @Composable
-fun Heading(text: String){
+fun Heading(text: String, modifier: Modifier = Modifier){
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
