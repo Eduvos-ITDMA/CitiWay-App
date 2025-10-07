@@ -323,10 +323,10 @@ fun ModernSettingsMenu(
 
                     HorizontalDivider()
 
-                    // Favorites Page
-                    // Clicking navigates to favorites
+                    // Favourites Page
+                    // Clicking navigates to favourites
                     MenuItemClickable(
-                        title = "Favorites",
+                        title = "Favourites",
                         subtitle = "Saved trips and preferred routes",
                         onClick = {
                             onDismiss()

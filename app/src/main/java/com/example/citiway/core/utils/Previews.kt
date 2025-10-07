@@ -38,6 +38,7 @@ fun HomeScreenPreview() {
         onMapIconClick = {},
         onSelectPrediction = { prediction, placesManager -> },
         onFavouritesTitleClick = {},
+        onRecentTitleClick = {}
     )
 
     CitiWayTheme {

@@ -59,7 +59,8 @@ fun HomeContent(
         CompletedTripsSection(
             completedJourneysState.recentJourneys,
             actions.onToggleFavourite,
-            "Recent Trips"
+            "Recent Trips",
+            onTitleClick = actions.onRecentTitleClick
         )
         VerticalSpace(24)
 
