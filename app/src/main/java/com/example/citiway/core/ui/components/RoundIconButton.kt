@@ -15,6 +15,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.ui.graphics.Color
+
+
 /**
  * A custom composable that renders a round button with an icon.
  *
@@ -30,15 +34,40 @@ import androidx.compose.ui.unit.dp
  *             `modifier = Modifier.clickable { /* action */ }`.
  * @param modifier An optional [Modifier] to be applied to the `RoundIconButton` itself.
  */
+
 @Composable
-fun RoundIconButton(icon: @Composable (Modifier) -> Unit, modifier: Modifier = Modifier) {
+fun RoundIconButton(
+    icon: @Composable (Modifier) -> Unit,
+    modifier: Modifier = Modifier,
+    outlined: Boolean = false
+) {
     Card(
         shape = RoundedCornerShape(25.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary),
+        colors = if (outlined) {
+            CardDefaults.cardColors(
+                containerColor = Color.Transparent
+            )
+        } else {
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.primary
+            )
+        },
+        border = if (outlined) {
+            BorderStroke(2.dp, MaterialTheme.colorScheme.onBackground)
+        } else null,
         modifier = modifier.size(50.dp)
     ) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onPrimary) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CompositionLocalProvider(
+                LocalContentColor provides if (outlined) {
+                    MaterialTheme.colorScheme.primary
+                } else {
+                    MaterialTheme.colorScheme.onPrimary
+                }
+            ) {
                 icon(Modifier.fillMaxSize(0.7f))
             }
         }

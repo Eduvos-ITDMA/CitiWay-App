@@ -143,7 +143,7 @@ fun JourneyHistoryScreenPreview() {
     CitiWayTheme {
         JourneyHistoryContent(
             paddingValues = PaddingValues(),
-            navController = rememberNavController(),
+            journeys = emptyList(),
         )
     }
 }
