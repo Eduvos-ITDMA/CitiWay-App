@@ -2,6 +2,8 @@ package com.example.citiway.data.remote
 
 import android.app.Application
 import android.location.Geocoder
+import android.util.Log
+import androidx.compose.runtime.Stable
 import com.example.citiway.BuildConfig
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
@@ -17,14 +19,47 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.util.Locale
 
+@Stable
+data class PlacesState(
+    val selectedLocation: SelectedLocation? = null,
+    val userLocation: LatLng? = null,
+    val predictions: List<AutocompletePrediction> = emptyList(),
+    val searchText: String = ""
+)
+
+class PlacesActions(
+    val onSetSearchText: (String) -> Unit,
+    val onSearchPlaces: (String) -> Unit,
+    val onSelectPlace: (AutocompletePrediction) -> Unit,
+    val getPlace: suspend (AutocompletePrediction) -> SelectedLocation,
+    val onClearSearch: () -> Unit,
+    val onSetSelectedLocation: (SelectedLocation) -> Unit,
+    val onUseUserLocation: () -> Unit,
+    val getPlaceFromLatLng: suspend (LatLng) -> SelectedLocation
+)
+
 class PlacesManager(
-    private val application: Application,
-    private val geocodingService: GeocodingService
+    private val application: Application, private val geocodingService: GeocodingService
 ) {
+    private val _state = MutableStateFlow(PlacesState())
+    val state: StateFlow<PlacesState> = _state
+
+    val actions = PlacesActions(
+        onSetSearchText = ::setSearchText,
+        onSearchPlaces = ::searchPlaces,
+        onSelectPlace = ::selectPlace,
+        getPlace = ::getPlace,
+        onClearSearch = ::clearSearch,
+        onSetSelectedLocation = ::setSelectedLocation,
+        onUseUserLocation = ::useUserLocation,
+        getPlaceFromLatLng = ::getPlaceFromLatLng
+    )
+
     /*
     * autocompleteSessionToken - session token for billing - regenerated after fetchPlaces() call
     * placesClient - Main interface for Google Places API calls
@@ -48,31 +83,32 @@ class PlacesManager(
     private val scope = CoroutineScope(Dispatchers.Main)
 
     // Expose state flows
-    private val _selectedLocation = MutableStateFlow<SelectedLocation?>(null)
-    val selectedLocation: StateFlow<SelectedLocation?> = _selectedLocation
-    private val _userLocation = MutableStateFlow<LatLng?>(null)
-    val userLocation: StateFlow<LatLng?> = _userLocation
-    private val _predictions = MutableStateFlow<List<AutocompletePrediction>>(emptyList())
-    val predictions: MutableStateFlow<List<AutocompletePrediction>> = _predictions
-    private val _searchText = MutableStateFlow("")
-    val searchText: MutableStateFlow<String> = _searchText
-
-    fun setSelectedLocation(location: SelectedLocation) {
-        _selectedLocation.value = location
+    private fun setSelectedLocation(location: SelectedLocation) {
+        _state.update { currentState -> currentState.copy(selectedLocation = location) }
     }
 
-    fun setSearchText(query: String) {
-        _searchText.value = query
+    private fun setPredictions(predictions: List<AutocompletePrediction>) {
+        _state.update { currentState -> currentState.copy(predictions = predictions) }
     }
 
-    fun clearSearch() {
-        _searchText.value = ""
-        _predictions.value = emptyList()
+    private fun setSearchText(query: String) {
+        Log.d("places setSearchText", query)
+        _state.update { currentState -> currentState.copy(searchText = query) }
     }
 
-    // This function requests a list of predictions from the Places API and updates the _predictions field
-    fun searchPlaces(queryText: String) {
-        if (queryText.length > 2) {
+    private fun clearSearch() {
+        Log.d("places clear search", "Search cleared")
+        _state.update { currentState ->
+            currentState.copy(searchText = "", predictions = emptyList())
+        }
+    }
+
+    // This function requests a list of predictions from the Places API and updates the state
+    private fun searchPlaces(queryText: String) {
+        setSearchText(queryText)
+        if (queryText.length <= 2) {
+            setPredictions(emptyList())
+        } else {
             scope.launch {
                 try {
                     val response = placesClient.awaitFindAutocompletePredictions {
@@ -82,43 +118,51 @@ class PlacesManager(
                         countries = listOf("ZA")
                     }
 
-                    _predictions.value = response.autocompletePredictions
+                    _state.update { currentState -> currentState.copy(predictions = response.autocompletePredictions) }
                 } catch (e: Exception) {
-                    _predictions.value = emptyList()
+                    _state.update { currentState -> currentState.copy(predictions = emptyList()) }
                 }
             }
         }
     }
 
     // When user taps on a search suggestion, this function fetches detailed place information and
-    // updates the search text with a clean location name. It also resets the AutocompleteSessionToken
-    fun selectPlace(prediction: AutocompletePrediction) {
+    // updates the state. It also resets the AutocompleteSessionToken
+    private fun selectPlace(prediction: AutocompletePrediction) {
         scope.launch {
-            try {
-                // Fetch detailed info on the selected location
-                val response = placesClient.awaitFetchPlace(prediction.placeId, placeFields) {
-                    sessionToken = sessionToken
-                }
-
-                val place = response.place
-                autocompleteSessionToken = AutocompleteSessionToken.newInstance()
-
-                // Update state with place info
-                place.location?.let { latLng ->
-                    val primaryText =
-                        place.displayName ?: prediction.getPrimaryText(null).toString()
-                    _selectedLocation.value = SelectedLocation(latLng, place.id ?: "", primaryText)
-                    _searchText.value = primaryText
-                }
-            } catch (e: Exception) {
-                // TODO: Handle fetchPlace failure
+            val selectedLocation = getPlace(prediction)
+            setSearchText(selectedLocation.primaryText)
+            setPredictions(emptyList())
+            _state.update { currentState ->
+                currentState.copy(
+                    selectedLocation = selectedLocation, userLocation = selectedLocation.latLng
+                )
             }
+        }
+    }
+
+    private suspend fun getPlace(prediction: AutocompletePrediction): SelectedLocation {
+        try {
+            // Fetch detailed info on the selected location
+            val response = placesClient.awaitFetchPlace(prediction.placeId, placeFields) {
+                sessionToken = sessionToken
+            }
+
+            val place = response.place
+            autocompleteSessionToken = AutocompleteSessionToken.newInstance()
+
+            val latLng = place.location ?: throw Exception("Place location is null.")
+            val primaryText = place.displayName ?: prediction.getPrimaryText(null).toString()
+
+            return SelectedLocation(latLng, place.id ?: "", primaryText)
+        } catch (e: Exception) {
+            throw Exception("Places API failed to fetch place", e)
         }
     }
 
     // This function uses the GeocodingService retrofit API and Places API to convert
     // a LatLng value to a SelectedLocation
-    suspend fun getPlaceFromLatLng(latLng: LatLng): SelectedLocation {
+    private suspend fun getPlaceFromLatLng(latLng: LatLng): SelectedLocation {
         val latLngString = "${latLng.latitude},${latLng.longitude}"
 
         // Get the Place ID via Reverse Geocoding (HTTP call)
@@ -130,8 +174,7 @@ class PlacesManager(
 
         // Use the first result's Place ID
         val placeId =
-            response.results.first().placeId
-                ?: throw Exception("Place ID not found in response.")
+            response.results.first().placeId ?: throw Exception("Place ID not found in response.")
 
         // Fetch the full Place object using the native PlacesClient
         val place = placesClient.awaitFetchPlace(placeId, placeFields) {
@@ -156,7 +199,7 @@ class PlacesManager(
      * the device's location. Therefore the responsibility is on the caller to check for location
      * permission granted AND location is enabled in the app
      */
-    fun useUserLocation() {
+    private fun useUserLocation() {
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(application)
 
         scope.launch {
@@ -165,12 +208,14 @@ class PlacesManager(
                 val latLng = LatLng(location.latitude, location.longitude)
 
                 val place = getPlaceFromLatLng(latLng)
-                _userLocation.value = latLng
-                _selectedLocation.value = place
+                _state.update { currentState ->
+                    currentState.copy(
+                        userLocation = latLng, selectedLocation = place
+                    )
+                }
             } catch (e: SecurityException) {
                 throw SecurityException(
-                    "Location permission not granted - user location cannot be used",
-                    e
+                    "Location permission not granted - user location cannot be used", e
                 )
             }
         }
@@ -178,7 +223,5 @@ class PlacesManager(
 }
 
 data class SelectedLocation(
-    val latLng: LatLng,
-    val placeId: String,
-    val primaryText: String
+    val latLng: LatLng, val placeId: String, val primaryText: String
 )

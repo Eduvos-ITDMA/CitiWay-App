@@ -36,6 +36,8 @@ import com.example.citiway.core.ui.components.HorizontalSpace
 import com.example.citiway.core.ui.components.LocationSearchField
 import com.example.citiway.core.ui.components.Title
 import com.example.citiway.core.ui.components.VerticalSpace
+import com.example.citiway.data.remote.PlacesActions
+import com.example.citiway.data.remote.PlacesState
 import com.example.citiway.data.remote.SelectedLocation
 import com.example.citiway.features.shared.MapActions
 import com.example.citiway.features.shared.MapState
@@ -54,6 +56,8 @@ fun StartLocationSelectionContent(
     paddingValues: PaddingValues,
     state: MapState,
     actions: MapActions,
+    placesState: PlacesState,
+    placesActions: PlacesActions,
     onPermissionRequest: () -> Unit,
     cameraPositionState: CameraPositionState,
     onConfirmLocation: (SelectedLocation) -> Unit,
@@ -85,6 +89,8 @@ fun StartLocationSelectionContent(
                     modifier = Modifier.size(20.dp)
                 )
             },
+            placesState = placesState,
+            placesActions = placesActions,
             placeholder = "Where are you?"
         )
 

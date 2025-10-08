@@ -35,11 +35,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.citiway.App
-import com.example.citiway.data.remote.PlacesManager
+import com.example.citiway.data.remote.PlacesActions
+import com.example.citiway.data.remote.PlacesState
 import com.google.android.libraries.places.api.model.AutocompletePrediction
 
 /**
@@ -55,8 +56,8 @@ import com.google.android.libraries.places.api.model.AutocompletePrediction
  *             an click action on the icon button. It is also intended that this composable
  *             specify its own `imageVector` on its Icon composable`.
  * @param onSelectPrediction The function to execute when a prediction from the dropdown is selected
- * @param placesManager An instance of [PlacesManager] without a
- * [com.google.maps.android.compose.CameraPositionState] instance
+ * @param placesState An instance of [PlacesState]
+ * @param placesActions An instance of [PlacesActions]
  * @param initialValue The initial text to be displayed in the text field. Defaults to an empty string.
  * @param placeholder The placeholder text to be displayed when the text field is empty.
  *                    Defaults to an empty string.
@@ -66,27 +67,39 @@ import com.google.android.libraries.places.api.model.AutocompletePrediction
 fun LocationSearchField(
     modifier: Modifier = Modifier,
     icon: @Composable (Modifier) -> Unit,
-    onSelectPrediction: ((AutocompletePrediction, PlacesManager) -> Unit)? = null,
-    placesManager: PlacesManager = App.appModule.placesManager,
+    onSelectPrediction: ((AutocompletePrediction) -> Unit)? = null,
+    placesState: PlacesState,
+    placesActions: PlacesActions,
     initialValue: String = "",
     placeholder: String = ""
 ) {
     // State variables
-    val predictions by placesManager.predictions.collectAsStateWithLifecycle()
+    val predictions = placesState.predictions
     var showPredictions by remember { mutableStateOf(predictions.isNotEmpty()) }
-    val searchText by placesManager.searchText.collectAsStateWithLifecycle()
     val expanded = showPredictions && predictions.isNotEmpty()
 
+    val textFieldValue by remember(placesState.searchText) {
+        val text = placesState.searchText
+        mutableStateOf(
+            TextFieldValue(
+                text = text,
+                selection = TextRange(text.length)
+            )
+        )
+    }
     ExposedDropdownMenuBox(
-        expanded = expanded,
+        expanded = showPredictions,
         onExpandedChange = { isExpanded -> showPredictions = isExpanded },
         modifier = modifier.fillMaxWidth()
     ) {
         OutlinedTextField(
-            value = searchText,
-            onValueChange = { query ->
-                placesManager.setSearchText(query)
-                placesManager.searchPlaces(query)
+            value = textFieldValue,
+            onValueChange = { textFieldValue ->
+                val query = textFieldValue.text
+                if (query.length > 2){
+                    showPredictions = true
+                }
+                placesActions.onSearchPlaces(query)
             },
             placeholder = { Text(text = placeholder, style = MaterialTheme.typography.bodyLarge) },
             shape = RoundedCornerShape(20.dp),
@@ -125,7 +138,7 @@ fun LocationSearchField(
             ),
             keyboardActions = KeyboardActions(
                 onSearch = {
-                    placesManager.searchPlaces(searchText)
+                    placesActions.onSearchPlaces(textFieldValue.text)
                 }),
             modifier = modifier
                 .fillMaxWidth()
@@ -161,9 +174,9 @@ fun LocationSearchField(
                                 .fillMaxWidth()
                                 .clickable {
                                     if (onSelectPrediction != null) {
-                                        onSelectPrediction(prediction, placesManager)
+                                        onSelectPrediction(prediction)
                                     } else {
-                                        placesManager.selectPlace(prediction)
+                                        placesActions.onSelectPlace(prediction)
                                     }
                                 }
                                 .padding(8.dp)) {
