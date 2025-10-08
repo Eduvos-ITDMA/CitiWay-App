@@ -75,6 +75,8 @@ fun HomeScreenPreview() {
         onSchedulesLinkClick = {},
         onMapIconClick = {},
         onSelectPrediction = { prediction -> },
+        onFavouritesTitleClick = {},
+        onRecentTitleClick = {}
     )
 
     CitiWayTheme {

@@ -62,17 +62,17 @@ fun HomeContent(
 
         CompletedTripsSection(
             completedJourneysState.recentJourneys,
-            actions.onToggleFavourite,
+            homeActions.onToggleFavourite,
             "Recent Trips",
-            onTitleClick = actions.onRecentTitleClick
+            onTitleClick = homeActions.onRecentTitleClick
         )
         VerticalSpace(24)
 
         CompletedTripsSection(
             completedJourneysState.favouriteJourneys,
-            actions.onToggleFavourite,
+            homeActions.onToggleFavourite,
             "Favourite Trips",
-            onTitleClick = actions.onFavouritesTitleClick
+            onTitleClick = homeActions.onFavouritesTitleClick
         )
         VerticalSpace(24)
 
