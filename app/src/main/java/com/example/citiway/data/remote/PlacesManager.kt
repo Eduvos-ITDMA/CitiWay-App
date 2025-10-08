@@ -2,7 +2,10 @@ package com.example.citiway.data.remote
 
 import android.app.Application
 import android.location.Geocoder
+import android.util.Log
 import com.example.citiway.BuildConfig
+import com.example.citiway.data.local.CitiWayDatabase
+import com.example.citiway.data.local.RecentSearch
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.Places
@@ -25,12 +28,6 @@ class PlacesManager(
     private val application: Application,
     private val geocodingService: GeocodingService
 ) {
-    /*
-    * autocompleteSessionToken - session token for billing - regenerated after fetchPlaces() call
-    * placesClient - Main interface for Google Places API calls
-    * geocoder - Android's built-in service for converting coordinates to addresses
-    * locationBounds - Rectangular bounds tht determines the area within which we accept location predictions
-    */
     private var autocompleteSessionToken = AutocompleteSessionToken.newInstance()
     private val placesClient: PlacesClient = Places.createClient(application)
     private val geocoder = Geocoder(application, Locale.getDefault())
@@ -47,6 +44,9 @@ class PlacesManager(
 
     private val scope = CoroutineScope(Dispatchers.Main)
 
+    // ✨ ADD THIS: Initialize the database
+    private val database = CitiWayDatabase.getDatabase(application)
+
     // Expose state flows
     private val _selectedLocation = MutableStateFlow<SelectedLocation?>(null)
     val selectedLocation: StateFlow<SelectedLocation?> = _selectedLocation
@@ -56,6 +56,10 @@ class PlacesManager(
     val predictions: MutableStateFlow<List<AutocompletePrediction>> = _predictions
     private val _searchText = MutableStateFlow("")
     val searchText: MutableStateFlow<String> = _searchText
+
+    // ✨ ADD THIS: Expose recent searches from database
+    private val _recentSearches = MutableStateFlow<List<RecentSearch>>(emptyList())
+    val recentSearches: StateFlow<List<RecentSearch>> = _recentSearches
 
     fun setSelectedLocation(location: SelectedLocation) {
         _selectedLocation.value = location
@@ -70,7 +74,15 @@ class PlacesManager(
         _predictions.value = emptyList()
     }
 
-    // This function requests a list of predictions from the Places API and updates the _predictions field
+    // ✨ ADD THIS: Load recent searches from database
+    fun loadRecentSearches() {
+        scope.launch(Dispatchers.IO) {
+            val searches = database.recentSearchDao().getRecentSearches()
+            _recentSearches.value = searches
+            Log.d("PlacesManager", "📖 Loaded ${searches.size} recent searches from database")
+        }
+    }
+
     fun searchPlaces(queryText: String) {
         if (queryText.length > 2) {
             scope.launch {
@@ -90,8 +102,7 @@ class PlacesManager(
         }
     }
 
-    // When user taps on a search suggestion, this function fetches detailed place information and
-    // updates the search text with a clean location name. It also resets the AutocompleteSessionToken
+    // ✨ MODIFIED: Now saves to database when user selects a place
     fun selectPlace(prediction: AutocompletePrediction) {
         scope.launch {
             try {
@@ -107,33 +118,65 @@ class PlacesManager(
                 place.location?.let { latLng ->
                     val primaryText =
                         place.displayName ?: prediction.getPrimaryText(null).toString()
+                    val secondaryText = place.formattedAddress ?: prediction.getSecondaryText(null).toString()
+
                     _selectedLocation.value = SelectedLocation(latLng, place.id ?: "", primaryText)
                     _searchText.value = primaryText
+
+                    // ✨ SAVE TO DATABASE!
+                    saveToDatabase(
+                        placeId = place.id ?: "",
+                        placeName = primaryText,
+                        placeAddress = secondaryText,
+                        latLng = latLng
+                    )
                 }
             } catch (e: Exception) {
-                // TODO: Handle fetchPlace failure
+                Log.e("PlacesManager", "Failed to select place", e)
             }
         }
     }
 
-    // This function uses the GeocodingService retrofit API and Places API to convert
-    // a LatLng value to a SelectedLocation
+    // ✨ ADD THIS: Helper function to save searches
+    private fun saveToDatabase(
+        placeId: String,
+        placeName: String,
+        placeAddress: String,
+        latLng: LatLng
+    ) {
+        scope.launch(Dispatchers.IO) {
+            try {
+                val search = RecentSearch(
+                    placeId = placeId,
+                    placeName = placeName,
+                    placeAddress = placeAddress,
+                    latitude = latLng.latitude,
+                    longitude = latLng.longitude
+                )
+                database.recentSearchDao().insertSearch(search)
+                Log.d("PlacesManager", "✅ Saved to database: $placeName")
+
+                // Reload the list
+                loadRecentSearches()
+            } catch (e: Exception) {
+                Log.e("PlacesManager", "❌ Failed to save to database", e)
+            }
+        }
+    }
+
     suspend fun getPlaceFromLatLng(latLng: LatLng): SelectedLocation {
         val latLngString = "${latLng.latitude},${latLng.longitude}"
 
-        // Get the Place ID via Reverse Geocoding (HTTP call)
         val response = geocodingService.reverseGeocode(latLngString, BuildConfig.MAPS_API_KEY)
 
         if (response.status != "OK" || response.results.isEmpty()) {
             throw Exception("Reverse Geocoding failed: ${response.status}")
         }
 
-        // Use the first result's Place ID
         val placeId =
             response.results.first().placeId
                 ?: throw Exception("Place ID not found in response.")
 
-        // Fetch the full Place object using the native PlacesClient
         val place = placesClient.awaitFetchPlace(placeId, placeFields) {
             sessionToken = sessionToken
         }.place
@@ -147,15 +190,6 @@ class PlacesManager(
         )
     }
 
-    /**
-     * Sets the selectedLocation property to the device's current location using the
-     * fusedLocationClient
-     *
-     * IMPORTANT: Throws exception if location permission is not granted by the user. Even if
-     * location is disabled in the app via the toggle in the drawer, this function will still user
-     * the device's location. Therefore the responsibility is on the caller to check for location
-     * permission granted AND location is enabled in the app
-     */
     fun useUserLocation() {
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(application)
 
