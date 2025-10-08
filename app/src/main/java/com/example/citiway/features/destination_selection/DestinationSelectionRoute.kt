@@ -9,6 +9,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.citiway.App
 import com.example.citiway.core.utils.ScreenWrapper
+import com.example.citiway.data.remote.PlacesActions
+import com.example.citiway.data.remote.PlacesState
 import com.example.citiway.data.remote.SelectedLocation
 import com.example.citiway.di.viewModelFactory
 import com.example.citiway.features.shared.JourneyViewModel
@@ -21,17 +23,16 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 fun DestinationSelectionRoute(
     navController: NavController,
 ) {
+    val placesManager = App.appModule.placesManager
+    val placesState by placesManager.state.collectAsStateWithLifecycle()
+    val placesActions = placesManager.actions
+
     val context = LocalActivity.current as ComponentActivity
 
-    val mapViewModel: MapViewModel = viewModel(
-        factory = viewModelFactory {
-            MapViewModel(App.appModule.placesManager)
-        }
-    )
+    val mapViewModel: MapViewModel = viewModel()
 
     val journeyViewModel: JourneyViewModel = viewModel(
-        viewModelStoreOwner = context,
-        factory = viewModelFactory {
+        viewModelStoreOwner = context, factory = viewModelFactory {
             JourneyViewModel(navController)
         })
 
@@ -41,9 +42,7 @@ fun DestinationSelectionRoute(
     // Navigating to start location selection screen once location is confirmed
     val onConfirmLocation: (SelectedLocation) -> Unit = { location ->
         journeyViewModel.confirmLocationSelection(
-            location,
-            LocationType.START,
-            mapViewModel::clearSearch
+            location, LocationType.END, placesActions.onClearSearch
         )
     }
 
@@ -52,6 +51,8 @@ fun DestinationSelectionRoute(
             paddingValues = paddingValues,
             state = state,
             actions = actions,
+            placesState = placesState,
+            placesActions = placesActions,
             cameraPositionState = mapViewModel.cameraPositionState,
             onConfirmLocation = onConfirmLocation
         )

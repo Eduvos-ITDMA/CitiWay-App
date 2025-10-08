@@ -4,13 +4,15 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.example.citiway.core.navigation.routes.Screen
+import com.example.citiway.data.remote.PlacesActions
+import com.example.citiway.data.remote.PlacesManager
+import com.example.citiway.data.remote.PlacesState
 import com.example.citiway.features.SplashScreen
 import com.example.citiway.features.help.HelpRoute
 import com.example.citiway.features.progress_tracker.ProgressTrackerRoute
 
 fun NavGraphBuilder.topLevelDestinations(
-    navController: NavController
-
+    navController: NavController,
 ) {
     // Splash screen
     composable(Screen.Splash.route) { SplashScreen(navController) }

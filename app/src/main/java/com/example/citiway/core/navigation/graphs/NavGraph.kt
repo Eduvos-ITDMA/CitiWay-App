@@ -9,11 +9,14 @@ package com.example.citiway.core.navigation.graphs
  * destinations.
  */
 
-import androidx.compose.material3.DrawerState
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import com.example.citiway.App
 import com.example.citiway.core.navigation.routes.GraphRoutes
 import com.example.citiway.core.navigation.routes.HOME_ROUTE
 import com.example.citiway.core.navigation.routes.ROOT_ROUTE

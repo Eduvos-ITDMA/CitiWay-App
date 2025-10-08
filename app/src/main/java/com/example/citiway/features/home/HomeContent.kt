@@ -34,13 +34,17 @@ import com.example.citiway.core.ui.components.Space
 import com.example.citiway.core.ui.components.Title
 import com.example.citiway.core.ui.components.VerticalSpace
 import com.example.citiway.data.local.CompletedJourney
+import com.example.citiway.data.remote.PlacesActions
+import com.example.citiway.data.remote.PlacesState
 import com.example.citiway.features.shared.CompletedJourneysState
 
 @Composable
 fun HomeContent(
     completedJourneysState: CompletedJourneysState,
+    homeActions: HomeActions,
+    placesState: PlacesState,
+    placesActions: PlacesActions,
     paddingValues: PaddingValues,
-    actions: HomeActions
 ) {
     Column(
         modifier = Modifier
@@ -53,24 +57,24 @@ fun HomeContent(
         HeaderSection()
         VerticalSpace(24)
 
-        DestinationSearchBar(actions)
+        DestinationSearchBar(homeActions, placesState, placesActions)
         VerticalSpace(24)
 
         CompletedTripsSection(
             completedJourneysState.recentJourneys,
-            actions.onToggleFavourite,
+            homeActions.onToggleFavourite,
             "Recent Trips"
         )
         VerticalSpace(24)
 
         CompletedTripsSection(
             completedJourneysState.favouriteJourneys,
-            actions.onToggleFavourite,
+            homeActions.onToggleFavourite,
             "Favourite Trips"
         )
         VerticalSpace(24)
 
-        SchedulesLink(actions.onSchedulesLinkClick)
+        SchedulesLink(homeActions.onSchedulesLinkClick)
         Space(1f)
     }
 }
@@ -91,16 +95,18 @@ private fun HeaderSection() {
 }
 
 @Composable
-fun DestinationSearchBar(actions: HomeActions) {
+fun DestinationSearchBar(homeActions: HomeActions, placesState: PlacesState, placesActions: PlacesActions) {
     LocationSearchField(
         icon = { modifier ->
             Icon(
                 painterResource(R.drawable.ic_map),
                 contentDescription = "Open Map",
-                modifier = modifier.clickable { actions.onMapIconClick() }
+                modifier = modifier.clickable { homeActions.onMapIconClick() }
             )
         },
-        onSelectPrediction = actions.onSelectPrediction,
+        placesState = placesState,
+        placesActions = placesActions,
+        onSelectPrediction = homeActions.onSelectPrediction,
         placeholder = "Where to?"
     )
 }

@@ -11,7 +11,7 @@ import com.example.citiway.features.home.HomeRoute
 import com.example.citiway.features.schedules.SchedulesRoute
 
 fun NavGraphBuilder.homeNavGraph(
-    navController: NavController
+    navController: NavController,
 ) {
     navigation(startDestination = Screen.Home.route, route = HOME_ROUTE) {
         // Home screen
