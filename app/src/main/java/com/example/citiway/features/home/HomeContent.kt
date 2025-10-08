@@ -62,15 +62,17 @@ fun HomeContent(
 
         CompletedTripsSection(
             completedJourneysState.recentJourneys,
-            homeActions.onToggleFavourite,
-            "Recent Trips"
+            actions.onToggleFavourite,
+            "Recent Trips",
+            onTitleClick = actions.onRecentTitleClick
         )
         VerticalSpace(24)
 
         CompletedTripsSection(
             completedJourneysState.favouriteJourneys,
-            homeActions.onToggleFavourite,
-            "Favourite Trips"
+            actions.onToggleFavourite,
+            "Favourite Trips",
+            onTitleClick = actions.onFavouritesTitleClick
         )
         VerticalSpace(24)
 
@@ -115,10 +117,18 @@ fun DestinationSearchBar(homeActions: HomeActions, placesState: PlacesState, pla
 fun CompletedTripsSection(
     journeys: List<CompletedJourney>,
     onToggleFavourite: (String) -> Unit,
-    title: String
+    title: String,
+    onTitleClick: (() -> Unit)? = null
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
-        Heading(title)
+        Heading(
+            title,
+            modifier = if (onTitleClick != null) {
+                Modifier.clickable { onTitleClick() }
+            } else {
+                Modifier
+            }
+        )
 
         VerticalSpace(12)
 

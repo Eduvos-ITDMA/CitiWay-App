@@ -104,7 +104,8 @@ fun FavouritesScreenPreview() {
     CitiWayTheme {
         FavouritesContent(
             paddingValues = PaddingValues(),
-            navController = rememberNavController(),
+            journeys = emptyList(),
+            onToggleFavourite = {}
         )
     }
 }
