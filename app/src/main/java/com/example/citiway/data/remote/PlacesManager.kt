@@ -102,12 +102,10 @@ class PlacesManager(
     }
 
     private fun setSearchText(query: String) {
-        Log.d("places setSearchText", query)
         _state.update { currentState -> currentState.copy(searchText = query) }
     }
 
     private fun clearSearch() {
-        Log.d("places clear search", "Search cleared")
         _state.update { currentState ->
             currentState.copy(searchText = "", predictions = emptyList())
         }

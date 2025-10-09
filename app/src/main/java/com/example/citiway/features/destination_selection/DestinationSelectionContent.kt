@@ -1,6 +1,7 @@
 package com.example.citiway.features.destination_selection
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
@@ -96,7 +98,7 @@ fun DestinationSelectionContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f) // Taking up remaining space in the column
-                .padding(horizontal = 16.dp),
+                .border(1.dp, MaterialTheme.colorScheme.onBackground),
             cameraPositionState = cameraPositionState,
             onMapClick = actions.selectLocationOnMap,
             properties = MapProperties(

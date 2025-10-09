@@ -79,7 +79,7 @@ fun LocationSearchField(
     val expanded = showPredictions && predictions.isNotEmpty()
 
     val textFieldValue by remember(placesState.searchText) {
-        val text = placesState.searchText
+        val text = placesState.searchText.ifEmpty { initialValue }
         mutableStateOf(
             TextFieldValue(
                 text = text,
