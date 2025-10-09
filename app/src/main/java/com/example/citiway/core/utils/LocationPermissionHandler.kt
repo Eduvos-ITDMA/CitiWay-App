@@ -1,7 +1,6 @@
-package com.example.citiway.utils
+package com.example.citiway.core.utils
 
 import android.Manifest
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings

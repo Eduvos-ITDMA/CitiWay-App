@@ -34,15 +34,17 @@ import com.example.citiway.core.ui.components.Space
 import com.example.citiway.core.ui.components.Title
 import com.example.citiway.core.ui.components.VerticalSpace
 import com.example.citiway.data.local.CompletedJourney
+import com.example.citiway.data.remote.PlacesActions
+import com.example.citiway.data.remote.PlacesState
 import com.example.citiway.features.shared.CompletedJourneysState
-import com.example.citiway.features.shared.LocationSelectionState
 
 @Composable
 fun HomeContent(
     completedJourneysState: CompletedJourneysState,
-    locationSelectionState: LocationSelectionState,
+    homeActions: HomeActions,
+    placesState: PlacesState,
+    placesActions: PlacesActions,
     paddingValues: PaddingValues,
-    actions: HomeActions
 ) {
     Column(
         modifier = Modifier
@@ -55,24 +57,26 @@ fun HomeContent(
         HeaderSection()
         VerticalSpace(24)
 
-        DestinationSearchBar(locationSelectionState, actions)
+        DestinationSearchBar(homeActions, placesState, placesActions)
         VerticalSpace(24)
 
         CompletedTripsSection(
             completedJourneysState.recentJourneys,
-            actions.onToggleFavourite,
-            "Recent Trips"
+            homeActions.onToggleFavourite,
+            "Recent Trips",
+            onTitleClick = homeActions.onRecentTitleClick
         )
         VerticalSpace(24)
 
         CompletedTripsSection(
             completedJourneysState.favouriteJourneys,
-            actions.onToggleFavourite,
-            "Favourite Trips"
+            homeActions.onToggleFavourite,
+            "Favourite Trips",
+            onTitleClick = homeActions.onFavouritesTitleClick
         )
         VerticalSpace(24)
 
-        SchedulesLink(actions.onSchedulesLinkClick)
+        SchedulesLink(homeActions.onSchedulesLinkClick)
         Space(1f)
     }
 }
@@ -93,18 +97,18 @@ private fun HeaderSection() {
 }
 
 @Composable
-fun DestinationSearchBar(locationSelectionState: LocationSelectionState, actions: HomeActions) {
+fun DestinationSearchBar(homeActions: HomeActions, placesState: PlacesState, placesActions: PlacesActions) {
     LocationSearchField(
         icon = { modifier ->
             Icon(
                 painterResource(R.drawable.ic_map),
                 contentDescription = "Open Map",
-                modifier = modifier.clickable { actions.onMapIconClick() }
+                modifier = modifier.clickable { homeActions.onMapIconClick() }
             )
         },
-        state = locationSelectionState,
-        actions = actions.locationSelectionActions,
-        onSelectPrediction = actions.onSelectPrediction,
+        placesState = placesState,
+        placesActions = placesActions,
+        onSelectPrediction = homeActions.onSelectPrediction,
         placeholder = "Where to?"
     )
 }
@@ -113,10 +117,18 @@ fun DestinationSearchBar(locationSelectionState: LocationSelectionState, actions
 fun CompletedTripsSection(
     journeys: List<CompletedJourney>,
     onToggleFavourite: (String) -> Unit,
-    title: String
+    title: String,
+    onTitleClick: (() -> Unit)? = null
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
-        Heading(title)
+        Heading(
+            title,
+            modifier = if (onTitleClick != null) {
+                Modifier.clickable { onTitleClick() }
+            } else {
+                Modifier
+            }
+        )
 
         VerticalSpace(12)
 

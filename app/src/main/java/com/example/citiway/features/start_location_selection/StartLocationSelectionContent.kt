@@ -1,9 +1,11 @@
 package com.example.citiway.features.start_location_selection
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -11,8 +13,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Autorenew
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -26,17 +31,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.citiway.core.ui.components.HorizontalSpace
 import com.example.citiway.core.ui.components.LocationSearchField
 import com.example.citiway.core.ui.components.Title
 import com.example.citiway.core.ui.components.VerticalSpace
-import com.example.citiway.core.util.StartLocationScreenPreview
-import com.example.citiway.features.shared.LocationSelectionActions
-import com.example.citiway.features.shared.LocationSelectionState
+import com.example.citiway.data.remote.PlacesActions
+import com.example.citiway.data.remote.PlacesState
+import com.example.citiway.data.remote.SelectedLocation
+import com.example.citiway.features.shared.MapActions
+import com.example.citiway.features.shared.MapState
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
@@ -44,21 +49,18 @@ import com.google.maps.android.compose.MapType
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
-import androidx.compose.material.icons.filled.MyLocation
-import androidx.compose.material.icons.filled.Autorenew
-import androidx.compose.material.icons.filled.TouchApp
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun StartLocationSelectionContent(
     paddingValues: PaddingValues,
-    state: LocationSelectionState,
-    actions: LocationSelectionActions,
+    state: MapState,
+    actions: MapActions,
+    placesState: PlacesState,
+    placesActions: PlacesActions,
     onPermissionRequest: () -> Unit,
     cameraPositionState: CameraPositionState,
-    onConfirmLocation: (LatLng) -> Unit,
+    onConfirmLocation: (SelectedLocation) -> Unit,
     locationEnabledInApp: Boolean
 ) {
     // State Variables from StartLocationViewModel. Same as in destination_selection
@@ -87,9 +89,8 @@ fun StartLocationSelectionContent(
                     modifier = Modifier.size(20.dp)
                 )
             },
-            state = state,
-            actions = actions,
-            onSelectPrediction = actions.selectPlace,
+            placesState = placesState,
+            placesActions = placesActions,
             placeholder = "Where are you?"
         )
 
@@ -162,9 +163,6 @@ fun StartLocationSelectionContent(
         VerticalSpace(10)
 
         /*
-         * onMapClick triggers reverse geocoding to show address in search field and
-         * Automatically hides search suggestions when map is tapped
-         *
          * TODO:
          * - Need to show loading states for location services and reverse geocoding during API calls.
          * - UX currently a bit janky and slow.
@@ -175,12 +173,7 @@ fun StartLocationSelectionContent(
                 .weight(1f) // Taking up remaining space in the column
                 .padding(horizontal = 16.dp),
             cameraPositionState = cameraPositionState,
-            onMapClick = { latLng ->
-                // When user taps the map, set location and get address
-                actions.setSelectedLocation(latLng)
-                actions.reverseGeocode(latLng)
-                actions.toggleShowPredictions(false)
-            },
+            onMapClick = actions.selectLocationOnMap,
             properties = MapProperties(
                 mapType = MapType.NORMAL,
                 isMyLocationEnabled = isLocationPermissionGranted
@@ -193,8 +186,8 @@ fun StartLocationSelectionContent(
             // Showing marker for selected location if one exists
             selectedLocation?.let { location ->
                 Marker(
-                    state = MarkerState(position = location),
-                    title = if (location == userLocation) "Your Current Location" else "Selected Location"
+                    state = MarkerState(position = location.latLng),
+                    title = if (location.latLng == userLocation) "Your Current Location" else "Selected Location"
                 )
             }
         }
@@ -230,10 +223,4 @@ fun StartLocationSelectionContent(
 
         VerticalSpace(16)
     }
-}
-
-@Preview
-@Composable
-fun Preview() {
-    StartLocationScreenPreview()
 }

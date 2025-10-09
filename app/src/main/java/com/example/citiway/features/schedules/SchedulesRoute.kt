@@ -3,7 +3,7 @@ package com.example.citiway.features.schedules
 import androidx.compose.material3.DrawerState
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
-import com.example.citiway.core.util.ScreenWrapper
+import com.example.citiway.core.utils.ScreenWrapper
 
 @Composable
 fun SchedulesRoute(

@@ -2,7 +2,7 @@ package com.example.citiway.features.help
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
-import com.example.citiway.core.util.ScreenWrapper
+import com.example.citiway.core.utils.ScreenWrapper
 
 @Composable
 fun HelpRoute(

@@ -2,7 +2,9 @@ package com.example.citiway.features.progress_tracker
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
-import com.example.citiway.core.util.ScreenWrapper
+import com.example.citiway.core.utils.ScreenWrapper
+import com.example.citiway.data.remote.PlacesActions
+import com.example.citiway.data.remote.PlacesState
 
 @Composable
 fun ProgressTrackerRoute(

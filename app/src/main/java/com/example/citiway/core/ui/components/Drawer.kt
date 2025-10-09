@@ -1,13 +1,11 @@
 package com.example.citiway.core.ui.components
 
 import androidx.activity.ComponentActivity
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,8 +17,20 @@ import androidx.compose.ui.window.PopupProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.citiway.core.navigation.routes.Screen
+import com.example.citiway.core.utils.rememberLocationPermissionHandler
 import com.example.citiway.features.shared.DrawerViewModel
-import com.example.citiway.utils.rememberLocationPermissionHandler
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 
 /**
  * ModernSettingsMenu Component
@@ -41,7 +51,6 @@ fun ModernSettingsMenu(
     expanded: Boolean,
     onDismiss: () -> Unit,
     navController: NavController,
-    modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
     val viewModel: DrawerViewModel = viewModel(
@@ -92,28 +101,94 @@ fun ModernSettingsMenu(
     if (showPermissionInfoDialog) {
         AlertDialog(
             onDismissRequest = { showPermissionInfoDialog = false },
-            title = { Text("About Location Permission") },
-            text = {
-                Text(
-                    "For security reasons, apps cannot remove their own permissions.\n\n" +
-                            "Turning this off will disable location features in the app, but the system permission will remain granted.\n\n" +
-                            "To fully revoke permission, go to:\nSettings → Apps → CitiWay → Permissions → Location → Deny"
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.Info,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(48.dp)
                 )
             },
+            title = {
+                Text(
+                    text = "About Location Permission",
+                    style = MaterialTheme.typography.headlineSmall,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            text = {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Text(
+                        text = "For security reasons, apps cannot remove their own permissions.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+
+                    HorizontalDivider(
+                        modifier = Modifier.padding(vertical = 8.dp),
+                        color = MaterialTheme.colorScheme.outlineVariant
+                    )
+
+                    Text(
+                        text = "What This Means:",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    OptionItem(
+                        icon = Icons.Default.Lock,
+                        text = "Turning this off disables location features in the app"
+                    )
+
+                    OptionItem(
+                        icon = Icons.Default.Check,
+                        text = "The system permission will remain granted"
+                    )
+
+                    OptionItem(
+                        icon = Icons.Default.Settings,
+                        text = "To fully revoke, use your device settings"
+                    )
+
+                    Text(
+                        text = "Path: Settings → Apps → CitiWay → Permissions → Location → Deny",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontStyle = FontStyle.Italic,
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
+                }
+            },
             confirmButton = {
-                TextButton(onClick = {
-                    // Opening system settings to allow manual permission management
-                    locationPermissionHandler.openSettings()
-                    showPermissionInfoDialog = false
-                }) {
+                Button(
+                    onClick = {
+                        locationPermissionHandler.openSettings()
+                        showPermissionInfoDialog = false
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Settings,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
                     Text("Open Settings")
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showPermissionInfoDialog = false }) {
-                    Text("Got it")
+                TextButton(
+                    onClick = { showPermissionInfoDialog = false },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Got It")
                 }
-            }
+            },
+            containerColor = MaterialTheme.colorScheme.surface,
+            shape = RoundedCornerShape(20.dp)
         )
     }
 
@@ -248,6 +323,20 @@ fun ModernSettingsMenu(
 
                     HorizontalDivider()
 
+                    // Favourites Page
+                    // Clicking navigates to favourites
+                    MenuItemClickable(
+                        title = "Favourites",
+                        subtitle = "Saved trips and preferred routes",
+                        onClick = {
+                            onDismiss()
+                            navController.navigate(Screen.Favourites.route)
+                        }
+                    )
+
+
+                    HorizontalDivider()
+
                     // MyCiTi card integration toggle
                     // Enabling shows discounted pricing for card members throughout the app
                     MenuItemWithSwitch(
@@ -328,7 +417,7 @@ private fun MenuItemClickable(
             }
             // Trailing arrow indicating navigation action
             Icon(
-                imageVector = Icons.Default.KeyboardArrowRight,
+                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -378,6 +467,31 @@ private fun MenuItemWithSwitch(
         Switch(
             checked = checked,
             onCheckedChange = onCheckedChange
+        )
+    }
+}
+
+@Composable
+private fun OptionItem(
+    icon: ImageVector,
+    text: String
+) {
+    // Displaying individual option with icon and descriptive text
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.Top,
+        modifier = Modifier.padding(vertical = 4.dp)
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(20.dp)
+        )
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface
         )
     }
 }

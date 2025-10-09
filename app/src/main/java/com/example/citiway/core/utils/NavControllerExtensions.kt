@@ -1,4 +1,4 @@
-package com.example.citiway.core.util
+package com.example.citiway.core.utils
 // In a file like NavControllerDebugger.kt
 
 import android.annotation.SuppressLint
