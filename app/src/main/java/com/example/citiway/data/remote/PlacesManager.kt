@@ -3,7 +3,6 @@ package com.example.citiway.data.remote
 import android.app.Application
 import android.location.Location
 import android.os.Looper
-import android.util.Log
 import androidx.compose.runtime.Stable
 import com.example.citiway.BuildConfig
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -29,7 +28,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.tasks.await
 import kotlin.coroutines.resumeWithException
 
 @Stable
@@ -52,7 +50,9 @@ class PlacesActions(
 )
 
 class PlacesManager(
-    private val application: Application, private val geocodingService: GeocodingService
+    private val application: Application,
+    private val apiKey: String,
+    private val geocodingService: GeocodingService
 ) {
     private val _state = MutableStateFlow(PlacesState())
     val state: StateFlow<PlacesState> = _state
@@ -173,8 +173,8 @@ class PlacesManager(
     private suspend fun getPlaceFromLatLng(latLng: LatLng): SelectedLocation {
         val latLngString = "${latLng.latitude},${latLng.longitude}"
 
-        // Get the Place ID via Reverse Geocoding (HTTP call)
-        val response = geocodingService.reverseGeocode(latLngString, BuildConfig.MAPS_API_KEY)
+        // Get the Place ID via Reverse Geocoding
+        val response = geocodingService.reverseGeocode(latLngString, apiKey)
 
         if (response.status != "OK" || response.results.isEmpty()) {
             throw Exception("Reverse Geocoding failed: ${response.status}")

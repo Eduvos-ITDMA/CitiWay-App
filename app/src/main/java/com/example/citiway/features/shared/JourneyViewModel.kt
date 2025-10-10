@@ -9,8 +9,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 
 class JourneyViewModel(val navController: NavController) : ViewModel() {
-    private val _journeyState = MutableStateFlow(JourneyState())
-    val journeyState: StateFlow<JourneyState> = _journeyState
+    private val _state = MutableStateFlow(JourneyState())
+    val state: StateFlow<JourneyState> = _state
 
     fun confirmLocationSelection(
         selectedLocation: SelectedLocation,
@@ -19,13 +19,13 @@ class JourneyViewModel(val navController: NavController) : ViewModel() {
     ) {
         when (locationType) {
             LocationType.START -> {
-                _journeyState.update { it.copy(startLocation = selectedLocation) }
+                _state.update { it.copy(startLocation = selectedLocation) }
                 clearSearch()
                 navController.navigate(Screen.JourneySelection.route)
             }
 
             LocationType.END -> {
-                _journeyState.update { it.copy(destination = selectedLocation) }
+                _state.update { it.copy(destination = selectedLocation) }
                 clearSearch()
                 navController.navigate(Screen.StartLocationSelection.route)
             }

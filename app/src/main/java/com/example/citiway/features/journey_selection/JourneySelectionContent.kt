@@ -1,6 +1,5 @@
 package com.example.citiway.features.journey_selection
 
-import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -30,7 +29,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.layout.boundsInParent
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.res.painterResource
@@ -78,7 +76,6 @@ fun SelectedLocationFields(
     placesState: PlacesState,
     placesActions: PlacesActions
 ) {
-    Log.d("Journey State", state.toString())
     var startIconCoords by remember { mutableStateOf<Offset?>(null) }
     var endIconCoords by remember { mutableStateOf<Offset?>(null) }
     var canvasCoords by remember { mutableStateOf<LayoutCoordinates?>(null) }
