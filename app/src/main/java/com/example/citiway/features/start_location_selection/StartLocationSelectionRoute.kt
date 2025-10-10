@@ -66,6 +66,9 @@ fun StartLocationSelectionRoute(
     LaunchedEffect(locationPermissionState.status.isGranted, locationEnabledInApp) {
         val systemGranted = locationPermissionState.status.isGranted
 
+        // Aded fix Update MapViewModel with current permission state
+        mapActions.updateLocationPermission(systemGranted)
+
         // Syncing DataStore only when user actively granted permission via our button
         // This prevents overriding if user intentionally disabled location in app settings
         if (systemGranted && permissionJustRequested && !locationEnabledInApp) {
@@ -80,6 +83,7 @@ fun StartLocationSelectionRoute(
             showPermissionMismatchDialog = true
         }
     }
+
 
     // Showing dialog when permissions are mismatched
     if (showPermissionMismatchDialog) {
@@ -102,6 +106,8 @@ fun StartLocationSelectionRoute(
         )
     }
 
+    // In StartLocationSelectionRoute, update the ScreenWrapper call:
+
     ScreenWrapper(navController, true, { paddingValues ->
         StartLocationSelectionContent(
             paddingValues = paddingValues,
@@ -110,16 +116,21 @@ fun StartLocationSelectionRoute(
             placesState = placesState,
             placesActions = placesActions,
             onPermissionRequest = {
-                // Marking that user initiated the request so we can distinguish between:
-                // 1. User actively clicking "Use my location" (should sync DataStore to true)
-                // 2. System permission existing from before but app setting disabled (should NOT override user's choice)
-                // This prevents us from automatically re-enabling location if user intentionally disabled it in app settings. No lies to user.
+                // This old handler is now replaced by smart logic in the content
+                // But keep it for backward compatibility or remove if not used elsewhere
                 permissionJustRequested = true
                 locationPermissionState.launchPermissionRequest()
             },
             cameraPositionState = mapViewModel.cameraPositionState,
             onConfirmLocation = onConfirmLocation,
-            locationEnabledInApp = locationEnabledInApp
+            locationEnabledInApp = locationEnabledInApp,
+            // ADD THESE NEW PARAMETERS:
+            isLocationPermissionGranted = locationPermissionState.status.isGranted,
+            onEnableLocation = { drawerViewModel.toggleLocation(true) },
+            onRequestSystemPermission = {
+                permissionJustRequested = true
+                locationPermissionState.launchPermissionRequest()
+            }
         )
     })
 }

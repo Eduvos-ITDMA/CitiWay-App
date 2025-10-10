@@ -251,11 +251,9 @@ class PlacesManager(
 
                 override fun onLocationAvailability(locationAvailability: LocationAvailability) {
                     if (!locationAvailability.isLocationAvailable) {
-                        // Handle cases where the GPS/system isn't ready
-                        continuation.resumeWithException(
-                            IllegalStateException("Location services are unavailable on the device.")
-                        )
-                        fusedLocationClient.removeLocationUpdates(this)
+                        Log.w("PlacesManager", "Location temporarily unavailable — will wait.")
+                        // Don't throw — just log and wait for onLocationResult()
+                        // The FusedLocationProvider will call it once ready
                     }
                 }
             }
