@@ -11,6 +11,8 @@ import kotlinx.coroutines.launch
 data class CompletedJourneysState(
     val recentJourneys: List<CompletedJourney> = emptyList(),
     val favouriteJourneys: List<CompletedJourney> = emptyList(),
+    val allJourneys: List<CompletedJourney> = emptyList(), // NEW val for loading all db entries for testing history and favorites
+    val allFavouriteJourneys: List<CompletedJourney> = emptyList() // NEW val for loading all db entries for testing history and favorites
 )
 
 class CompletedJourneysViewModel(
@@ -22,6 +24,8 @@ class CompletedJourneysViewModel(
 
     init {
         loadJourneys()
+        loadAllJourneys()
+        loadAllFavouriteJourneys()
     }
 
     private fun loadJourneys() {
@@ -38,6 +42,24 @@ class CompletedJourneysViewModel(
             savedPlaceDao.getFavoriteJourneys().collectLatest { savedPlaces ->
                 val journeys = savedPlaces.map { it.toCompletedJourney() }
                 _screenState.update { it.copy(favouriteJourneys = journeys) }
+            }
+        }
+    }
+
+    private fun loadAllJourneys() {
+        viewModelScope.launch {
+            savedPlaceDao.getAllJourneys().collectLatest { savedPlaces ->
+                val journeys = savedPlaces.map { it.toCompletedJourney() }
+                _screenState.update { it.copy(allJourneys = journeys) } // reuse existing field
+            }
+        }
+    }
+
+    private fun loadAllFavouriteJourneys() {
+        viewModelScope.launch {
+            savedPlaceDao.getAllFavouriteJourneys().collectLatest { savedPlaces ->
+                val favourites = savedPlaces.map { it.toCompletedJourney() }
+                _screenState.update { it.copy(allFavouriteJourneys = favourites) }
             }
         }
     }

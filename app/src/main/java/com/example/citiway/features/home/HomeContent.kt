@@ -82,6 +82,40 @@ fun HomeContent(
 }
 
 @Composable
+fun SectionTitleWithArrow( //Added small arrow so users know they can click it to see more.
+    title: String,
+    onClick: (() -> Unit)? = null
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .then(
+                if (onClick != null) Modifier.clickable { onClick() }
+                else Modifier
+            ),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Start
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleLarge.copy(
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+        )
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f),
+            modifier = Modifier
+                .size(20.dp)
+                .padding(start = 6.dp)
+        )
+    }
+}
+
+
+@Composable
 private fun HeaderSection() {
     Column(
         modifier = Modifier.fillMaxWidth()
@@ -121,14 +155,7 @@ fun CompletedTripsSection(
     onTitleClick: (() -> Unit)? = null
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
-        Heading(
-            title,
-            modifier = if (onTitleClick != null) {
-                Modifier.clickable { onTitleClick() }
-            } else {
-                Modifier
-            }
-        )
+        SectionTitleWithArrow(title = title, onClick = onTitleClick)
 
         VerticalSpace(12)
 

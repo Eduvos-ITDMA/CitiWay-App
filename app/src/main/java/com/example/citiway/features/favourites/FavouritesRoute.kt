@@ -28,7 +28,7 @@ fun FavouritesRoute(
 
     ScreenWrapper(navController, showBottomBar = true, content = { paddingValues ->
         FavouritesContent(
-            journeys = completedJourneysState.favouriteJourneys,
+            journeys = completedJourneysState.allFavouriteJourneys,
             paddingValues = paddingValues,
             onToggleFavourite = completedJourneysViewModel::toggleFavourite
         )

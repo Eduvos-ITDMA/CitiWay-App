@@ -11,30 +11,55 @@ fun createDummyJourneys(dao: SavedPlaceDao) {
     CoroutineScope(Dispatchers.IO).launch {
         val dummyJourneys = listOf(
             SavedPlace(
-                route = "test",
-                journeyDate = "2025-10-10",
-                durationMin = 25,
-                isFavorite = false,
+                route = "Downtown → Greenstone Mall",
+                journeyDate = "2025-10-11",
+                durationMin = 22,
+                isFavorite = true,
                 itemType = "journey",
                 lastUsedTimestamp = System.currentTimeMillis()
             ),
             SavedPlace(
-                route = "test1",
-                journeyDate = "2025-10-09",
-                durationMin = 30,
+                route = "OR Tambo Airport → Sandton",
+                journeyDate = "2025-10-10",
+                durationMin = 36,
                 isFavorite = false,
                 itemType = "journey",
-                lastUsedTimestamp = System.currentTimeMillis() - 86400000 // 1 day ago
+                lastUsedTimestamp = System.currentTimeMillis() - 86_400_000L // 1 day ago
             ),
             SavedPlace(
-                route = "test2",
-                journeyDate = "2025-10-08",
-                durationMin = 35,
+                route = "Melrose Arch → Rosebank",
+                journeyDate = "2025-10-09",
+                durationMin = 18,
                 isFavorite = false,
                 itemType = "journey",
-                lastUsedTimestamp = System.currentTimeMillis() - 172800000 // 2 days ago
+                lastUsedTimestamp = System.currentTimeMillis() - 2 * 86_400_000L // 2 days ago
+            ),
+            SavedPlace(
+                route = "Sandton → Midrand",
+                journeyDate = "2025-10-08",
+                durationMin = 27,
+                isFavorite = true,
+                itemType = "journey",
+                lastUsedTimestamp = System.currentTimeMillis() - 3 * 86_400_000L // 3 days ago
+            ),
+            SavedPlace(
+                route = "Pretoria → Johannesburg CBD",
+                journeyDate = "2025-10-07",
+                durationMin = 45,
+                isFavorite = false,
+                itemType = "journey",
+                lastUsedTimestamp = System.currentTimeMillis() - 4 * 86_400_000L // 4 days ago
+            ),
+            SavedPlace(
+                route = "Randburg → Fourways",
+                journeyDate = "2025-10-06",
+                durationMin = 33,
+                isFavorite = false,
+                itemType = "journey",
+                lastUsedTimestamp = System.currentTimeMillis() - 5 * 86_400_000L // 5 days ago
             )
         )
+
 
         dummyJourneys.forEach { journey ->
             dao.insertPlace(journey)

@@ -18,6 +18,15 @@ interface SavedPlaceDao {
     @Query("SELECT * FROM saved_places WHERE itemType = 'journey' ORDER BY lastUsedTimestamp ASC LIMIT 3")
     fun getRecentJourneys(): Flow<List<SavedPlace>>
 
+    // Get ALL journey entries (for full route history screen)
+    @Query("SELECT * FROM saved_places WHERE itemType = 'journey' ORDER BY lastUsedTimestamp DESC")
+    fun getAllJourneys(): Flow<List<SavedPlace>>
+
+    // Get ALL favourite journeys (no limit)
+    @Query("SELECT * FROM saved_places WHERE itemType = 'journey' AND isFavorite = 1 ORDER BY lastUsedTimestamp DESC")
+    fun getAllFavouriteJourneys(): Flow<List<SavedPlace>>
+
+
     @Query("SELECT * FROM saved_places WHERE isFavorite = 1 ORDER BY lastUsedTimestamp DESC")
     fun getFavoritePlaces(): Flow<List<SavedPlace>>
 

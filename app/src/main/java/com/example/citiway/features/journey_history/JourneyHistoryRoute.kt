@@ -27,7 +27,7 @@ fun JourneyHistoryRoute(
 
     ScreenWrapper(navController, showBottomBar = true, content = { paddingValues ->
         JourneyHistoryContent(
-            journeys = completedJourneysState.recentJourneys,
+            journeys = completedJourneysState.allJourneys,
             paddingValues = paddingValues
         )
     })
