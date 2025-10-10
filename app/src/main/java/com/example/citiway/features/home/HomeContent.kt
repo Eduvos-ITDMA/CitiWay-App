@@ -58,6 +58,7 @@ fun HomeContent(
         VerticalSpace(24)
 
         DestinationSearchBar(homeActions, placesState, placesActions)
+
         VerticalSpace(24)
 
         CompletedTripsSection(
@@ -66,6 +67,7 @@ fun HomeContent(
             "Recent Trips",
             onTitleClick = homeActions.onRecentTitleClick
         )
+
         VerticalSpace(24)
 
         CompletedTripsSection(
@@ -157,7 +159,7 @@ fun CompletedTripsSection(
     Column(modifier = Modifier.fillMaxWidth()) {
         SectionTitleWithArrow(title = title, onClick = onTitleClick)
 
-        VerticalSpace(12)
+        VerticalSpace(4)
 
         journeys.forEach { journey ->
             key(journey.id) { // DO NOT REMOVE THIS. Recomposition will not be triggered without this
