@@ -19,7 +19,8 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import android.util.Log
-import com.example.citiway.data.local.CitiWayDatabase
+import com.citiway.data.local.DatabaseTest
+//import com.example.citiway.data.local.CitiWayDatabase
 import com.example.citiway.data.local.RecentSearch
 
 class MainActivity : ComponentActivity() {
@@ -30,8 +31,10 @@ class MainActivity : ComponentActivity() {
         if (!Places.isInitialized()) {
             Places.initializeWithNewPlacesApiEnabled(applicationContext, BuildConfig.MAPS_API_KEY)
         }
-// 🧪 TEST DATABASE - Add this temporarily
-        testDatabase()
+
+        // Test the database
+        DatabaseTest(this).runTest()
+
         enableEdgeToEdge()
         setContent {
 
@@ -50,30 +53,6 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
 
                 CitiWayApp(navController)
-            }
-        }
-    }
-    // 🧪 Temporary test function
-    private fun testDatabase() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            val database = CitiWayDatabase.getDatabase(applicationContext)
-
-            // Write test data
-            val testSearch = RecentSearch(
-                placeId = "test123",
-                placeName = "Test Place",
-                placeAddress = "Test Address, Cape Town",
-                latitude = -33.9249,
-                longitude = 18.4241
-            )
-            database.recentSearchDao().insertSearch(testSearch)
-            Log.d("TEST", "✅ Wrote to database")
-
-            // Read it back
-            val searches = database.recentSearchDao().getRecentSearches()
-            Log.d("TEST", "📖 Found ${searches.size} searches")
-            searches.forEach {
-                Log.d("TEST", "  - ${it.placeName}")
             }
         }
     }

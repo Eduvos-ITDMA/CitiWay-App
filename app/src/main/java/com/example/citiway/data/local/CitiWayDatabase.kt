@@ -1,39 +1,32 @@
-package com.example.citiway.data.local
+package com.citiway.data.local
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-/**
- * This is your main database class.
- * It connects everything together and gives you access to the DAO.
- */
 @Database(
-    entities = [RecentSearch::class],  // List all your tables here
+    entities = [SavedPlace::class],
     version = 1,
     exportSchema = false
 )
 abstract class CitiWayDatabase : RoomDatabase() {
 
-    // This gives you access to the functions in RecentSearchDao
-    abstract fun recentSearchDao(): RecentSearchDao
+    abstract fun savedPlaceDao(): SavedPlaceDao
 
     companion object {
         @Volatile
         private var INSTANCE: CitiWayDatabase? = null
 
-        /**
-         * This ensures you only create ONE database instance for your whole app.
-         * Just call: CitiWayDatabase.getDatabase(context)
-         */
         fun getDatabase(context: Context): CitiWayDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     CitiWayDatabase::class.java,
                     "citiway_database"
-                ).build()
+                )
+                    .fallbackToDestructiveMigration()
+                    .build()
                 INSTANCE = instance
                 instance
             }
