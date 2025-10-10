@@ -14,10 +14,10 @@ class DatabaseTest(context: Context) {
         CoroutineScope(Dispatchers.IO).launch {
             // TEST 1: Write to database
             val testPlace = SavedPlace(
-                placeId = "test_123",
-                placeName = "V&A Waterfront",
+                placeId = "test_3333",
+                placeName = "V&C Waterfront",
                 placeAddress = "Cape Town Waterfront",
-                latitude = -33.9025,
+                latitude = -33.1025,
                 longitude = 18.4186,
                 isFavorite = true
             )

@@ -4,10 +4,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.citiway.data.local.CitiWayDatabase
 import com.example.citiway.App
 import com.example.citiway.core.navigation.routes.Screen
 import com.example.citiway.core.utils.ScreenWrapper
@@ -30,8 +32,16 @@ data class HomeActions(
 @Composable
 fun HomeRoute(
     navController: NavController,
-    completedJourneysViewModel: CompletedJourneysViewModel = viewModel()
+    //completedJourneysViewModel: CompletedJourneysViewModel // Removed the default value
 ) {
+    // ADDED THESE 3 LINES.  each screen is responsible for its own ViewModel. less gymnatics of pass viewmodel paremters.
+    val database = CitiWayDatabase.getDatabase(LocalContext.current)
+    val completedJourneysViewModel: CompletedJourneysViewModel = viewModel(
+        factory = viewModelFactory {
+            CompletedJourneysViewModel(database.savedPlaceDao())
+        }
+    )
+
     val placesManager = App.appModule.placesManager
     val placesState by placesManager.state.collectAsStateWithLifecycle()
     val placesActions = placesManager.actions

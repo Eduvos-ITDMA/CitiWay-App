@@ -12,6 +12,12 @@ interface SavedPlaceDao {
     @Query("SELECT * FROM saved_places WHERE id = :placeId")
     suspend fun getPlaceById(placeId: Int): SavedPlace?
 
+    @Query("SELECT * FROM saved_places WHERE itemType = 'journey' AND isFavorite = 1 ORDER BY lastUsedTimestamp DESC")
+    fun getFavoriteJourneys(): Flow<List<SavedPlace>>
+
+    @Query("SELECT * FROM saved_places WHERE itemType = 'journey' ORDER BY lastUsedTimestamp ASC LIMIT 3")
+    fun getRecentJourneys(): Flow<List<SavedPlace>>
+
     @Query("SELECT * FROM saved_places WHERE isFavorite = 1 ORDER BY lastUsedTimestamp DESC")
     fun getFavoritePlaces(): Flow<List<SavedPlace>>
 
