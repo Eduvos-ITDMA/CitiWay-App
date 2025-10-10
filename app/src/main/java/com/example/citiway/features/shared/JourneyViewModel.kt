@@ -4,10 +4,13 @@ import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import com.example.citiway.core.navigation.routes.Screen
 import com.example.citiway.data.remote.SelectedLocation
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 
 class JourneyViewModel(val navController: NavController) : ViewModel() {
-
-    private val journeySelectionOptions = JourneySelectionOptions()
+    private val _journeyState = MutableStateFlow(JourneyState())
+    val journeyState: StateFlow<JourneyState> = _journeyState
 
     fun confirmLocationSelection(
         selectedLocation: SelectedLocation,
@@ -16,13 +19,13 @@ class JourneyViewModel(val navController: NavController) : ViewModel() {
     ) {
         when (locationType) {
             LocationType.START -> {
-                journeySelectionOptions.startLocation = selectedLocation
+                _journeyState.update { it.copy(startLocation = selectedLocation) }
                 clearSearch()
                 navController.navigate(Screen.JourneySelection.route)
             }
 
             LocationType.END -> {
-                journeySelectionOptions.destination = selectedLocation
+                _journeyState.update { it.copy(destination = selectedLocation) }
                 clearSearch()
                 navController.navigate(Screen.StartLocationSelection.route)
             }
@@ -30,7 +33,7 @@ class JourneyViewModel(val navController: NavController) : ViewModel() {
     }
 }
 
-data class JourneySelectionOptions(
+data class JourneyState(
     var startLocation: SelectedLocation? = null,
     var destination: SelectedLocation? = null,
     // var selectedRoute: ...

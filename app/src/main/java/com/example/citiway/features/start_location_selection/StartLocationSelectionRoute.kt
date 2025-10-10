@@ -14,10 +14,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.citiway.App
-import com.example.citiway.core.navigation.routes.Screen
 import com.example.citiway.core.ui.components.LocationPermissionDialog
 import com.example.citiway.core.utils.ScreenWrapper
-import com.example.citiway.data.remote.PlacesManager
 import com.example.citiway.data.remote.SelectedLocation
 import com.example.citiway.di.viewModelFactory
 import com.example.citiway.features.shared.DrawerViewModel
@@ -32,23 +30,24 @@ import com.google.accompanist.permissions.rememberPermissionState
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun StartLocationSelectionRoute(
-    navController: NavController, placesManager: PlacesManager = App.appModule.placesManager
+    navController: NavController,
 ) {
+    val placesManager = App.appModule.placesManager
+    val placesState by placesManager.state.collectAsStateWithLifecycle()
+    val placesActions = placesManager.actions
+
     val context = LocalActivity.current as ComponentActivity
+
     // Getting activity-scoped DrawerViewModel
     val drawerViewModel: DrawerViewModel = viewModel(
         viewModelStoreOwner = context
     )
     val locationEnabledInApp by drawerViewModel.locationEnabled.collectAsState()
 
-    val mapViewModel: MapViewModel = viewModel(
-        factory = viewModelFactory {
-            MapViewModel(placesManager)
-        })
+    val mapViewModel: MapViewModel = viewModel()
 
     val journeyViewModel: JourneyViewModel = viewModel(
-        viewModelStoreOwner = context,
-        factory = viewModelFactory {
+        viewModelStoreOwner = context, factory = viewModelFactory {
             JourneyViewModel(navController)
         })
 
@@ -67,6 +66,9 @@ fun StartLocationSelectionRoute(
     LaunchedEffect(locationPermissionState.status.isGranted, locationEnabledInApp) {
         val systemGranted = locationPermissionState.status.isGranted
 
+        // Aded fix Update MapViewModel with current permission state
+        mapActions.updateLocationPermission(systemGranted)
+
         // Syncing DataStore only when user actively granted permission via our button
         // This prevents overriding if user intentionally disabled location in app settings
         if (systemGranted && permissionJustRequested && !locationEnabledInApp) {
@@ -76,12 +78,12 @@ fun StartLocationSelectionRoute(
 
         // Fetching location only when BOTH conditions are true
         if (systemGranted && locationEnabledInApp) {
-            placesManager.useUserLocation()
-            navController.navigate(Screen.JourneySelection.route)
+            placesActions.onUseUserLocation()
         } else if (locationEnabledInApp) {
             showPermissionMismatchDialog = true
         }
     }
+
 
     // Showing dialog when permissions are mismatched
     if (showPermissionMismatchDialog) {
@@ -99,25 +101,36 @@ fun StartLocationSelectionRoute(
 
     // Navigating to journey selection once location is confirmed
     val onConfirmLocation: (SelectedLocation) -> Unit = { location ->
-        journeyViewModel.confirmLocationSelection(location, LocationType.START, mapViewModel::clearSearch)
+        journeyViewModel.confirmLocationSelection(
+            location, LocationType.START, placesActions.onClearSearch
+        )
     }
+
+    // In StartLocationSelectionRoute, update the ScreenWrapper call:
 
     ScreenWrapper(navController, true, { paddingValues ->
         StartLocationSelectionContent(
             paddingValues = paddingValues,
             state = mapState,
             actions = mapActions,
+            placesState = placesState,
+            placesActions = placesActions,
             onPermissionRequest = {
-                // Marking that user initiated the request so we can distinguish between:
-                // 1. User actively clicking "Use my location" (should sync DataStore to true)
-                // 2. System permission existing from before but app setting disabled (should NOT override user's choice)
-                // This prevents us from automatically re-enabling location if user intentionally disabled it in app settings. No lies to user.
+                // This old handler is now replaced by smart logic in the content
+                // But keep it for backward compatibility or remove if not used elsewhere
                 permissionJustRequested = true
                 locationPermissionState.launchPermissionRequest()
             },
             cameraPositionState = mapViewModel.cameraPositionState,
             onConfirmLocation = onConfirmLocation,
-            locationEnabledInApp = locationEnabledInApp
+            locationEnabledInApp = locationEnabledInApp,
+            // ADD THESE NEW PARAMETERS:
+            isLocationPermissionGranted = locationPermissionState.status.isGranted,
+            onEnableLocation = { drawerViewModel.toggleLocation(true) },
+            onRequestSystemPermission = {
+                permissionJustRequested = true
+                locationPermissionState.launchPermissionRequest()
+            }
         )
     })
 }

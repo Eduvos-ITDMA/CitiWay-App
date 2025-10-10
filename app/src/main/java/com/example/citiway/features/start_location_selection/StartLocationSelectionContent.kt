@@ -36,6 +36,8 @@ import com.example.citiway.core.ui.components.HorizontalSpace
 import com.example.citiway.core.ui.components.LocationSearchField
 import com.example.citiway.core.ui.components.Title
 import com.example.citiway.core.ui.components.VerticalSpace
+import com.example.citiway.data.remote.PlacesActions
+import com.example.citiway.data.remote.PlacesState
 import com.example.citiway.data.remote.SelectedLocation
 import com.example.citiway.features.shared.MapActions
 import com.example.citiway.features.shared.MapState
@@ -46,7 +48,7 @@ import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapType
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
-import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.rememberMarkerState
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
@@ -54,10 +56,17 @@ fun StartLocationSelectionContent(
     paddingValues: PaddingValues,
     state: MapState,
     actions: MapActions,
+    placesState: PlacesState,
+    placesActions: PlacesActions,
     onPermissionRequest: () -> Unit,
     cameraPositionState: CameraPositionState,
     onConfirmLocation: (SelectedLocation) -> Unit,
-    locationEnabledInApp: Boolean
+    locationEnabledInApp: Boolean,
+
+    // NEW PARAMETERS:
+    isLocationPermissionGranted: Boolean,
+    onEnableLocation: () -> Unit,
+    onRequestSystemPermission: () -> Unit
 ) {
     // State Variables from StartLocationViewModel. Same as in destination_selection
     val selectedLocation = state.selectedLocation
@@ -85,17 +94,40 @@ fun StartLocationSelectionContent(
                     modifier = Modifier.size(20.dp)
                 )
             },
+            placesState = placesState,
+            placesActions = placesActions,
             placeholder = "Where are you?"
         )
 
-        // Location button - only shown when BOTH permissions aren't granted
-        if (!isLocationPermissionGranted || !locationEnabledInApp) {
+
+        // Location button - hide only when BOTH permission is granted AND enabled in app
+        if (!(isLocationPermissionGranted && locationEnabledInApp)) {
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 TextButton(
-                    onClick = onPermissionRequest,
+                    onClick = {
+                        when {
+                            // Case 1: Has system permission but app preference is disabled
+                            // Just enable the app preference, no need to request permission again
+                            isLocationPermissionGranted && !locationEnabledInApp -> {
+                                onEnableLocation()  // Using the callback, and not drawerViewModel*
+                                // Location will be fetched by the LaunchedEffect automatically
+                            }
+
+                            // Case 2: No system permission at all
+                            // Request the system permission (Android popup will appear)
+                            !isLocationPermissionGranted -> {
+                                onRequestSystemPermission()  // Using the callback to routee
+                            }
+
+                            // Case 3: Both are already enabled (shouldn't reach here due to if condition)
+                            else -> {
+                                // Do nothing, button shouldn't be visible anyway
+                            }
+                        }
+                    },
                     contentPadding = PaddingValues(0.dp)
                 ) {
                     Icon(
@@ -115,7 +147,9 @@ fun StartLocationSelectionContent(
                 }
             }
         }
+
         VerticalSpace(8)
+
         Row(
             modifier = Modifier.align(Alignment.CenterHorizontally),
             verticalAlignment = Alignment.CenterVertically,
@@ -164,24 +198,34 @@ fun StartLocationSelectionContent(
         GoogleMap(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f) // Taking up remaining space in the column
+                .weight(1f)
                 .padding(horizontal = 16.dp),
             cameraPositionState = cameraPositionState,
             onMapClick = actions.selectLocationOnMap,
             properties = MapProperties(
                 mapType = MapType.NORMAL,
-                isMyLocationEnabled = isLocationPermissionGranted
+                // Enable blue dot only when BOTH conditions are true
+                isMyLocationEnabled = isLocationPermissionGranted && locationEnabledInApp
             ),
             uiSettings = MapUiSettings(
                 zoomControlsEnabled = true,
-                myLocationButtonEnabled = isLocationPermissionGranted
+                // Match the isMyLocationEnabled condition
+                myLocationButtonEnabled = isLocationPermissionGranted && locationEnabledInApp
             )
         ) {
-            // Showing marker for selected location if one exists
-            selectedLocation?.let { location ->
+            // Only show marker when we're NOT showing the blue location dot
+            // If the selected location IS the user location and we have permissions,
+            // the blue dot will show it, so don't duplicate with a marker
+            val isShowingUserLocationWithBlueDot =
+                isLocationPermissionGranted &&
+                        locationEnabledInApp &&
+                        selectedLocation?.latLng == userLocation
+
+            // Then in your code:
+            if (selectedLocation != null && !isShowingUserLocationWithBlueDot) {
                 Marker(
-                    state = MarkerState(position = location.latLng),
-                    title = if (location.latLng == userLocation) "Your Current Location" else "Selected Location"
+                    state = rememberMarkerState(position = selectedLocation.latLng),
+                    title = "Selected Location"
                 )
             }
         }
