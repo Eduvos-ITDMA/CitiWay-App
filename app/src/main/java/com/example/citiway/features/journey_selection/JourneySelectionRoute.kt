@@ -32,8 +32,9 @@ fun JourneySelectionRoute(
             JourneyViewModel(navController)
         }
     )
+    journeyViewModel.setJourneyOptions()
 
-    val journeyState by journeyViewModel.journeyState.collectAsStateWithLifecycle()
+    val journeyState by journeyViewModel.state.collectAsStateWithLifecycle()
     val journeySelectionActions = JourneySelectionActions(
         LocationFieldActions(
             onFieldIconClick = {
