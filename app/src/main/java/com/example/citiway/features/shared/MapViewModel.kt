@@ -14,7 +14,6 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.CameraPositionState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.compose
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -26,7 +25,8 @@ data class MapState(
 )
 
 data class MapActions(
-    val selectLocationOnMap: (LatLng) -> Unit
+    val selectLocationOnMap: (LatLng) -> Unit,
+    val updateLocationPermission: (Boolean) -> Unit
 )
 
 class MapViewModel(
@@ -37,7 +37,8 @@ class MapViewModel(
     val screenState: StateFlow<MapState> = _screenState
 
     val actions = MapActions(
-        this::selectLocationOnMap
+        selectLocationOnMap = ::selectLocationOnMap,
+        updateLocationPermission = ::updateLocationPermission
     )
 
     val cameraPositionState =
@@ -83,6 +84,12 @@ class MapViewModel(
             val selectedLocation = placesActions.getPlaceFromLatLng(location)
             placesActions.onSetSelectedLocation(selectedLocation)
             placesActions.onSetSearchText(selectedLocation.primaryText)
+        }
+    }
+
+    fun updateLocationPermission(isGranted: Boolean) {
+        _screenState.update { currentState ->
+            currentState.copy(isLocationPermissionGranted = isGranted)
         }
     }
 }

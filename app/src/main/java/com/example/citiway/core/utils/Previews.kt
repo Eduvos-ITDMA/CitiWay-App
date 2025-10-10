@@ -33,7 +33,8 @@ import com.google.android.libraries.places.api.model.kotlin.autocompletePredicti
 import com.google.maps.android.compose.rememberCameraPositionState
 
 private val mockMapActions = MapActions(
-    selectLocationOnMap = {}
+    selectLocationOnMap = {},
+    updateLocationPermission = {}
 )
 
 private val mockPlacesActions = PlacesActions(
@@ -224,7 +225,10 @@ fun StartLocationScreenPreview() {
             onPermissionRequest = {},
             cameraPositionState = rememberCameraPositionState(),
             onConfirmLocation = {},
-            locationEnabledInApp = true
+            locationEnabledInApp = true,
+            isLocationPermissionGranted = true,
+            onEnableLocation = {},
+            onRequestSystemPermission = {}
         )
     }
 }

@@ -1,11 +1,18 @@
 package com.example.citiway.data.remote
 
 import android.app.Application
-import android.location.Geocoder
+import android.location.Location
+import android.os.Looper
 import android.util.Log
 import androidx.compose.runtime.Stable
 import com.example.citiway.BuildConfig
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationAvailability
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.AutocompletePrediction
@@ -21,8 +28,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.tasks.await
-import java.util.Locale
+import kotlin.coroutines.resumeWithException
 
 @Stable
 data class PlacesState(
@@ -68,7 +76,6 @@ class PlacesManager(
     */
     private var autocompleteSessionToken = AutocompleteSessionToken.newInstance()
     private val placesClient: PlacesClient = Places.createClient(application)
-    private val geocoder = Geocoder(application, Locale.getDefault())
     private val locationBounds = RectangularBounds.newInstance(
         LatLng(BuildConfig.SOUTHWEST_CAPE_TOWN_LAT, BuildConfig.SOUTHWEST_CAPE_TOWN_LNG),
         LatLng(BuildConfig.NORTHEAST_CAPE_TOWN_LAT, BuildConfig.NORTHEAST_CAPE_TOWN_LNG)
@@ -79,8 +86,11 @@ class PlacesManager(
         Place.Field.LOCATION,
         Place.Field.FORMATTED_ADDRESS
     )
-
     private val scope = CoroutineScope(Dispatchers.Main)
+    private val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 5000L)
+        .setMinUpdateIntervalMillis(2000L)
+        .setMaxUpdates(1)
+        .build()
 
     // Expose state flows
     private fun setSelectedLocation(location: SelectedLocation) {
@@ -204,7 +214,7 @@ class PlacesManager(
 
         scope.launch {
             try {
-                val location = fusedLocationClient.lastLocation.await()
+                val location = getFreshLocation(fusedLocationClient)
                 val latLng = LatLng(location.latitude, location.longitude)
 
                 val place = getPlaceFromLatLng(latLng)
@@ -220,6 +230,52 @@ class PlacesManager(
             }
         }
     }
+
+    private suspend fun getFreshLocation(fusedLocationClient: FusedLocationProviderClient): Location =
+        suspendCancellableCoroutine { continuation ->
+
+            val locationCallback = object : LocationCallback() {
+                override fun onLocationResult(locationResult: LocationResult) {
+                    // Get the latest location
+                    val location = locationResult.lastLocation
+
+                    fusedLocationClient.removeLocationUpdates(this)
+
+                    // Resume the coroutine with the result
+                    if (location != null) {
+                        continuation.resume(location) { cause, _, _ -> }
+                    } else {
+                        continuation.resumeWithException(
+                            IllegalStateException("Location result received, but location object was null.")
+                        )
+                    }
+                }
+
+                override fun onLocationAvailability(locationAvailability: LocationAvailability) {
+                    if (!locationAvailability.isLocationAvailable) {
+                        Log.w("PlacesManager", "Location temporarily unavailable — will wait.")
+                        // Don't throw — just log and wait for onLocationResult()
+                        // The FusedLocationProvider will call it once ready
+                    }
+                }
+            }
+
+            // Request the location update
+            try {
+                fusedLocationClient.requestLocationUpdates(
+                    locationRequest,
+                    locationCallback,
+                    Looper.getMainLooper()
+                )
+            } catch (e: SecurityException) {
+                continuation.resumeWithException(e)
+            }
+
+            // Stop location updates if coroutine is cancelled
+            continuation.invokeOnCancellation {
+                fusedLocationClient.removeLocationUpdates(locationCallback)
+            }
+        }
 }
 
 data class SelectedLocation(
