@@ -1,6 +1,6 @@
 package com.example.citiway.features.shared
 
-import com.citiway.data.local.SavedPlaceDao
+import com.example.citiway.data.local.dao.SavedPlaceDao
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

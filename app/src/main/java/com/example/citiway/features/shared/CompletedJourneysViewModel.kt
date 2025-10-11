@@ -3,7 +3,7 @@ package com.example.citiway.features.shared
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.citiway.data.local.SavedPlace
-import com.citiway.data.local.SavedPlaceDao
+import com.example.citiway.data.local.dao.SavedPlaceDao
 import com.example.citiway.data.local.CompletedJourney
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch

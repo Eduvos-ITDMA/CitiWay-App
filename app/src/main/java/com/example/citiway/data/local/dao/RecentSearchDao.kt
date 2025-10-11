@@ -1,6 +1,7 @@
-package com.example.citiway.data.local
+package com.example.citiway.data.local.dao
 
 import androidx.room.*
+import com.example.citiway.data.local.entities.RecentSearch
 
 /**
  * DAO = Data Access Object
