@@ -8,12 +8,12 @@ data class SavedPlace(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
 
-    // For place predictions ** Testing
-    val placeId: String? = null,
-    val placeName: String? = null,
-    val placeAddress: String? = null,
-    val latitude: Double? = null,
-    val longitude: Double? = null,
+//    For place predictions ** Testing
+//    val placeId: String? = null,
+//    val placeName: String? = null,
+//    val placeAddress: String? = null,
+//    val latitude: Double? = null,
+//    val longitude: Double? = null,
 
     // For completed journeys
     val route: String? = null,
