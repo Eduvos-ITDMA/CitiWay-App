@@ -10,7 +10,7 @@ package com.example.citiway.data.repository
  * @Inject constructor() allows Dagger/Hilt to create an instance of this repository.
  */
 
-class AppRepository(
+class CitiWayRepository(
 //    TODO: Inject Room DB once it's implemented
 ){
 
