@@ -36,7 +36,7 @@ class MainActivity : ComponentActivity() {
 
         val database = CitiWayDatabase.getDatabase(this)
         val dao = database.savedPlaceDao()
-        //createDummyJourneys(dao) // Uncomment this line to populate db with dummy data
+        createDummyJourneys(dao) // Uncomment this line to populate db with dummy data
 
         enableEdgeToEdge()
         setContent {
