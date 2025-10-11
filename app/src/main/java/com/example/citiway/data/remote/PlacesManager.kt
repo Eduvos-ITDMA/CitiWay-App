@@ -3,6 +3,7 @@ package com.example.citiway.data.remote
 import android.app.Application
 import android.location.Location
 import android.os.Looper
+import android.util.Log
 import androidx.compose.runtime.Stable
 import com.example.citiway.BuildConfig
 import com.google.android.gms.location.FusedLocationProviderClient
