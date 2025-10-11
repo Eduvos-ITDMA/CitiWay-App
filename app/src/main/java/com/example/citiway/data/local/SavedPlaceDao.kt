@@ -1,17 +1,12 @@
-package com.example.citiway.data.local.dao
+package com.citiway.data.local
 
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
-import com.citiway.data.local.SavedPlace
+import androidx.room.*
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface SavedPlaceDao {
 
-    @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPlace(place: SavedPlace)
 
     @Query("SELECT * FROM saved_places WHERE id = :placeId")

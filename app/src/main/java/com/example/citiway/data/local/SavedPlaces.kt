@@ -1,4 +1,4 @@
-package com.example.citiway.data.local.entities
+package com.example.citiway.data.local
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
