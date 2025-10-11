@@ -11,12 +11,12 @@ import com.example.citiway.features.home.HomeRoute
 import com.example.citiway.features.schedules.SchedulesRoute
 
 fun NavGraphBuilder.homeNavGraph(
-    navController: NavController,
+    navController: NavController
 ) {
     navigation(startDestination = Screen.Home.route, route = HOME_ROUTE) {
         // Home screen
         composable(Screen.Home.route) {
-            HomeRoute(navController)
+            HomeRoute(navController) // Passing new ViewModel
         }
 
         // Schedules screen
@@ -26,7 +26,7 @@ fun NavGraphBuilder.homeNavGraph(
 
         // Favourites screen
         composable(Screen.Favourites.route) {
-            FavouritesRoute(navController)
+            FavouritesRoute(navController) // Passing new ViewModel
         }
     }
 }

@@ -25,7 +25,7 @@ import java.time.LocalDate
 @Composable
 fun CompletedJourneyCardWithButton(
     route: String,
-    date: LocalDate,
+    date: String,
     durationMin: Int,
     icon: @Composable (Modifier) -> Unit,
     outlined: Boolean = false
