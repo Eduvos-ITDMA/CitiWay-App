@@ -6,7 +6,6 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.citiway.data.local.dao.*
 import com.example.citiway.data.local.entities.*
-import com.example.citiway.data.local.entities.
 
 
 
