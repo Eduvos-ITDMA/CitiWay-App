@@ -3,9 +3,6 @@ package com.example.citiway.core.ui.components
 import com.example.citiway.R
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -15,9 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -33,7 +28,7 @@ import java.time.format.DateTimeFormatter
  * @param weight The layout weight of this card within a [RowScope]. Defaults to 1f.
  */
 @Composable
-fun RowScope.CompletedJourneyCard(route: String, date: LocalDate, durationMin: Int, weight: Float = 1f) {
+fun RowScope.CompletedJourneyCard(route: String, date: String, durationMin: Int, weight: Float = 1f) {
     val formattedDate = date.format(DateTimeFormatter.ofPattern("MMM dd, yyyy"))
 
     val hours = durationMin / 60
