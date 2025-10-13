@@ -140,7 +140,7 @@ fun HelpScreenPreview() {
     CitiWayTheme {
         HelpContent(
             paddingValues = PaddingValues(),
-            navController = rememberNavController(), // Or specific callbacks like onLinkClicked
+            // Or specific callbacks like onLinkClicked
         )
     }
 }
@@ -245,6 +245,6 @@ fun ConfirmationDialogPreview() {
         dismissText = "No, go back",
         onConfirm = {},
         onDismiss = {},
-        onClose = {}
+//        onClose = {}
     )
 }
