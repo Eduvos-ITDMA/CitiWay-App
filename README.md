@@ -149,12 +149,6 @@ data/
 └── repository/
 └── CitiWayRepository.kt    # Single source of truth
 
-### Repository Pattern Benefits
-- ✅ **Separation of Concerns**: ViewModels don't directly access DAOs
-- ✅ **Centralized Logic**: All data operations in one place
-- ✅ **Easier Testing**: Mock repository instead of multiple DAOs
-- ✅ **Future-Proof**: Easy to add API calls alongside database operations
-- ✅ **Consistency**: Uniform data access patterns across the app
 
 ### Key Features
 - Flow-based reactive queries for real-time UI updates
