@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
+import com.example.citiway.core.ui.components.ConfirmationDialog
 import com.example.citiway.core.ui.components.LocationSearchField
 import com.example.citiway.core.ui.theme.CitiWayTheme
 import com.example.citiway.data.remote.PlacesActions
@@ -231,4 +232,19 @@ fun StartLocationScreenPreview() {
             onRequestSystemPermission = {}
         )
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ConfirmationDialogPreview() {
+    ConfirmationDialog(
+        visible = true,
+        title = "Are you sure you want to cancel your trip?",
+        message = "You will be redirected to the Home Page",
+        confirmText = "Continue",
+        dismissText = "No, go back",
+        onConfirm = {},
+        onDismiss = {},
+        onClose = {}
+    )
 }
