@@ -61,12 +61,14 @@ import com.example.citiway.core.ui.components.LocationSearchField
 import com.example.citiway.core.ui.components.Title
 import com.example.citiway.core.ui.components.VerticalSpace
 import com.example.citiway.core.utils.JourneySelectionScreenPreview
+import com.example.citiway.core.utils.toDisplayableLocalTime
 import com.example.citiway.data.remote.PlacesActions
 import com.example.citiway.data.remote.PlacesState
 import com.example.citiway.features.shared.JourneyDetails
 import com.example.citiway.features.shared.JourneyState
 import com.example.citiway.features.shared.LocationType
 import com.example.citiway.features.shared.TravelPoint
+import java.time.Instant
 import java.time.LocalTime
 
 @Composable
@@ -242,21 +244,6 @@ fun LocationFieldWithIcon(
 @Composable
 fun JourneyOptionsSection(state: JourneyState) {
     Column {
-        state.journeyOptions = listOf(
-            JourneyDetails(
-                10,
-                TravelPoint.STOP,
-                listOf("Walk", "MyCiTi", "Walk", "Metrorail", "Walk"),
-                15,
-                LocalTime.of(8, 30)
-            ), JourneyDetails(
-                8,
-                TravelPoint.STATION,
-                listOf("Walk", "Metrorail", "Walk", "MyCiTi", "Walk"),
-                20,
-                LocalTime.of(15, 45)
-            )
-        )
         state.journeyOptions.forEach { journey ->
             JourneyCard(journey)
             VerticalSpace(24)
@@ -325,7 +312,7 @@ fun JourneyCard(journey: JourneyDetails) {
  * Composable for the blue header of the card.
  */
 @Composable
-fun TripHeader(cornerRadius: Dp, arrivalTime: LocalTime, fareTotal: Float) {
+fun TripHeader(cornerRadius: Dp, arrivalTime: Instant?, fareTotal: Float) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -345,7 +332,7 @@ fun TripHeader(cornerRadius: Dp, arrivalTime: LocalTime, fareTotal: Float) {
 
         // Arrival Time Text
         Text(
-            text = "Arrival Time: $arrivalTime",
+            text = "Arrival Time: ${arrivalTime?.toDisplayableLocalTime() ?: "N/A"}",
             color = MaterialTheme.colorScheme.onPrimary,
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.weight(1f)
@@ -389,7 +376,7 @@ fun JourneyDetailRow(icon: ImageVector, content: AnnotatedString) {
  * Composable for the complex, multi-line route description.
  */
 @Composable
-fun RouteDescriptionRow(routeSegments: List<String>) {
+fun RouteDescriptionRow(routeSegments: List<String>?) {
     Row(
         verticalAlignment = Alignment.Top,
         modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)
@@ -449,10 +436,10 @@ fun StartJourneyButton() {
 
 @Composable
 fun createStyledRouteString(
-    routeSegments: List<String>,
+    routeSegments: List<String>?,
 ): AnnotatedString {
     return buildAnnotatedString {
-        routeSegments.forEachIndexed { index, segment ->
+        routeSegments?.forEachIndexed { index, segment ->
             // Assume any segment that is NOT "Walk" is a transit mode/station name
             val isTransit = segment.trim().uppercase() != "WALK"
             val style = if (isTransit) {

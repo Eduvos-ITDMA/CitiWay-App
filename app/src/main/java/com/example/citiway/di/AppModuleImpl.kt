@@ -2,38 +2,52 @@ package com.example.citiway.di
 
 import android.app.Application
 import com.example.citiway.BuildConfig
-import com.example.citiway.data.remote.DirectionsService
+import com.example.citiway.core.utils.provideOkHttpClient
 import com.example.citiway.data.remote.GeocodingService
 import com.example.citiway.data.remote.PlacesManager
 import com.example.citiway.data.remote.RoutesManager
+import com.example.citiway.data.remote.RoutesService
 import com.example.citiway.data.repository.AppRepository
-import com.google.common.collect.Maps
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import kotlin.getValue
 
-private const val BASE_URL = "https://maps.googleapis.com/"
+private const val BASE_MAPS_URL = "https://maps.googleapis.com/"
+private const val BASE_ROUTES_URL = "https://routes.googleapis.com/"
 private const val MAPS_API_KEY = BuildConfig.MAPS_API_KEY
 
 class AppModuleImpl(
     val appContext: Application,
 ) : AppModule {
     override val repository: AppRepository by lazy { AppRepository() }
-    override val placesManager: PlacesManager by lazy { PlacesManager(appContext, MAPS_API_KEY, geocodingService) }
-    override val routesManager: RoutesManager by lazy {
-        RoutesManager(MAPS_API_KEY, directionsService)
+    override val placesManager: PlacesManager by lazy {
+        PlacesManager(
+            appContext,
+            MAPS_API_KEY,
+            geocodingService
+        )
     }
-    override val retrofit: Retrofit by lazy {
-        Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
+    override val routesManager: RoutesManager by lazy {
+        RoutesManager(MAPS_API_KEY, routesService)
     }
     override val geocodingService: GeocodingService by lazy {
+        val retrofit = Retrofit.Builder()
+            .baseUrl(BASE_MAPS_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
         retrofit.create(GeocodingService::class.java)
     }
 
-    override val directionsService: DirectionsService by lazy {
-        retrofit.create(DirectionsService::class.java)
+    override val routesService: RoutesService by lazy {
+        val retrofit = Retrofit.Builder()
+            .baseUrl(BASE_ROUTES_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(okHttpClient)
+            .build()
+        retrofit.create(RoutesService::class.java)
     }
+
+    override val okHttpClient: OkHttpClient
+        get() = provideOkHttpClient()
 }

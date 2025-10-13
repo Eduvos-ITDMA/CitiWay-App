@@ -3,6 +3,7 @@ package com.example.citiway.data.remote
 import android.app.Application
 import android.location.Location
 import android.os.Looper
+import android.util.Log
 import androidx.compose.runtime.Stable
 import com.example.citiway.BuildConfig
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -251,9 +252,8 @@ class PlacesManager(
 
                 override fun onLocationAvailability(locationAvailability: LocationAvailability) {
                     if (!locationAvailability.isLocationAvailable) {
+                        // Log and wait for onLocationResult() - FusedLocationProvider will call it once ready
                         Log.w("PlacesManager", "Location temporarily unavailable — will wait.")
-                        // Don't throw — just log and wait for onLocationResult()
-                        // The FusedLocationProvider will call it once ready
                     }
                 }
             }
