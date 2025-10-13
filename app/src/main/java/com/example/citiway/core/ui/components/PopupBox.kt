@@ -12,11 +12,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.material3.ButtonDefaults
+import com.example.citiway.core.ui.components.ConfirmationDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.runtime.*
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.material3.ButtonColors
