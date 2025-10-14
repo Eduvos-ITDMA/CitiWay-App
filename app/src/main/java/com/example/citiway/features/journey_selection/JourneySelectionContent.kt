@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -56,6 +57,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.example.citiway.R
+import com.example.citiway.core.ui.components.ConfirmationDialog
 import com.example.citiway.core.ui.components.HorizontalSpace
 import com.example.citiway.core.ui.components.LocationSearchField
 import com.example.citiway.core.ui.components.Title
@@ -405,7 +407,7 @@ fun RouteDescriptionRow(routeSegments: List<String>) {
                     .size(12.dp)
                     .background(
                         MaterialTheme.colorScheme.onBackground,
-                        shape = androidx.compose.foundation.shape.CircleShape
+                        shape = CircleShape
                     )
                     .align(Alignment.TopCenter)
                     .offset(y = 6.dp)
@@ -427,25 +429,43 @@ fun RouteDescriptionRow(routeSegments: List<String>) {
  */
 @Composable
 fun StartJourneyButton() {
+    var showDialog by remember{mutableStateOf(false)}
     // This uses the bottom rounded corners of the main card
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(56.dp)
-            .background(color = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)) // Light blue background
-            .clickable { /* TODO: Handle journey start click */ }
+            .background(color = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f))
+            .clickable { /* TODO: Handle journey start click */showDialog=true }
             .padding(vertical = 12.dp),
         contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = "Start Journey",
+    ){
+        Text(text = "Start Journey",
             color = MaterialTheme.colorScheme.secondary,
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center)
+    }
+
+    if (showDialog) {
+        ConfirmationDialog(
+            visible = showDialog,
+            title = "Are you sure you want to start this journey?",
+            message = "Journeys can be canceled at any time",
+            onConfirm = {
+                // Put your confirmation logic here
+
+            },
+            onDismiss = {
+                showDialog = false
+            },
+            onClose={
+                showDialog=false
+            }
         )
     }
 }
+
 
 @Composable
 fun createStyledRouteString(

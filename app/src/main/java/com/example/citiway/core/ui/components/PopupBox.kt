@@ -1,5 +1,6 @@
 package com.example.citiway.core.ui.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.runtime.Composable
 import androidx.compose.material3.AlertDialog
@@ -20,6 +21,8 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.material3.ButtonColors
+import androidx.compose.foundation.border
+import androidx.compose.material3.ChipBorder
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,61 +44,71 @@ fun ConfirmationDialog(
     onDismiss: () -> Unit,
     onClose: (() -> Unit)? = null,
     // Style parameters you can add as needed:
-    dialogShape: Shape = RoundedCornerShape(16.dp), // Dialog shape styling
-    dialogBackground: Color = MaterialTheme.colorScheme.surface, // Dialog background color
-    titleTextStyle: TextStyle = MaterialTheme.typography.titleLarge, // Title style
-    titleColor: Color = MaterialTheme.colorScheme.onSurface,         // Title color
-    messageTextStyle: TextStyle = MaterialTheme.typography.bodyMedium,  // Message style
-    messageColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,   // Message color
+    dialogShape: Shape = RoundedCornerShape(16.dp),
+    dialogBackground: Color = MaterialTheme.colorScheme.surface,
+    dialogBorderColor: Color=Color(0xFF109FD6),
+    titleTextStyle: TextStyle = MaterialTheme.typography.titleLarge,
+    titleColor: Color = Color(0xFF0B3B4E),
+    messageTextStyle: TextStyle = MaterialTheme.typography.bodyMedium,
+    messageColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
     confirmButtonColors: ButtonColors = ButtonDefaults.buttonColors(
-        containerColor = MaterialTheme.colorScheme.primary           // Confirm button bg color
+
+        containerColor = Color(0xFF0B3B4E)
     ),
     dismissButtonColors: ButtonColors = ButtonDefaults.outlinedButtonColors(
-        containerColor = Color.Transparent                           // Outlined button bg color
+        contentColor = Color(0xFF0B3B4E),
+        containerColor = Color.Transparent,
+
     ),
-    buttonShape: Shape = RoundedCornerShape(6.dp),                   // Button shapes
-    iconTint: Color = MaterialTheme.colorScheme.onSurfaceVariant      // Icon color
+    dismissButtonBorderColor: Color=Color(0xFF0B3B4E),
+    buttonShape:Shape=RoundedCornerShape(6.dp),
+//    buttonShape: Shape = RoundedCornerShape(6.dp),
+//    iconTint: Color = Color(0xFF0B3B4E),
 ) {
     if (visible) {
         AlertDialog(
             onDismissRequest = { onDismiss() },
-            shape = dialogShape, // Place to style dialog corners
-            containerColor = dialogBackground, // Dialog background color (Material3)
+            shape = dialogShape,
+            containerColor = dialogBackground,
+            modifier = Modifier.border(
+                BorderStroke(2.dp, dialogBorderColor),
+                shape = dialogShape
+            ),
             // Custom close ("X") icon in top-right
-            icon = if (onClose != null) {
-                {
-                    IconButton(onClick = onClose) {
-                        Icon(
-                            Icons.Default.Close,
-                            contentDescription = "Close dialog",
-                            tint = iconTint // Color of the X icon
-                        )
-                    }
-                }
-            } else null,
+//            icon = if (onClose != null) {
+//                {
+//                    IconButton(onClick = onClose) {
+//                        Icon(
+//                            Icons.Default.Close,
+//                            contentDescription = "Close dialog",
+//                            tint = iconTint // Color of the X icon
+//                        )
+//                    }
+//                }
+//            } else null,
             title = {
                 Text(
                     text = title,
-                    style = titleTextStyle, // Title font, weight, size
-                    color = titleColor      // Title color
+                    style = titleTextStyle,
+                    color = titleColor
                 )
             },
             text = {
                 Text(
                     text = message,
-                    style = messageTextStyle, // Message font
-                    color = messageColor,     // Message color
-                    modifier = Modifier.padding(bottom = 12.dp) // Message padding
+                    style = messageTextStyle,
+                    color = messageColor,
+                    modifier = Modifier.padding(bottom = 12.dp)
                 )
             },
             confirmButton = {
                 Button(
                     onClick = onConfirm,
-                    colors = confirmButtonColors, // Button background colors
-                    shape = buttonShape ,          // Button corners
+                    colors = confirmButtonColors,
+                    shape = buttonShape ,
                     modifier = Modifier
                         .defaultMinSize(minWidth = 120.dp)
-                        .padding(end = 8.dp)      // Button spacing
+                        .padding(end = 8.dp)
                 ) {
                     Text(confirmText)
                 }
@@ -103,7 +116,8 @@ fun ConfirmationDialog(
             dismissButton = {
                 OutlinedButton(
                     onClick = onDismiss,
-                    colors = dismissButtonColors, // Outlined button colors
+                    colors = dismissButtonColors,
+                    border = BorderStroke(2.dp, dismissButtonBorderColor),
                     shape = buttonShape,
                     modifier = Modifier
                         .defaultMinSize(minWidth = 120.dp)
