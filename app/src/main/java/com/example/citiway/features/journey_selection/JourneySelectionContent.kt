@@ -436,7 +436,7 @@ fun StartJourneyButton() {
             .fillMaxWidth()
             .height(56.dp)
             .background(color = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f))
-            .clickable { /* TODO: Handle journey start click */showDialog=true }
+            .clickable { showDialog=true }
             .padding(vertical = 12.dp),
         contentAlignment = Alignment.Center
     ){
