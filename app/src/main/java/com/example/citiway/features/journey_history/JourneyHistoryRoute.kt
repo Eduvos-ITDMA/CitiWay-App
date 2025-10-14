@@ -8,6 +8,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.citiway.data.local.CitiWayDatabase
 import com.example.citiway.core.utils.ScreenWrapper
+import com.example.citiway.data.repository.CitiWayRepository
 import com.example.citiway.di.viewModelFactory
 import com.example.citiway.features.shared.CompletedJourneysViewModel
 
@@ -17,12 +18,19 @@ fun JourneyHistoryRoute(
    // completedJourneysViewModel: CompletedJourneysViewModel = viewModel()
 ) {
     // Now just creating it where we need it, less gymnastics
-    val database = CitiWayDatabase.getDatabase(LocalContext.current)
+    // Get database and repository
+    val context = LocalContext.current
+    val database = CitiWayDatabase.getDatabase(context)
+    val repository = CitiWayRepository(database)
+
+    // Use YOUR existing viewModelFactory helper! 🎉
     val completedJourneysViewModel: CompletedJourneysViewModel = viewModel(
         factory = viewModelFactory {
-            CompletedJourneysViewModel(database.savedPlaceDao())
+            CompletedJourneysViewModel(repository = repository)
         }
     )
+
+
     val completedJourneysState by completedJourneysViewModel.screenState.collectAsStateWithLifecycle()
 
     ScreenWrapper(navController, showBottomBar = true, content = { paddingValues ->
