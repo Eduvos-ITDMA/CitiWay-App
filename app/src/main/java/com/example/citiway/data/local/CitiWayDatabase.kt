@@ -49,7 +49,7 @@ abstract class CitiWayDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: CitiWayDatabase? = null
 
-        /**
+        /** Updates coming soon for db setup and logic.
          * Gets the database instance. Creates it if it doesn't exist yet.
          * Uses the Singleton pattern - only one database instance exists throughout the app.
          *
