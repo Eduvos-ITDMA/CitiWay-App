@@ -9,6 +9,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -19,8 +20,11 @@ import com.example.citiway.core.ui.theme.CitiWayTheme
 import com.example.citiway.features.shared.DrawerViewModel
 import com.example.citiway.features.shared.CompletedJourneysViewModel
 import com.google.android.libraries.places.api.Places
-import com.citiway.data.local.DatabaseTest
+
+import com.example.citiway.data.local.DatabaseSeeder
+import com.example.citiway.data.repository.CitiWayRepository
 import com.example.citiway.features.shared.createDummyJourneys
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,12 +35,15 @@ class MainActivity : ComponentActivity() {
             Places.initializeWithNewPlacesApiEnabled(applicationContext, BuildConfig.MAPS_API_KEY)
         }
 
-        // Test the database
-        DatabaseTest(this).runTest()
-
+        // Initialize database
         val database = CitiWayDatabase.getDatabase(this)
-        val dao = database.savedPlaceDao()
-        createDummyJourneys(dao) // Uncomment this line to populate db with dummy data
+        val repository = CitiWayRepository(database)
+        val seeder = DatabaseSeeder(repository)
+
+        // Seed database on first launch
+        lifecycleScope.launch {
+           // seeder.seedDatabase()
+        }
 
         enableEdgeToEdge()
         setContent {

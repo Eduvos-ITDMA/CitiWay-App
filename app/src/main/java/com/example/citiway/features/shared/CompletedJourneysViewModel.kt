@@ -2,8 +2,8 @@ package com.example.citiway.features.shared
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.citiway.data.local.SavedPlace
-import com.citiway.data.local.SavedPlaceDao
+import com.example.citiway.data.local.entities.Trip
+import com.example.citiway.data.repository.CitiWayRepository
 import com.example.citiway.data.local.CompletedJourney
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -11,12 +11,13 @@ import kotlinx.coroutines.launch
 data class CompletedJourneysState(
     val recentJourneys: List<CompletedJourney> = emptyList(),
     val favouriteJourneys: List<CompletedJourney> = emptyList(),
-    val allJourneys: List<CompletedJourney> = emptyList(), // NEW val for loading all db entries for testing history and favorites
-    val allFavouriteJourneys: List<CompletedJourney> = emptyList() // NEW val for loading all db entries for testing history and favorites
+    val allJourneys: List<CompletedJourney> = emptyList(),
+    val allFavouriteJourneys: List<CompletedJourney> = emptyList()
 )
 
 class CompletedJourneysViewModel(
-    private val savedPlaceDao: SavedPlaceDao
+    private val repository: CitiWayRepository,
+    private val currentUserId: Int = 1
 ) : ViewModel() {
 
     private val _screenState = MutableStateFlow(CompletedJourneysState())
@@ -25,41 +26,22 @@ class CompletedJourneysViewModel(
     init {
         loadJourneys()
         loadAllJourneys()
-        loadAllFavouriteJourneys()
     }
 
     private fun loadJourneys() {
         viewModelScope.launch {
-            // Load recent journeys
-            savedPlaceDao.getRecentJourneys().collectLatest { savedPlaces ->
-                val journeys = savedPlaces.map { it.toCompletedJourney() }
+            repository.getRecentTrips(currentUserId, limit = 20).collectLatest { trips ->
+                val journeys = trips.map { it.toCompletedJourney() }
                 _screenState.update { it.copy(recentJourneys = journeys) }
-            }
-        }
-
-        viewModelScope.launch {
-            // Load favorite journeys
-            savedPlaceDao.getFavoriteJourneys().collectLatest { savedPlaces ->
-                val journeys = savedPlaces.map { it.toCompletedJourney() }
-                _screenState.update { it.copy(favouriteJourneys = journeys) }
             }
         }
     }
 
     private fun loadAllJourneys() {
         viewModelScope.launch {
-            savedPlaceDao.getAllJourneys().collectLatest { savedPlaces ->
-                val journeys = savedPlaces.map { it.toCompletedJourney() }
-                _screenState.update { it.copy(allJourneys = journeys) } // reuse existing field
-            }
-        }
-    }
-
-    private fun loadAllFavouriteJourneys() {
-        viewModelScope.launch {
-            savedPlaceDao.getAllFavouriteJourneys().collectLatest { savedPlaces ->
-                val favourites = savedPlaces.map { it.toCompletedJourney() }
-                _screenState.update { it.copy(allFavouriteJourneys = favourites) }
+            repository.getAllTripsForUser(currentUserId).collectLatest { trips ->
+                val journeys = trips.map { it.toCompletedJourney() }
+                _screenState.update { it.copy(allJourneys = journeys) }
             }
         }
     }
@@ -68,44 +50,45 @@ class CompletedJourneysViewModel(
         viewModelScope.launch {
             try {
                 val id = journeyId.toIntOrNull() ?: return@launch
-
-                // Get current place from database
-                val place = savedPlaceDao.getPlaceById(id) ?: return@launch
-
-                // Toggle favorite status
-                savedPlaceDao.updateFavoriteStatus(id, !place.isFavorite)
-
-                println("✅ Toggled favorite for journey $id to ${!place.isFavorite}")
+                println("⚠️ Favorite toggle not yet implemented - need to add isFavorite to Trip table")
             } catch (e: Exception) {
                 println("❌ Error toggling favorite: ${e.message}")
             }
         }
     }
 
-    // Helper function to save a journey (call this when user completes a journey) ** will do after Routes api is working
-    fun saveJourney(route: String, date: String, durationMin: Int, isFavorite: Boolean = false) {
+    fun saveJourney(
+        startStop: String?,
+        endStop: String?,
+        date: String,
+        tripTime: String,
+        totalFare: Double
+    ) {
         viewModelScope.launch {
-            val journey = SavedPlace(
-                route = route,
-                journeyDate = date,
-                durationMin = durationMin,
-                isFavorite = isFavorite,
-                itemType = "journey",
-                lastUsedTimestamp = System.currentTimeMillis()
-            )
-            savedPlaceDao.insertPlace(journey)
-            println("✅ Saved journey: $route")
+            try {
+                val trip = Trip(
+                    user_id = currentUserId,
+                    start_stop = startStop,
+                    end_stop = endStop,
+                    date = date,
+                    trip_time = tripTime,
+                    total_fare = totalFare
+                )
+                repository.insertTrip(trip)
+                println("✅ Saved journey: $date - R$totalFare")
+            } catch (e: Exception) {
+                println("❌ Error saving journey: ${e.message}")
+            }
         }
     }
 
-    // Extension function to convert SavedPlace to CompletedJourney
-    private fun SavedPlace.toCompletedJourney(): CompletedJourney {
+    private fun Trip.toCompletedJourney(): CompletedJourney {
         return CompletedJourney(
-            id = this.id.toString(),
-            route = this.route ?: "",
-            date = this.journeyDate ?: "",
-            durationMin = this.durationMin ?: 0,
-            isFavourite = this.isFavorite
+            id = this.trip_id.toString(),
+            route = "${this.start_stop ?: "Start"} → ${this.end_stop ?: "End"}",
+            date = this.date ?: "",
+            durationMin = this.trip_time?.replace(" min", "")?.toIntOrNull() ?: 0,
+            isFavourite = false
         )
     }
 }

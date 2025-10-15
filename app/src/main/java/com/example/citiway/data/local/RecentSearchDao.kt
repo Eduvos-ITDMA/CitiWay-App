@@ -2,9 +2,9 @@ package com.example.citiway.data.local
 
 import androidx.room.*
 
-/**
+/** to be deleted file
  * DAO = Data Access Object
- * These are the functions you'll call to interact with your database.
+ * These are the functions you'll call to interact with the database.
  * Room will handle all the SQL for you automatically!
  */
 @Dao

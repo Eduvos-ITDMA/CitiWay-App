@@ -125,3 +125,52 @@ Refer to the figma design to see how this component will be reused.
 - Bottom Nav Bar = for switching major sections
 - Material Theme = modern look, less manual styling
 - Custom components = reduce development time and effort through reusability
+
+## 🗄️ Database Setup (Room + Repository Pattern)
+
+**Date: October 13, 2025**
+
+### Overview
+Implemented complete Room database architecture based on ERD design with repository pattern for clean data access.
+
+### Database Schema
+- **8 Entity Tables**: User, Provider, Route, Trip, TripRoute, MonthlySpend, MyCitiFare, MetrorailFare
+- **Foreign Key Relationships**: Proper referential integrity with cascade deletes
+- **Nullable Fields**: All fields nullable for flexible development and testing
+
+### Architecture
+
+data/
+├── local/
+│   ├── entities/        # Database table definitions
+│   ├── dao/            # Data Access Objects (SQL queries)
+│   ├── CitiWayDatabase.kt
+│   └── DatabaseSeeder.kt
+└── repository/
+└── CitiWayRepository.kt    # Single source of truth
+
+
+### Key Features
+- Flow-based reactive queries for real-time UI updates
+- DatabaseSeeder with realistic South African transport data (MyCiti, Metrorail, Golden Arrow)
+- Coroutine-based async operations
+- Proper dependency injection via ViewModelFactory
+
+### Usage Example
+```kotlin
+// In the Composable/Screens
+val database = CitiWayDatabase.getDatabase(context)
+val repository = CitiWayRepository(database)
+
+val viewModel: MyViewModel = viewModel(
+    factory = viewModelFactory { 
+        MyViewModel(repository) 
+    }
+)
+
+Test Data
+Run DatabaseSeeder.seedDatabase() to populate with sample data:
+
+Sample users, providers, routes
+Realistic fare structures
+Test trips and monthly spend data
