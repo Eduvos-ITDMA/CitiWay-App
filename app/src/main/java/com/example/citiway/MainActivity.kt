@@ -7,23 +7,19 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.citiway.data.local.CitiWayDatabase
+import com.example.citiway.data.local.CitiWayDatabase
 import com.example.citiway.core.navigation.graphs.SetupNavGraph
 import com.example.citiway.core.navigation.routes.HOME_ROUTE
 import com.example.citiway.core.ui.theme.CitiWayTheme
 import com.example.citiway.features.shared.DrawerViewModel
-import com.example.citiway.features.shared.CompletedJourneysViewModel
 import com.google.android.libraries.places.api.Places
 
 import com.example.citiway.data.local.DatabaseSeeder
 import com.example.citiway.data.repository.CitiWayRepository
-import com.example.citiway.features.shared.createDummyJourneys
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -42,7 +38,7 @@ class MainActivity : ComponentActivity() {
 
         // Seed database on first launch
         lifecycleScope.launch {
-            seeder.seedDatabase()
+            seeder.seedDatabase()  // comment this line out after 1st app launch to avoid duplicated data
         }
 
         enableEdgeToEdge()

@@ -3,6 +3,10 @@ package com.example.citiway.core.ui.components
 import com.example.citiway.R
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.TrendingFlat
+import androidx.compose.material.icons.filled.TrendingFlat
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -12,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -28,7 +33,7 @@ import java.time.format.DateTimeFormatter
  * @param weight The layout weight of this card within a [RowScope]. Defaults to 1f.
  */
 @Composable
-fun RowScope.CompletedJourneyCard(route: String, date: String, durationMin: Int, weight: Float = 1f) {
+fun RowScope.CompletedJourneyCard(route: String, date: String, mode: String, durationMin: Int, weight: Float = 1f) {
     val formattedDate = date.format(DateTimeFormatter.ofPattern("MMM dd, yyyy"))
 
     val hours = durationMin / 60
@@ -40,6 +45,22 @@ fun RowScope.CompletedJourneyCard(route: String, date: String, durationMin: Int,
         }
         append("${minutes}min")
     }.trim()
+
+    val normalizedMode = mode.ifEmpty { "Mode" }
+
+    // Determine which icon to show based on mode
+    val modeIcon = when (normalizedMode.lowercase()) {
+        "train" -> R.drawable.ic_train
+        "bus" -> R.drawable.ic_bus
+        "multi" -> R.drawable.ic_multimodal
+        else -> R.drawable.ic_multimodal // Default fallback
+    }
+
+    // Parse route into start and end locations
+    val routeParts = route.split("|")
+    val startLocation = routeParts.getOrNull(0) ?: "Start"
+    val endLocation = routeParts.getOrNull(1) ?: "End"
+
 
     // ========== Component composable ==========
     Card(
@@ -55,12 +76,29 @@ fun RowScope.CompletedJourneyCard(route: String, date: String, durationMin: Int,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                // ========== Route text ==========
-                Text(
-                    text = route,
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    style = MaterialTheme.typography.titleMedium
-                )
+
+                // ========== Route text with arrow icon ==========
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = startLocation,
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.TrendingFlat,
+                        contentDescription = "to",
+                        tint = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = endLocation,
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
                 Spacer(modifier = Modifier.height(8.dp))
 
                 // ========== Date and Duration ==========
@@ -87,10 +125,29 @@ fun RowScope.CompletedJourneyCard(route: String, date: String, durationMin: Int,
                         modifier = Modifier.size(18.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
+
                     Text(
                         text = durationText,
                         color = MaterialTheme.colorScheme.background,
                         style = MaterialTheme.typography.bodyLarge
+                    )
+
+                    Spacer(modifier = Modifier.width(18.dp))
+
+                    // ========== Mode of transport (conditional icon) ==========
+                    Icon(
+                        painter = painterResource(modeIcon),
+                        contentDescription = normalizedMode,
+                        tint = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+
+                    Text(
+                        text = normalizedMode,
+                        color = MaterialTheme.colorScheme.background,
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold
                     )
                 }
             }

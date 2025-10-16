@@ -198,9 +198,10 @@ class CompletedJourneysViewModel(
     private fun Trip.toCompletedJourney(): CompletedJourney {
         return CompletedJourney(
             id = this.trip_id.toString(),
-            route = "${this.start_stop ?: "Start"} → ${this.end_stop ?: "End"}",
+            route = "${this.start_stop ?: "Start"} | ${this.end_stop ?: "End"}",
             date = this.date ?: "",
             durationMin = this.trip_time?.replace(" min", "")?.toIntOrNull() ?: 0,
+            mode = this.mode ?: "",
             isFavourite = this.is_favourite
         )
     }

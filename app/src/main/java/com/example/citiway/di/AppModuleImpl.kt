@@ -11,7 +11,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import kotlin.getValue
 import com.example.citiway.data.repository.CitiWayRepository
-import com.citiway.data.local.CitiWayDatabase
+import com.example.citiway.data.local.CitiWayDatabase
 
 private const val BASE_URL = "https://maps.googleapis.com/"
 private const val MAPS_API_KEY = BuildConfig.MAPS_API_KEY

@@ -169,6 +169,7 @@ fun CompletedTripsSection(
                     route = journey.route,
                     date = journey.date,
                     durationMin = journey.durationMin,
+                    mode = journey.mode,
                     icon = { modifier ->
                         Icon(
                             imageVector = if (journey.isFavourite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,

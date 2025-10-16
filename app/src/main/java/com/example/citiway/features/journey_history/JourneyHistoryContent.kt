@@ -50,6 +50,7 @@ fun JourneyHistoryContent(
                     route = journey.route,
                     date = journey.date,
                     durationMin = journey.durationMin,
+                    mode = journey.mode,
                     outlined = true,
                     icon = { modifier ->
                         Icon(
