@@ -6,7 +6,6 @@ import com.example.citiway.data.remote.DirectionsService
 import com.example.citiway.data.remote.GeocodingService
 import com.example.citiway.data.remote.PlacesManager
 import com.example.citiway.data.remote.RoutesManager
-import com.example.citiway.data.repository.AppRepository
 import com.google.common.collect.Maps
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
