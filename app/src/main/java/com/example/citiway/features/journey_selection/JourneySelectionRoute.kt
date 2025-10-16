@@ -10,10 +10,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.citiway.App
 import com.example.citiway.core.utils.ScreenWrapper
-import com.example.citiway.data.remote.PlacesActions
-import com.example.citiway.data.remote.PlacesManager
-import com.example.citiway.data.remote.PlacesState
+import com.example.citiway.core.utils.getNearestHalfHour
 import com.example.citiway.di.viewModelFactory
+import com.example.citiway.features.shared.JourneySelectionActions
 import com.example.citiway.features.shared.JourneyViewModel
 import com.google.android.libraries.places.api.model.AutocompletePrediction
 import kotlinx.coroutines.launch
@@ -32,10 +31,12 @@ fun JourneySelectionRoute(
             JourneyViewModel(navController)
         }
     )
+    journeyViewModel.setTime(getNearestHalfHour())
     journeyViewModel.setJourneyOptions()
 
     val journeyState by journeyViewModel.state.collectAsStateWithLifecycle()
-    val journeySelectionActions = JourneySelectionActions(
+    val journeySelectionActions = JourneySelectionScreenActions(
+        journeyViewModel.actions,
         LocationFieldActions(
             onFieldIconClick = {
                 val startLocation = journeyState.startLocation
@@ -47,7 +48,7 @@ fun JourneySelectionRoute(
             onSelectPrediction = { prediction ->
                 journeyViewModel.viewModelScope.launch {
                     val selectedLocation = placesActions.getPlace(prediction)
-                    journeyState.startLocation = selectedLocation
+                    journeyViewModel.actions.onSetStartLocation(selectedLocation)
                 }
             }
         ),
@@ -62,10 +63,11 @@ fun JourneySelectionRoute(
             onSelectPrediction = { prediction ->
                 journeyViewModel.viewModelScope.launch {
                     val selectedLocation = placesActions.getPlace(prediction)
-                    journeyState.destination = selectedLocation
+                    journeyViewModel.actions.onSetDestination(selectedLocation)
                 }
             }
-        )
+        ),
+
     )
 
     ScreenWrapper(navController, true, { paddingValues ->
@@ -73,11 +75,11 @@ fun JourneySelectionRoute(
     })
 }
 
-data class JourneySelectionActions(
+data class JourneySelectionScreenActions(
+    val journeySelectionActions: JourneySelectionActions,
     val startLocationFieldActions: LocationFieldActions,
-    val destinationFieldActions: LocationFieldActions
+    val destinationFieldActions: LocationFieldActions,
 )
-
 data class LocationFieldActions(
     val onFieldIconClick: () -> Unit,
     val onSelectPrediction: (AutocompletePrediction) -> Unit,
