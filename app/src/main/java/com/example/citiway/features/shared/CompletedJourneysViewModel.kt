@@ -201,6 +201,7 @@ class CompletedJourneysViewModel(
             route = "${this.start_stop ?: "Start"} → ${this.end_stop ?: "End"}",
             date = this.date ?: "",
             durationMin = this.trip_time?.replace(" min", "")?.toIntOrNull() ?: 0,
+            mode = this.mode ?: "",
             isFavourite = this.is_favourite
         )
     }
