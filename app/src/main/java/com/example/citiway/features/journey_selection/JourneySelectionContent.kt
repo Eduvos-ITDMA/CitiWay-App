@@ -83,14 +83,32 @@ fun JourneySelectionContent(
             .background(MaterialTheme.colorScheme.background)
             .padding(paddingValues)
             .padding(horizontal = 16.dp)
-            .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .verticalScroll(rememberScrollState())
     ) {
-        Title("Select Your Journey")
-        VerticalSpace(24)
+        // Left-aligned title
+        Text(
+            text = "Your Journey:",
+            style = MaterialTheme.typography.headlineLarge,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        VerticalSpace(13)
 
         SelectedLocationFields(state, actions, placesState, placesActions)
-        VerticalSpace(24)
+
+        VerticalSpace(8)
+
+        // "Choose your Journey:" title after location fields
+        Text(
+            text = "Choose your Journey:",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.fillMaxWidth()
+        )
+        VerticalSpace(16)
 
         JourneyOptionsSection(state)
     }
@@ -284,7 +302,7 @@ fun JourneyCard(journey: JourneyDetails) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 12.dp)
+                    .padding(horizontal = 12.dp, vertical = 8.dp)
             ) {
                 JourneyDetailRow(
                     icon = Icons.AutoMirrored.Filled.DirectionsWalk,
@@ -300,7 +318,7 @@ fun JourneyCard(journey: JourneyDetails) {
                         append(" walk to first station")
                     }
                 )
-                VerticalSpace(12)
+                VerticalSpace(8)
 
                 RouteDescriptionRow(journey.routeSegments)
                 VerticalSpace(12)
@@ -331,7 +349,7 @@ fun TripHeader(cornerRadius: Dp, arrivalTime: LocalTime, fareTotal: Float) {
             .fillMaxWidth()
             .clip(RoundedCornerShape(topStart = cornerRadius, topEnd = cornerRadius))
             .background(MaterialTheme.colorScheme.primary)
-            .padding(16.dp),
+            .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Clock Icon
@@ -431,10 +449,10 @@ fun StartJourneyButton() {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(56.dp)
+            .height(48.dp)
             .background(color = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)) // Light blue background
             .clickable { /* TODO: Handle journey start click */ }
-            .padding(vertical = 12.dp),
+            .padding(vertical = 10.dp),
         contentAlignment = Alignment.Center
     ) {
         Text(

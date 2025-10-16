@@ -62,7 +62,7 @@ class CompletedJourneysViewModel(
     private fun loadJourneys() {
         viewModelScope.launch {
             // Load recent journeys (last 2 trips) (HOME PAGE)
-            repository.getRecentTrips(currentUserId, limit = 2).collectLatest { trips ->
+            repository.getRecentTrips(currentUserId, limit = 3).collectLatest { trips ->
                 val journeys = trips.map { it.toCompletedJourney() }
                 _screenState.update { it.copy(recentJourneys = journeys) }
             }
@@ -105,7 +105,7 @@ class CompletedJourneysViewModel(
                 val journeys = trips.map { it.toCompletedJourney() }
                 _screenState.update {
                     it.copy(
-                        favouriteJourneys = journeys.take(2), // HOME PAGE LIMITING to 2
+                        favouriteJourneys = journeys.take(3), // HOME PAGE LIMITING to 2
                         allFavouriteJourneys = journeys
                     )
                 }
