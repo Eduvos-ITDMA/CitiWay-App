@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.citiway.R
@@ -33,6 +34,8 @@ import com.example.citiway.core.ui.components.LocationSearchField
 import com.example.citiway.core.ui.components.Space
 import com.example.citiway.core.ui.components.Title
 import com.example.citiway.core.ui.components.VerticalSpace
+import com.example.citiway.core.utils.HomeScreenPreview
+import com.example.citiway.core.utils.JourneySelectionScreenPreview
 import com.example.citiway.data.local.CompletedJourney
 import com.example.citiway.data.remote.PlacesActions
 import com.example.citiway.data.remote.PlacesState
@@ -177,4 +180,10 @@ fun SchedulesLink(onSchedulesLinkClick: () -> Unit) {
             modifier = Modifier.size(20.dp)
         )
     }
+}
+
+@Preview
+@Composable
+fun HomePreview() {
+    HomeScreenPreview()
 }

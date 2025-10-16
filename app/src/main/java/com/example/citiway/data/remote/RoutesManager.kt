@@ -1,5 +1,6 @@
 package com.example.citiway.data.remote
 
+import com.example.citiway.features.shared.TimeType
 import com.google.android.gms.maps.model.LatLng
 
 class RoutesManager(
@@ -8,7 +9,9 @@ class RoutesManager(
 ) {
     suspend fun getTransitRoutes(
         start: LatLng,
-        destination: LatLng
+        destination: LatLng,
+        timeType: TimeType,
+        time: String
     ): List<Route> {
         // Make request body
         val originWaypoint = Waypoint(Location(start))
@@ -19,7 +22,9 @@ class RoutesManager(
             travelMode = "TRANSIT",
             computeAlternativeRoutes = true,
             languageCode = "en-US",
-            units = "METRIC"
+            units = "METRIC",
+            arrivalTime = if (timeType == TimeType.Arrival) time else null,
+            departureTime = if (timeType == TimeType.Departure) time else null,
         )
 
         return try {

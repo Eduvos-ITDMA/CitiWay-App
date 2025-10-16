@@ -1,11 +1,14 @@
 package com.example.citiway.features.shared
 
 import android.util.Log
+import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.citiway.App
 import com.example.citiway.core.navigation.routes.Screen
+import com.example.citiway.core.utils.convertHourToInstantIso
+import com.example.citiway.core.utils.getNearestHalfHour
 import com.example.citiway.core.utils.toSecondsInt
 import com.example.citiway.data.remote.RoutesManager
 import com.example.citiway.data.remote.SelectedLocation
@@ -18,8 +21,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.Duration
 import java.time.Instant
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 import java.util.Locale.getDefault
+import kotlin.math.ceil
 
 class JourneyViewModel(
     private val navController: NavController,
@@ -28,8 +34,70 @@ class JourneyViewModel(
     private val _state = MutableStateFlow(JourneyState())
     val state: StateFlow<JourneyState> = _state
 
-    init {
-        viewModelScope.launch {}
+    val actions = JourneySelectionActions(
+        onSetTime = ::setTime,
+        onSetTimeType = ::setTimeType,
+        onSetDestination = ::setDestination,
+        onSetStartLocation = ::setStartLocation,
+        onSetJourneyOptions = ::setJourneyOptions
+    )
+
+    fun setTimeType(type: TimeType) {
+        _state.update { currentState ->
+            currentState.copy(filter = currentState.filter.copy(timeType = type))
+        }
+    }
+
+    fun setTime(time: String) {
+        // Attempt to convert time to ISO format string
+        Log.d("JourneyViewModel set time", time)
+        var formattedTime = time
+        try {
+            formattedTime = convertHourToInstantIso(time)
+        } catch (e: Exception) {
+            try {
+                Instant.parse(time)
+            } catch (e: Exception) {
+                Log.e("JourneyViewModel", "Failed to parse time string: ${e.message}")
+                return
+            }
+        }
+        Log.d("JourneyViewModel set time", formattedTime)
+        Log.d("JourneyViewModel time string", time)
+
+        _state.update { currentState ->
+            currentState.copy(
+                selectedTimeString = time,
+                filter = currentState.filter.copy(time = formattedTime)
+            )
+        }
+    }
+
+    fun setSelectedTimeString(hourString: String) {
+        try {
+            val time = convertHourToInstantIso(hourString)
+            _state.update {
+                it.copy(
+                    filter = it.filter.copy(time = time),
+                    selectedTimeString = hourString
+                )
+            }
+        } catch (e: Exception) {
+            _state.update {
+                it.copy(
+                    filter = it.filter.copy(time = null),
+                    selectedTimeString = "now"
+                )
+            }
+        }
+    }
+
+    fun setStartLocation(selectedLocation: SelectedLocation) {
+        _state.update { it.copy(startLocation = selectedLocation) }
+    }
+
+    fun setDestination(selectedLocation: SelectedLocation) {
+        _state.update { it.copy(destination = selectedLocation) }
     }
 
     fun confirmLocationSelection(
@@ -37,13 +105,13 @@ class JourneyViewModel(
     ) {
         when (locationType) {
             LocationType.START -> {
-                _state.update { it.copy(startLocation = selectedLocation) }
+                setStartLocation(selectedLocation)
                 clearSearch()
                 navController.navigate(Screen.JourneySelection.route)
             }
 
             LocationType.END -> {
-                _state.update { it.copy(destination = selectedLocation) }
+                setDestination(selectedLocation)
                 clearSearch()
                 navController.navigate(Screen.StartLocationSelection.route)
             }
@@ -57,18 +125,21 @@ class JourneyViewModel(
 
 
             viewModelScope.launch {
-                val routes = routesManager.getTransitRoutes(start, destination)
+                val filter = state.value.filter
+                val routes =
+                    routesManager.getTransitRoutes(
+                        start,
+                        destination,
+                        filter.timeType,
+                        filter.resolveTime()
+                    )
 
-                val journeyOptions = routes.map { route ->
+                val journeyOptions = routes.mapNotNull { route ->
                     val steps = route.legs.firstOrNull()?.steps ?: emptyList()
 
                     fun getVehicle(step: Step?): Vehicle? {
                         return step?.transitDetails?.transitLine?.vehicle
                     }
-
-                    // firstWalkDuration: first WALK step's duration
-                    val firstWalkDurationMinutes =
-                        getNextDepartureDuration(steps)?.toMinutes()?.toInt()
 
                     // firstNodeType: find first TRANSIT step and decide STOP vs STATION
                     val firstTransitStep = steps.firstOrNull { it.travelMode == "TRANSIT" }
@@ -80,30 +151,30 @@ class JourneyViewModel(
                     } ?: TravelPoint.STOP
 
                     // routeSegments: iterate through steps to build string segments
+                    var firstWalkOver = false
+                    var firstWalkDuration = 0
                     val segments = mutableListOf<String>()
                     steps.forEach { step ->
                         when (step.travelMode) {
-                            "WALK" -> segments.add("Walk")
+                            "WALK" -> {
+                                if (segments.lastOrNull() != "Walk") segments.add("Walk")
+                                // firstWalkDuration: first WALK step's duration
+                                if (!firstWalkOver) firstWalkDuration += step.staticDuration.toSecondsInt()
+                            }
+
                             "TRANSIT" -> {
-                                val vehicleType = getVehicle(step)?.type?.uppercase()
-                                when (vehicleType) {
-                                    "BUS" -> {
-                                        segments.add("MyCiTi")
-                                    }
-
-                                    "HEAVY_RAIL", "RAIL" -> {
-                                        segments.add("Metrorail")
-                                    }
-
-                                    else -> {
-                                        // Fallback for flexibility
-                                        val vehicleName = getVehicle(step)?.name?.text
-                                        segments.add(vehicleName ?: "Transit")
-                                    }
-                                }
+                                firstWalkOver = true
+                                val departureStop =
+                                    step.transitDetails?.stopDetails?.departureStop?.name
+                                val arrivalStop =
+                                    step.transitDetails?.stopDetails?.arrivalStop?.name
+                                if (arrivalStop == null || departureStop == null) return@mapNotNull null
+                                segments.add(departureStop)
+                                segments.add(arrivalStop)
                             }
 
                             else -> {
+                                firstWalkOver = true
                                 // Fallback for flexibility - just map generic name
                                 segments.add(step.travelMode.replaceFirstChar {
                                     if (it.isLowerCase()) it.titlecase(getDefault())
@@ -112,6 +183,7 @@ class JourneyViewModel(
                             }
                         }
                     }
+                    firstWalkDuration /= 60
 
                     // nextDeparture: time until next departure
                     val nextDeparture = Duration.between(
@@ -121,6 +193,15 @@ class JourneyViewModel(
 
                     // arrivalTime: current time + route.duration.value
                     val arrivalTime = calculateArrivalTime(steps)
+
+                    // Filter routes - nextDeparture must exceed walk duration, it must not be
+                    // negative, and arrivalTime should not be more than 6 hours from now
+                    val arrivalTooFarInFuture =
+                        (arrivalTime?.minus(Duration.ofHours(6)) ?: Instant.MAX) > Instant.now()
+                    val departureTooSoonToWalk =
+                        nextDeparture.toMinutes() < ceil(0.75 * firstWalkDuration)
+                    if (nextDeparture.isNegative || departureTooSoonToWalk || arrivalTooFarInFuture) return@mapNotNull null
+
 
                     // TODO: fareTotal
                     var fare = 0.0f
@@ -135,7 +216,7 @@ class JourneyViewModel(
                     }
 
                     JourneyDetails(
-                        firstWalkDuration = firstWalkDurationMinutes,
+                        firstWalkMinutes = firstWalkDuration,
                         firstNodeType = firstNodeType,
                         routeSegments = segments,
                         nextDeparture = nextDeparture,
@@ -144,31 +225,9 @@ class JourneyViewModel(
                     )
                 }
 
-                Log.d("Route update journeyOptions", journeyOptions.toString())
                 _state.update { it.copy(journeyOptions = journeyOptions) }
             }
         }
-    }
-
-    fun getNextDepartureDuration(steps: List<Step>): Duration? {
-        val now = Instant.now()
-
-        steps.forEach { step ->
-            if (step.travelMode == "TRANSIT") {
-                val departureTimeString = step.transitDetails?.stopDetails?.departureTime
-
-                if (departureTimeString != null) {
-                    return try {
-                        Duration.between(now, Instant.parse(departureTimeString))
-                    } catch (e: DateTimeParseException) {
-                        println("Error parsing departure time string: $departureTimeString. Error: ${e.message}")
-                        null
-                    }
-                }
-            }
-        }
-
-        return null
     }
 
     fun calculateArrivalTime(steps: List<Step>): Instant? {
@@ -185,17 +244,19 @@ class JourneyViewModel(
 
         return null
     }
-
 }
 
+@Stable
 data class JourneyState(
-    var startLocation: SelectedLocation? = null,
-    var destination: SelectedLocation? = null,
-    var journeyOptions: List<JourneyDetails> = emptyList()
+    val startLocation: SelectedLocation? = null,
+    val destination: SelectedLocation? = null,
+    val journeyOptions: List<JourneyDetails> = emptyList(),
+    val selectedTimeString: String = "now",
+    val filter: JourneyFilter = JourneyFilter()
 )
 
 data class JourneyDetails(
-    val firstWalkDuration: Int?,
+    val firstWalkMinutes: Int?,
     val firstNodeType: TravelPoint?,
     val routeSegments: List<String>?,
     val nextDeparture: Duration?,
@@ -203,8 +264,38 @@ data class JourneyDetails(
     val fareTotal: Float = 0f,
 )
 
+data class JourneySelectionActions(
+    val onSetTimeType: (TimeType) -> Unit,
+    val onSetTime: (String) -> Unit,
+    val onSetStartLocation: (SelectedLocation) -> Unit,
+    val onSetDestination: (SelectedLocation) -> Unit,
+    val onSetJourneyOptions: () -> Unit
+)
+
+data class JourneyFilter(
+    val timeType: TimeType = TimeType.Departure,
+    val time: String? = null
+) {
+    fun resolveTime(): String {
+        return if (this.time != null) time else convertHourToInstantIso(getNearestHalfHour())
+    }
+}
+
+/**
+ * A string list of time slots from "04:30" to "23:00"
+ */
+val TimeSlots = (9..46).map { interval ->
+    val hour = interval / 2
+    val minutes = if (interval % 2 == 1) 30 else 0
+    LocalTime.of(hour, minutes).format(DateTimeFormatter.ofPattern("HH:mm"))
+}
+
 enum class TravelPoint(val label: String) {
     STOP("stop"), STATION("station")
+}
+
+enum class TimeType(val label: String) {
+    Departure("departure"), Arrival("arrival")
 }
 
 enum class LocationType {

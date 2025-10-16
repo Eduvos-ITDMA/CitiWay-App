@@ -253,7 +253,7 @@ class PlacesManager(
                 override fun onLocationAvailability(locationAvailability: LocationAvailability) {
                     if (!locationAvailability.isLocationAvailable) {
                         // Log and wait for onLocationResult() - FusedLocationProvider will call it once ready
-                        Log.w("PlacesManager", "Location temporarily unavailable — will wait.")
+                        Log.w("PlacesManager", "Waiting for temporary location.")
                     }
                 }
             }

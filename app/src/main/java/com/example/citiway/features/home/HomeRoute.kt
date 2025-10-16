@@ -41,38 +41,6 @@ fun HomeRoute(
         factory = viewModelFactory {
             JourneyViewModel(navController)
         })
-    val journeyState by journeyViewModel.state.collectAsStateWithLifecycle()
-
-    /* ====== TESTING ROUTES API ====== */
-    LaunchedEffect(key1 = journeyState.journeyOptions) {
-        completedJourneysViewModel.viewModelScope.launch {
-            try {
-                Log.d(
-                    "Routes API",
-                    journeyState.journeyOptions.toString()
-                )
-            } catch (e: Exception) {
-                Log.d("Routes API exception", e.message ?: "Exception has no message")
-            }
-        }
-    }
-
-    journeyViewModel.confirmLocationSelection(
-        SelectedLocation(
-            LatLng(-33.962333, 18.475691),
-            "mock_place_id", "Place A"
-        ), LocationType.START
-    ) {}
-    journeyViewModel.confirmLocationSelection(
-        SelectedLocation(
-            LatLng(-33.888730, 18.507877),
-            "mock_place_id", "Place B"
-        ), LocationType.END
-    ) {}
-
-    journeyViewModel.setJourneyOptions()
-    /* ================================ */
-
 
     val placesManager = App.appModule.placesManager
     val placesState by placesManager.state.collectAsStateWithLifecycle()

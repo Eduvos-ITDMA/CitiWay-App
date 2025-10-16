@@ -7,6 +7,8 @@ data class ComputeRoutesRequest(
     val computeAlternativeRoutes: Boolean = false,
     val languageCode: String = "en-US",
     val units: String = "METRIC",
+    val departureTime: String? = null,
+    val arrivalTime: String? = null
 )
 
 data class Waypoint(
