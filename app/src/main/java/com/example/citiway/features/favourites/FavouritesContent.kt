@@ -45,6 +45,7 @@ fun FavouritesContent(
                     route = journey.route,
                     date = journey.date,
                     durationMin = journey.durationMin,
+                    mode = journey.mode,
                     outlined = false,
                     icon = { modifier ->
                         Icon(
