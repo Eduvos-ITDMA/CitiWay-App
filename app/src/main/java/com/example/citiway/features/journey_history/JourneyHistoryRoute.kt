@@ -12,30 +12,46 @@ import com.example.citiway.data.repository.CitiWayRepository
 import com.example.citiway.di.viewModelFactory
 import com.example.citiway.features.shared.CompletedJourneysViewModel
 
+/**
+ * Route composable for the Journey History screen
+ *
+ * Architecture Flow: Route → ViewModel → Repository → DAO → Database
+ *
+ * This route handles:
+ * - Manual Dependency Injection: Constructs Database → Repository → ViewModel chain
+ *   (No Hilt/Koin used, keeping dependencies explicit and simple)
+ * - ViewModel Factory: Uses viewModelFactory helper to inject Repository into ViewModel
+ *   (Required for ViewModels with constructor parameters, survives configuration changes)
+ * - Lifecycle-aware State: collectAsStateWithLifecycle stops collection when screen is
+ *   backgrounded, saving resources while maintaining reactive UI updates
+ *
+ * The route acts as a bridge between navigation and UI, managing ViewModel instantiation
+ * and state observation lifecycle.
+ */
+
 @Composable
 fun JourneyHistoryRoute(
-    navController: NavController,
-   // completedJourneysViewModel: CompletedJourneysViewModel = viewModel()
+    navController: NavController
 ) {
-    // Now just creating it where we need it, less gymnastics
-    // Get database and repository
+    // Manual DI: Database → Repository → ViewModel
     val context = LocalContext.current
     val database = CitiWayDatabase.getDatabase(context)
     val repository = CitiWayRepository(database)
 
-    // Use YOUR existing viewModelFactory helper! 🎉
+    // ViewModel with factory for constructor injection
     val completedJourneysViewModel: CompletedJourneysViewModel = viewModel(
         factory = viewModelFactory {
             CompletedJourneysViewModel(repository = repository)
         }
     )
 
-
+    // Lifecycle-aware state collection (stops when backgrounded)
     val completedJourneysState by completedJourneysViewModel.screenState.collectAsStateWithLifecycle()
 
+    // Render screen with all journey history
     ScreenWrapper(navController, showBottomBar = true, content = { paddingValues ->
         JourneyHistoryContent(
-            journeys = completedJourneysState.allJourneys,
+            journeys = completedJourneysState.allJourneys, // Selecting allJourneys property from ViewModel state to render full trip history for this screen
             paddingValues = paddingValues
         )
     })

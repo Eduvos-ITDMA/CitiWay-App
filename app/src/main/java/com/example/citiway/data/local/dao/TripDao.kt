@@ -25,6 +25,12 @@ interface TripDao {
     @Query("SELECT * FROM trip WHERE user_id = :userId ORDER BY date DESC LIMIT :limit")
     fun getRecentTrips(userId: Int, limit: Int = 10): Flow<List<Trip>>
 
+    @Query("SELECT * FROM trip WHERE user_id = :userId AND is_favourite = 1 ORDER BY date DESC")
+    fun getFavoriteTrips(userId: Int): Flow<List<Trip>>
+
+    @Query("UPDATE trip SET is_favourite = :isFavorite WHERE trip_id = :tripId")
+    suspend fun updateFavoriteStatus(tripId: Int, isFavorite: Boolean)
+
     @Query("SELECT * FROM trip")
     fun getAllTrips(): Flow<List<Trip>>
 

@@ -42,7 +42,7 @@ class MainActivity : ComponentActivity() {
 
         // Seed database on first launch
         lifecycleScope.launch {
-           // seeder.seedDatabase()
+            seeder.seedDatabase()
         }
 
         enableEdgeToEdge()

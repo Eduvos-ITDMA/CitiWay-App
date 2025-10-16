@@ -20,13 +20,13 @@ import com.example.citiway.data.local.entities.*
         Provider::class,          // Stores transport provider details (MyCiti, Metrorail, etc.)
         Route::class,             // Stores individual route information
         Trip::class,              // Stores trip history and details
-        TripRoute::class,         // Links trips with their routes (junction table)
+        // TripRoute removed - no longer needed
         MonthlySpend::class,      // Tracks monthly spending per provider
         MyCitiFare::class,        // Stores MyCiti fare prices
         MetrorailFare::class,     // Stores Metrorail fare prices
 //        SavedPlace::class         // Stores saved places and favorite journeys
     ],
-    version = 2,                  // Database version - increment when schema changes
+    version = 3,                  // Database version - increment when schema changes
     exportSchema = false          // Set to true to export schema for version control
 )
 abstract class CitiWayDatabase : RoomDatabase() {
@@ -38,11 +38,11 @@ abstract class CitiWayDatabase : RoomDatabase() {
     abstract fun providerDao(): ProviderDao
     abstract fun routeDao(): RouteDao
     abstract fun tripDao(): TripDao
-    abstract fun tripRouteDao(): TripRouteDao
+    //abstract fun tripRouteDao(): TripRouteDao // won't use this anymore (was for offline help.)
     abstract fun monthlySpendDao(): MonthlySpendDao
     abstract fun myCitiFareDao(): MyCitiFareDao
     abstract fun metrorailFareDao(): MetrorailFareDao
-//   abstract fun savedPlaceDao(): SavedPlaceDao
+    abstract fun savedPlaceDao(): SavedPlaceDao
 
     companion object {
         // Volatile ensures changes to INSTANCE are immediately visible to all threads

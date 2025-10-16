@@ -25,11 +25,12 @@ class CitiWayRepository(private val database: CitiWayDatabase) {
     private val tripDao = database.tripDao()
     private val routeDao = database.routeDao()
     private val providerDao = database.providerDao()
-//    private val savedPlaceDao = database.savedPlaceDao()
+    private val savedPlaceDao = database.savedPlaceDao()
     private val monthlySpendDao = database.monthlySpendDao()
     private val myCitiFareDao = database.myCitiFareDao()
     private val metrorailFareDao = database.metrorailFareDao()
-    private val tripRouteDao = database.tripRouteDao()
+    // TripRouteDao REMOVED - no longer needed
+
 
     // ========== USER OPERATIONS ==========
     suspend fun insertUser(user: User) = userDao.insertUser(user)
@@ -37,23 +38,37 @@ class CitiWayRepository(private val database: CitiWayDatabase) {
     suspend fun getUserByEmail(email: String) = userDao.getUserByEmail(email)
     fun getAllUsers(): Flow<List<User>> = userDao.getAllUsers()
 
+
+
     // ========== TRIP OPERATIONS ==========
     suspend fun insertTrip(trip: Trip) = tripDao.insertTrip(trip)
     suspend fun getTripById(tripId: Int) = tripDao.getTripById(tripId)
     fun getRecentTrips(userId: Int, limit: Int = 10): Flow<List<Trip>> =
         tripDao.getRecentTrips(userId, limit)
+    fun getFavoriteTrips(userId: Int): Flow<List<Trip>> =
+        tripDao.getFavoriteTrips(userId)
+    suspend fun toggleFavoriteTrip(tripId: Int, isFavorite: Boolean) =
+        tripDao.updateFavoriteStatus(tripId, isFavorite)
     fun getAllTripsForUser(userId: Int): Flow<List<Trip>> =
         tripDao.getTripsByUser(userId)
     suspend fun deleteTrip(tripId: Int) = tripDao.deleteTripById(tripId)
+
+
+
 
     // ========== ROUTE OPERATIONS ==========
     suspend fun insertRoute(route: Route) = routeDao.insertRoute(route)
     suspend fun insertRoutes(routes: List<Route>) = routeDao.insertRoutes(routes)
     suspend fun getRouteById(routeId: Int) = routeDao.getRouteById(routeId)
+    fun getRoutesByTrip(tripId: Int): Flow<List<Route>> = routeDao.getRoutesByTrip(tripId)
     fun getRoutesByMode(mode: String): Flow<List<Route>> = routeDao.getRoutesByMode(mode)
     fun searchRoutes(location: String): Flow<List<Route>> =
         routeDao.searchRoutesByLocation(location)
     fun getAllRoutes(): Flow<List<Route>> = routeDao.getAllRoutes()
+    suspend fun deleteRoutesByTrip(tripId: Int) = routeDao.deleteRoutesByTrip(tripId)
+
+
+
 
     // ========== PROVIDER OPERATIONS ==========
     suspend fun insertProvider(provider: Provider) = providerDao.insertProvider(provider)
@@ -62,6 +77,9 @@ class CitiWayRepository(private val database: CitiWayDatabase) {
     fun getProvidersByType(type: String): Flow<List<Provider>> =
         providerDao.getProvidersByType(type)
     fun getAllProviders(): Flow<List<Provider>> = providerDao.getAllProviders()
+
+
+
 
     // ========== SAVED PLACE OPERATIONS ==========
 //    suspend fun insertSavedPlace(place: SavedPlace) = savedPlaceDao.insertPlace(place)
@@ -73,6 +91,8 @@ class CitiWayRepository(private val database: CitiWayDatabase) {
 //        savedPlaceDao.getRecentPlaces(userId, limit)
 //    suspend fun updatePlaceLastUsed(placeId: Int, timestamp: Long) =
 //        savedPlaceDao.updateLastUsedTimestamp(placeId, timestamp)
+//
+
 
     // ========== MONTHLY SPEND OPERATIONS ==========
     suspend fun insertMonthlySpend(spend: MonthlySpend) =
@@ -82,22 +102,23 @@ class CitiWayRepository(private val database: CitiWayDatabase) {
     suspend fun getSpendForMonth(userId: Int, month: String): MonthlySpend? =
         monthlySpendDao.getMonthlySpendByUserAndMonth(userId, month)
 
+
+
+
     // ========== FARE OPERATIONS ==========
     suspend fun insertMyCitiFares(fares: List<MyCitiFare>) =
         myCitiFareDao.insertMyCitiFares(fares)
     suspend fun getMyCitiFare(distanceBand: String): MyCitiFare? =
         myCitiFareDao.getFareByDistanceBand(distanceBand)
 
+
+
     suspend fun insertMetrorailFares(fares: List<MetrorailFare>) =
         metrorailFareDao.insertMetrorailFares(fares)
     suspend fun getMetrorailFare(zone: String, ticketType: String): MetrorailFare? =
         metrorailFareDao.getFareByZoneAndType(zone, ticketType)
 
-    // ========== TRIP-ROUTE OPERATIONS ==========
-    suspend fun insertTripRoutes(tripRoutes: List<TripRoute>) =
-        tripRouteDao.insertTripRoutes(tripRoutes)
-    fun getTripRoutes(tripId: Int): Flow<List<TripRoute>> =
-        tripRouteDao.getTripRoutesByTrip(tripId)
+
 
     // ========== UTILITY OPERATIONS ==========
     suspend fun clearAllData() {
