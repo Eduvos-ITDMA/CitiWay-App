@@ -10,7 +10,7 @@ package com.example.citiway.data.repository
  * @Inject constructor() allows Dagger/Hilt to create an instance of this repository.
  */
 
-import com.citiway.data.local.CitiWayDatabase
+import com.example.citiway.data.local.CitiWayDatabase
 import com.example.citiway.data.local.entities.*
 import kotlinx.coroutines.flow.Flow
 
@@ -25,7 +25,6 @@ class CitiWayRepository(private val database: CitiWayDatabase) {
     private val tripDao = database.tripDao()
     private val routeDao = database.routeDao()
     private val providerDao = database.providerDao()
-    private val savedPlaceDao = database.savedPlaceDao()
     private val monthlySpendDao = database.monthlySpendDao()
     private val myCitiFareDao = database.myCitiFareDao()
     private val metrorailFareDao = database.metrorailFareDao()

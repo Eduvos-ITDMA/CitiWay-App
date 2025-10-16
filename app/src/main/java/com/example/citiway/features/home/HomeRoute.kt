@@ -9,7 +9,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.citiway.data.local.CitiWayDatabase
+import com.example.citiway.data.local.CitiWayDatabase
 import com.example.citiway.App
 import com.example.citiway.core.navigation.routes.Screen
 import com.example.citiway.core.utils.ScreenWrapper

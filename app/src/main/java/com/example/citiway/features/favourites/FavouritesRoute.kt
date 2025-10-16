@@ -6,7 +6,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.citiway.data.local.CitiWayDatabase
+import com.example.citiway.data.local.CitiWayDatabase
 import com.example.citiway.core.utils.ScreenWrapper
 import com.example.citiway.data.repository.CitiWayRepository
 import com.example.citiway.di.viewModelFactory

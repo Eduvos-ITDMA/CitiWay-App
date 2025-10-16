@@ -6,13 +6,11 @@ import com.example.citiway.data.remote.DirectionsService
 import com.example.citiway.data.remote.GeocodingService
 import com.example.citiway.data.remote.PlacesManager
 import com.example.citiway.data.remote.RoutesManager
-import com.example.citiway.data.repository.AppRepository
-import com.google.common.collect.Maps
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import kotlin.getValue
 import com.example.citiway.data.repository.CitiWayRepository
-import com.citiway.data.local.CitiWayDatabase
+import com.example.citiway.data.local.CitiWayDatabase
 
 private const val BASE_URL = "https://maps.googleapis.com/"
 private const val MAPS_API_KEY = BuildConfig.MAPS_API_KEY

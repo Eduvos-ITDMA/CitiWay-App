@@ -1,4 +1,4 @@
-package com.citiway.data.local
+package com.example.citiway.data.local
 
 import android.content.Context
 import androidx.room.Database
@@ -42,7 +42,6 @@ abstract class CitiWayDatabase : RoomDatabase() {
     abstract fun monthlySpendDao(): MonthlySpendDao
     abstract fun myCitiFareDao(): MyCitiFareDao
     abstract fun metrorailFareDao(): MetrorailFareDao
-    abstract fun savedPlaceDao(): SavedPlaceDao
 
     companion object {
         // Volatile ensures changes to INSTANCE are immediately visible to all threads
