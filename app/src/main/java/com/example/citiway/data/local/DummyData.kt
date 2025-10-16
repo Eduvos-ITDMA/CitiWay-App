@@ -413,9 +413,9 @@ fun createDummyJourneys(dao: SavedPlaceDao) {
         )
 
 
-        dummyJourneys.forEach { journey ->
-            dao.insertPlace(journey)
-        }
+//        dummyJourneys.forEach { journey ->
+//            dao.insertPlace(journey)
+//        }
 
         println("✅ Created ${dummyJourneys.size} dummy journeys!")
     }

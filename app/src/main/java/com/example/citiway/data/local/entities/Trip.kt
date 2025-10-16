@@ -21,9 +21,13 @@ data class Trip(
     @PrimaryKey(autoGenerate = true)
     val trip_id: Int = 0,
     val user_id: Int? = null,
-    val start_stop: String? = null,  //made it strings (no offline stop id's)
+    val start_stop: String? = null,
     val end_stop: String? = null,
     val date: String? = null,
     val trip_time: String? = null,
-    val total_fare: Double? = null
+    val mode: String? = null, // ENUM: "Bus", "Train", "Multi"
+    val total_distance_km: Double? = null,
+    val total_fare: Double? = null,
+    val is_favourite: Boolean = false,
+    val created_at: Long? = null
 )

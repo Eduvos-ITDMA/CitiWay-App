@@ -21,6 +21,9 @@ interface RouteDao {
     @Query("SELECT * FROM route WHERE route_id = :routeId")
     suspend fun getRouteById(routeId: Int): Route?
 
+    @Query("SELECT * FROM route WHERE trip_id = :tripId")
+    fun getRoutesByTrip(tripId: Int): Flow<List<Route>>
+
     @Query("SELECT * FROM route WHERE provider_id = :providerId")
     fun getRoutesByProvider(providerId: Int): Flow<List<Route>>
 
@@ -32,6 +35,9 @@ interface RouteDao {
 
     @Query("SELECT * FROM route")
     fun getAllRoutes(): Flow<List<Route>>
+
+    @Query("DELETE FROM route WHERE trip_id = :tripId")
+    suspend fun deleteRoutesByTrip(tripId: Int)
 
     @Query("DELETE FROM route")
     suspend fun deleteAllRoutes()
