@@ -1,18 +1,32 @@
 package com.example.citiway.data.remote
 
+import android.util.Log
 import com.example.citiway.features.shared.TimeType
 import com.google.android.gms.maps.model.LatLng
+import java.util.Timer
+import kotlin.concurrent.schedule
 
 class RoutesManager(
     private val apiKey: String,
     private val routesService: RoutesService
 ) {
+    private var requestAllowed = true
+    private val requestLimitDuration = 1000L
+
     suspend fun getTransitRoutes(
         start: LatLng,
         destination: LatLng,
         timeType: TimeType,
         time: String
     ): List<Route> {
+        Log.d("Routes requestAllowed", requestAllowed.toString())
+        if (!requestAllowed) return emptyList()
+        requestAllowed = false
+
+        Timer("RateLimiter", false).schedule(requestLimitDuration) {
+            requestAllowed = true
+        }
+
         // Make request body
         val originWaypoint = Waypoint(Location(start))
         val destinationWaypoint = Waypoint(Location(destination))

@@ -36,11 +36,7 @@ class AppModuleImpl(
     }
 
     override val placesManager: PlacesManager by lazy {
-        PlacesManager(
-            appContext,
-            MAPS_API_KEY,
-            geocodingService
-        )
+        placesManagerFactory.create()
     }
 
     override val routesManager: RoutesManager by lazy {

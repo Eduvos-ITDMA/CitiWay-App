@@ -24,11 +24,14 @@ import com.google.android.libraries.places.api.net.kotlin.awaitFetchPlace
 import com.google.android.libraries.places.api.net.kotlin.awaitFindAutocompletePredictions
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import java.util.Timer
+import kotlin.concurrent.schedule
 import kotlin.coroutines.resumeWithException
 
 @Stable
@@ -43,7 +46,7 @@ class PlacesActions(
     val onSetSearchText: (String) -> Unit,
     val onSearchPlaces: (String) -> Unit,
     val onSelectPlace: (AutocompletePrediction) -> Unit,
-    val getPlace: suspend (AutocompletePrediction) -> SelectedLocation,
+    val getPlace: suspend (AutocompletePrediction) -> SelectedLocation?,
     val onClearSearch: () -> Unit,
     val onSetSelectedLocation: (SelectedLocation) -> Unit,
     val onUseUserLocation: () -> Unit,
@@ -55,6 +58,9 @@ class PlacesManager(
     private val apiKey: String,
     private val geocodingService: GeocodingService
 ) {
+    private var requestAllowed = true
+    private val requestLimitDuration = 2000L
+
     private val _state = MutableStateFlow(PlacesState())
     val state: StateFlow<PlacesState> = _state
 
@@ -118,6 +124,12 @@ class PlacesManager(
         if (queryText.length <= 2) {
             setPredictions(emptyList())
         } else {
+            if (!requestAllowed) return
+            requestAllowed = false
+
+            Timer("RateLimiter", false).schedule(requestLimitDuration / 5) {
+                requestAllowed = true
+            }
             scope.launch {
                 try {
                     val response = placesClient.awaitFindAutocompletePredictions {
@@ -140,17 +152,25 @@ class PlacesManager(
     private fun selectPlace(prediction: AutocompletePrediction) {
         scope.launch {
             val selectedLocation = getPlace(prediction)
-            setSearchText(selectedLocation.primaryText)
-            setPredictions(emptyList())
-            _state.update { currentState ->
-                currentState.copy(
-                    selectedLocation = selectedLocation, userLocation = selectedLocation.latLng
-                )
+            if (selectedLocation != null) {
+                setSearchText(selectedLocation.primaryText)
+                setPredictions(emptyList())
+                _state.update { currentState ->
+                    currentState.copy(
+                        selectedLocation = selectedLocation, userLocation = selectedLocation.latLng
+                    )
+                }
             }
         }
     }
 
-    private suspend fun getPlace(prediction: AutocompletePrediction): SelectedLocation {
+    private suspend fun getPlace(prediction: AutocompletePrediction): SelectedLocation? {
+        if (!requestAllowed) return null
+        requestAllowed = false
+
+        Timer("RateLimiter", false).schedule(requestLimitDuration) {
+            requestAllowed = true
+        }
         try {
             // Fetch detailed info on the selected location
             val response = placesClient.awaitFetchPlace(prediction.placeId, placeFields) {
@@ -274,6 +294,10 @@ class PlacesManager(
                 fusedLocationClient.removeLocationUpdates(locationCallback)
             }
         }
+
+    fun cancel() {
+        scope.cancel()
+    }
 }
 
 data class SelectedLocation(

@@ -60,7 +60,13 @@ val mockPlacesActions = PlacesActions(
 )
 
 private val mockJourneySelectionActions = JourneySelectionScreenActions(
-    JourneySelectionActions({ timeType -> }, { string -> }, { location -> }, { location -> }, {}),
+    JourneySelectionActions(
+        { timeType -> },
+        { string -> },
+        { location -> },
+        { location -> },
+        {},
+        {}),
     LocationFieldActions({}, { autocompletePrediction -> }),
     LocationFieldActions({}, { autocompletePrediction -> })
 )
@@ -151,8 +157,10 @@ fun JourneySelectionScreenPreview() {
         JourneySelectionContent(
             state = JourneyState(),
             actions = mockJourneySelectionActions,
-            placesState = PlacesState(),
-            placesActions = mockPlacesActions,
+            startPlacesState = PlacesState(),
+            startPlacesActions = mockPlacesActions,
+            destPlacesState = PlacesState(),
+            destPlacesActions = mockPlacesActions,
             paddingValues = PaddingValues(),
         )
     }
