@@ -53,9 +53,11 @@ fun HomeRoute(
             // Set selectedLocation using prediction
             journeyViewModel.viewModelScope.launch {
                 val selectedLocation = placesActions.getPlace(prediction)
-                journeyViewModel.confirmLocationSelection(
-                    selectedLocation, LocationType.END, placesActions.onClearSearch
-                )
+                if (selectedLocation != null) {
+                    journeyViewModel.confirmLocationSelection(
+                        selectedLocation, LocationType.END, placesActions.onClearSearch
+                    )
+                }
             }
         }
 

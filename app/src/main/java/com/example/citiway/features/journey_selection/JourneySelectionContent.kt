@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -29,8 +30,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.HourglassEmpty
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -90,8 +93,10 @@ import java.time.Instant
 fun JourneySelectionContent(
     state: JourneyState,
     actions: JourneySelectionScreenActions,
-    placesState: PlacesState,
-    placesActions: PlacesActions,
+    startPlacesState: PlacesState,
+    startPlacesActions: PlacesActions,
+    destPlacesState: PlacesState,
+    destPlacesActions: PlacesActions,
     paddingValues: PaddingValues
 ) {
     Column(
@@ -106,7 +111,14 @@ fun JourneySelectionContent(
         Title("Select Your Journey")
         VerticalSpace(24)
 
-        SelectedLocationFields(state, actions, placesState, placesActions)
+        SelectedLocationFields(
+            state,
+            actions,
+            startPlacesState,
+            startPlacesActions,
+            destPlacesState,
+            destPlacesActions
+        )
         VerticalSpace(8)
 
         JourneyOptionsSection(state, actions.journeySelectionActions)
@@ -118,8 +130,10 @@ fun JourneySelectionContent(
 fun SelectedLocationFields(
     state: JourneyState,
     actions: JourneySelectionScreenActions,
-    placesState: PlacesState,
-    placesActions: PlacesActions
+    startPlacesState: PlacesState,
+    startPlacesActions: PlacesActions,
+    destPlacesState: PlacesState,
+    destPlacesActions: PlacesActions,
 ) {
     var startIconCoords by remember { mutableStateOf<Offset?>(null) }
     var endIconCoords by remember { mutableStateOf<Offset?>(null) }
@@ -146,7 +160,7 @@ fun SelectedLocationFields(
                     start = startIconCoords!! - canvasCoords!!.positionInRoot(),
                     end = endIconCoords!! - canvasCoords!!.positionInRoot(),
                     strokeWidth = 4.dp.toPx(),
-                    pathEffect = PathEffect.dashPathEffect(floatArrayOf(20f, 20f)),
+                    pathEffect = PathEffect.dashPathEffect(floatArrayOf(20f, 30f)),
                 )
             }
         }
@@ -179,8 +193,8 @@ fun SelectedLocationFields(
         ) {
             LocationFieldWithIcon(
                 actions.startLocationFieldActions,
-                placesState,
-                placesActions,
+                startPlacesState,
+                startPlacesActions,
                 state.startLocation?.primaryText ?: "",
             ) { modifier ->
                 Icon(
@@ -197,8 +211,8 @@ fun SelectedLocationFields(
 
             LocationFieldWithIcon(
                 actions.destinationFieldActions,
-                placesState,
-                placesActions,
+                destPlacesState,
+                destPlacesActions,
                 state.destination?.primaryText ?: "",
             ) { modifier ->
                 Icon(
@@ -295,10 +309,15 @@ fun JourneyOptionsSection(state: JourneyState, actions: JourneySelectionActions)
             ),
         )
 
-        state.journeyOptions.forEach { journey ->
-//        mockJourneyDetails.forEach { journey ->
-            JourneyCard(journey)
-            VerticalSpace(24)
+        if (state.journeyOptions == null) {
+            NoJourneyOptionsAvailable()
+        } else if (state.journeyOptions.isEmpty()) {
+            JourneyLoadingIndicator()
+        } else {
+            state.journeyOptions.forEach { journey ->
+                JourneyCard(journey)
+                VerticalSpace(24)
+            }
         }
     }
 }
@@ -315,11 +334,10 @@ fun TimeSlotSelector(state: JourneyState, actions: JourneySelectionActions) {
             TimeSlotDropDown(
                 TimeType.entries,
                 state.filter.timeType.name,
-                { timeType -> timeType.name }) {
-                { timeType: TimeType ->
-                    actions.onSetTimeType(timeType)
-                    actions.onSetJourneyOptions()
-                }
+                { timeType -> timeType.name })
+            { timeType: String ->
+                actions.onSetTimeType(TimeType.valueOf(timeType))
+                actions.onGetJourneyOptions()
             }
 
             // Text in the middle
@@ -333,11 +351,10 @@ fun TimeSlotSelector(state: JourneyState, actions: JourneySelectionActions) {
             TimeSlotDropDown(
                 TimeSlots,
                 state.selectedTimeString,
-                { hourString -> hourString }) {
-                { time: String ->
-                    actions.onSetTime(time)
-                    actions.onSetJourneyOptions()
-                }
+                { hourString -> hourString })
+            { time: String ->
+                actions.onSetTime(time)
+                actions.onGetJourneyOptions()
             }
         }
     }
@@ -647,6 +664,51 @@ fun <T> TimeSlotDropDown(
                 )
             }
         }
+    }
+}
+
+@Composable
+fun JourneyLoadingIndicator() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 48.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        CircularProgressIndicator()
+        VerticalSpace(16)
+        Text(
+            text = "Finding the best routes for you...",
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+@Composable
+fun NoJourneyOptionsAvailable() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 48.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Icon(
+            imageVector = Icons.Default.Info,
+            contentDescription = "No routes found",
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.size(32.dp)
+        )
+        VerticalSpace(16)
+        Text(
+            text = "No transit options were found for the selected locations and time.",
+            style = MaterialTheme.typography.bodyLarge,
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(horizontal = 32.dp)
+        )
     }
 }
 

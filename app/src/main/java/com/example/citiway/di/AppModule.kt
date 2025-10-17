@@ -9,9 +9,14 @@ import okhttp3.OkHttpClient
 
 interface AppModule {
     val repository: AppRepository
+    val placesManagerFactory: PlacesManagerFactory
     val placesManager: PlacesManager
     val routesManager: RoutesManager
     val geocodingService: GeocodingService
     val routesService: RoutesService
     val okHttpClient: OkHttpClient
+}
+
+fun interface PlacesManagerFactory {
+    fun create(): PlacesManager
 }

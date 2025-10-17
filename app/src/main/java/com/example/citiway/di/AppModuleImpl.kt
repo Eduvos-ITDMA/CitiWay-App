@@ -20,13 +20,18 @@ private const val MAPS_API_KEY = BuildConfig.MAPS_API_KEY
 class AppModuleImpl(
     val appContext: Application,
 ) : AppModule {
-    override val repository: AppRepository by lazy { AppRepository() }
-    override val placesManager: PlacesManager by lazy {
+
+    override val placesManagerFactory: PlacesManagerFactory = PlacesManagerFactory {
         PlacesManager(
             appContext,
             MAPS_API_KEY,
             geocodingService
         )
+    }
+
+    override val repository: AppRepository by lazy { AppRepository() }
+    override val placesManager: PlacesManager by lazy {
+        placesManagerFactory.create()
     }
     override val routesManager: RoutesManager by lazy {
         RoutesManager(MAPS_API_KEY, routesService)
