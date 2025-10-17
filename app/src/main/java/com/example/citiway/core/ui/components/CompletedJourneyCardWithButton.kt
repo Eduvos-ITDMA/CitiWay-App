@@ -25,13 +25,14 @@ import java.time.LocalDate
 @Composable
 fun CompletedJourneyCardWithButton(
     route: String,
-    date: LocalDate,
+    date: String,
     durationMin: Int,
     icon: @Composable (Modifier) -> Unit,
+    mode: String = "",
     outlined: Boolean = false
 ) {
     Row {
-        CompletedJourneyCard(route, date, durationMin)
+        CompletedJourneyCard(route, date, mode, durationMin)
         Spacer(modifier = Modifier.weight(0.05f))
         RoundIconButton(icon, Modifier.align(Alignment.CenterVertically), outlined)
     }

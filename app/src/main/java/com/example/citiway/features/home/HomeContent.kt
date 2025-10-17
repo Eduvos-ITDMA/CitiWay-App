@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Favorite
@@ -54,6 +56,7 @@ fun HomeContent(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
             .padding(paddingValues)
+            .verticalScroll(rememberScrollState())
             .padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -61,6 +64,7 @@ fun HomeContent(
         VerticalSpace(24)
 
         DestinationSearchBar(homeActions, placesState, placesActions)
+
         VerticalSpace(24)
 
         CompletedTripsSection(
@@ -69,6 +73,7 @@ fun HomeContent(
             "Recent Trips",
             onTitleClick = homeActions.onRecentTitleClick
         )
+
         VerticalSpace(24)
 
         CompletedTripsSection(
@@ -80,9 +85,44 @@ fun HomeContent(
         VerticalSpace(24)
 
         SchedulesLink(homeActions.onSchedulesLinkClick)
-        Space(1f)
+
+        VerticalSpace(18)
     }
 }
+
+@Composable
+fun SectionTitleWithArrow( //Added small arrow so users know they can click it to see more.
+    title: String,
+    onClick: (() -> Unit)? = null
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .then(
+                if (onClick != null) Modifier.clickable { onClick() }
+                else Modifier
+            ),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Start
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleLarge.copy(
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+        )
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f),
+            modifier = Modifier
+                .size(20.dp)
+                .padding(start = 6.dp)
+        )
+    }
+}
+
 
 @Composable
 private fun HeaderSection() {
@@ -124,16 +164,9 @@ fun CompletedTripsSection(
     onTitleClick: (() -> Unit)? = null
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
-        Heading(
-            title,
-            modifier = if (onTitleClick != null) {
-                Modifier.clickable { onTitleClick() }
-            } else {
-                Modifier
-            }
-        )
+        SectionTitleWithArrow(title = title, onClick = onTitleClick)
 
-        VerticalSpace(12)
+        VerticalSpace(4)
 
         journeys.forEach { journey ->
             key(journey.id) { // DO NOT REMOVE THIS. Recomposition will not be triggered without this
@@ -143,6 +176,7 @@ fun CompletedTripsSection(
                     route = journey.route,
                     date = journey.date,
                     durationMin = journey.durationMin,
+                    mode = journey.mode,
                     icon = { modifier ->
                         Icon(
                             imageVector = if (journey.isFavourite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,

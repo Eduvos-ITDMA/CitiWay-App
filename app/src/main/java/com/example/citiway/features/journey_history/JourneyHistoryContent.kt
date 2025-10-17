@@ -10,7 +10,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.Icon
@@ -37,6 +39,7 @@ fun JourneyHistoryContent(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
             .padding(paddingValues)
+            .verticalScroll(rememberScrollState())
             .padding(horizontal = 16.dp)
     ) {
         Title("Routes History:")
@@ -50,6 +53,7 @@ fun JourneyHistoryContent(
                     route = journey.route,
                     date = journey.date,
                     durationMin = journey.durationMin,
+                    mode = journey.mode,
                     outlined = true,
                     icon = { modifier ->
                         Icon(

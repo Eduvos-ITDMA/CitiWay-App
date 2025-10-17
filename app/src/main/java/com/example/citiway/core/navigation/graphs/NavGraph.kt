@@ -1,22 +1,9 @@
 package com.example.citiway.core.navigation.graphs
 
-/** This file defines the main navigation graph for the application using Jetpack Navigation.
- * The nav graph contains all of the app's destinations and their organization hierarchy.
- *
- * The SetupNavGraph composable here acts as the central hub for defining how different
- * screens (or groups of screens, AKA nested navigation graphs) are connected.
- * It sets up the NavHost, which is the container for swapping different composable
- * destinations.
- */
-
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import com.example.citiway.App
 import com.example.citiway.core.navigation.routes.GraphRoutes
 import com.example.citiway.core.navigation.routes.HOME_ROUTE
 import com.example.citiway.core.navigation.routes.ROOT_ROUTE
@@ -25,9 +12,10 @@ import com.example.citiway.core.navigation.routes.ScreenToGraphMap
 @Composable
 fun SetupNavGraph(
     navController: NavHostController,
-
     startRoute: String = HOME_ROUTE
 ) {
+
+
     // Determine start graph
     val startGraph = if (startRoute in GraphRoutes) {
         startRoute
@@ -38,17 +26,17 @@ fun SetupNavGraph(
 
     // Set up NavHost
     NavHost(
-        navController = navController, startDestination = startGraph, route = ROOT_ROUTE
+        navController = navController,
+        startDestination = startGraph,
+        route = ROOT_ROUTE
     ) {
         topLevelDestinations(navController)
-        homeNavGraph(navController)
+        homeNavGraph(navController) // Pass it here
         journeySelectionGraph(navController)
-        tripsNavGraph(navController)
+        tripsNavGraph(navController) // And here if needed
     }
 
-
-    // Conditionally navigation to a specific screen when a SCREEN route was passed
-    // and it is not the first screen of the specified graph
+    // Conditionally navigate to a specific screen when a SCREEN route was passed
     if (targetScreen != null) {
         LaunchedEffect(key1 = targetScreen) {
             val currentRoute = navController.currentDestination?.route

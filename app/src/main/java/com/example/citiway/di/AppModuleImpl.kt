@@ -7,11 +7,12 @@ import com.example.citiway.data.remote.GeocodingService
 import com.example.citiway.data.remote.PlacesManager
 import com.example.citiway.data.remote.RoutesManager
 import com.example.citiway.data.remote.RoutesService
-import com.example.citiway.data.repository.AppRepository
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import kotlin.getValue
+import com.example.citiway.data.repository.CitiWayRepository
+import com.example.citiway.data.local.CitiWayDatabase
 
 private const val BASE_MAPS_URL = "https://maps.googleapis.com/"
 private const val BASE_ROUTES_URL = "https://routes.googleapis.com/"
@@ -21,6 +22,11 @@ class AppModuleImpl(
     val appContext: Application,
 ) : AppModule {
 
+    override val repository: CitiWayRepository by lazy {
+        val database = CitiWayDatabase.getDatabase(appContext)
+        CitiWayRepository(database)
+    }
+
     override val placesManagerFactory: PlacesManagerFactory = PlacesManagerFactory {
         PlacesManager(
             appContext,
@@ -29,13 +35,14 @@ class AppModuleImpl(
         )
     }
 
-    override val repository: AppRepository by lazy { AppRepository() }
     override val placesManager: PlacesManager by lazy {
         placesManagerFactory.create()
     }
+
     override val routesManager: RoutesManager by lazy {
         RoutesManager(MAPS_API_KEY, routesService)
     }
+
     override val geocodingService: GeocodingService by lazy {
         val retrofit = Retrofit.Builder()
             .baseUrl(BASE_MAPS_URL)
