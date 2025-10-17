@@ -4,6 +4,9 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -16,20 +19,30 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.HourglassEmpty
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,6 +60,7 @@ import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -54,6 +68,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.example.citiway.R
 import com.example.citiway.core.ui.components.HorizontalSpace
@@ -61,20 +76,27 @@ import com.example.citiway.core.ui.components.LocationSearchField
 import com.example.citiway.core.ui.components.Title
 import com.example.citiway.core.ui.components.VerticalSpace
 import com.example.citiway.core.utils.JourneySelectionScreenPreview
+import com.example.citiway.core.utils.toDisplayableLocalTime
 import com.example.citiway.data.remote.PlacesActions
 import com.example.citiway.data.remote.PlacesState
 import com.example.citiway.features.shared.JourneyDetails
+import com.example.citiway.features.shared.JourneySelectionActions
 import com.example.citiway.features.shared.JourneyState
 import com.example.citiway.features.shared.LocationType
+import com.example.citiway.features.shared.TimeSlots
+import com.example.citiway.features.shared.TimeType
 import com.example.citiway.features.shared.TravelPoint
-import java.time.LocalTime
+import java.time.Duration
+import java.time.Instant
 
 @Composable
 fun JourneySelectionContent(
     state: JourneyState,
-    actions: JourneySelectionActions,
-    placesState: PlacesState,
-    placesActions: PlacesActions,
+    actions: JourneySelectionScreenActions,
+    startPlacesState: PlacesState,
+    startPlacesActions: PlacesActions,
+    destPlacesState: PlacesState,
+    destPlacesActions: PlacesActions,
     paddingValues: PaddingValues
 ) {
     Column(
@@ -85,7 +107,6 @@ fun JourneySelectionContent(
             .padding(horizontal = 16.dp)
             .verticalScroll(rememberScrollState())
     ) {
-        // Left-aligned title
         Text(
             text = "Your Journey:",
             style = MaterialTheme.typography.headlineLarge,
@@ -96,8 +117,14 @@ fun JourneySelectionContent(
 
         VerticalSpace(13)
 
-        SelectedLocationFields(state, actions, placesState, placesActions)
-
+        SelectedLocationFields(
+            state,
+            actions,
+            startPlacesState,
+            startPlacesActions,
+            destPlacesState,
+            destPlacesActions
+        )
         VerticalSpace(8)
 
         // "Choose your Journey:" title after location fields
@@ -110,16 +137,19 @@ fun JourneySelectionContent(
         )
         VerticalSpace(16)
 
-        JourneyOptionsSection(state)
+        JourneyOptionsSection(state, actions.journeySelectionActions)
+        VerticalSpace(24)
     }
 }
 
 @Composable
 fun SelectedLocationFields(
     state: JourneyState,
-    actions: JourneySelectionActions,
-    placesState: PlacesState,
-    placesActions: PlacesActions
+    actions: JourneySelectionScreenActions,
+    startPlacesState: PlacesState,
+    startPlacesActions: PlacesActions,
+    destPlacesState: PlacesState,
+    destPlacesActions: PlacesActions,
 ) {
     var startIconCoords by remember { mutableStateOf<Offset?>(null) }
     var endIconCoords by remember { mutableStateOf<Offset?>(null) }
@@ -146,7 +176,7 @@ fun SelectedLocationFields(
                     start = startIconCoords!! - canvasCoords!!.positionInRoot(),
                     end = endIconCoords!! - canvasCoords!!.positionInRoot(),
                     strokeWidth = 4.dp.toPx(),
-                    pathEffect = PathEffect.dashPathEffect(floatArrayOf(20f, 20f)),
+                    pathEffect = PathEffect.dashPathEffect(floatArrayOf(20f, 30f)),
                 )
             }
         }
@@ -179,8 +209,8 @@ fun SelectedLocationFields(
         ) {
             LocationFieldWithIcon(
                 actions.startLocationFieldActions,
-                placesState,
-                placesActions,
+                startPlacesState,
+                startPlacesActions,
                 state.startLocation?.primaryText ?: "",
             ) { modifier ->
                 Icon(
@@ -197,8 +227,8 @@ fun SelectedLocationFields(
 
             LocationFieldWithIcon(
                 actions.destinationFieldActions,
-                placesState,
-                placesActions,
+                destPlacesState,
+                destPlacesActions,
                 state.destination?.primaryText ?: "",
             ) { modifier ->
                 Icon(
@@ -258,26 +288,90 @@ fun LocationFieldWithIcon(
 }
 
 @Composable
-fun JourneyOptionsSection(state: JourneyState) {
+fun JourneyOptionsSection(state: JourneyState, actions: JourneySelectionActions) {
     Column {
-        state.journeyOptions = listOf(
+        TimeSlotSelector(state, actions)
+        VerticalSpace(12)
+
+        val mockJourneyDetails = listOf(
+            // Scenario 1: Simple Bus route
             JourneyDetails(
-                10,
-                TravelPoint.STOP,
-                listOf("Walk", "MyCiTi", "Walk", "Metrorail", "Walk"),
-                15,
-                LocalTime.of(8, 30)
-            ), JourneyDetails(
-                8,
-                TravelPoint.STATION,
-                listOf("Walk", "Metrorail", "Walk", "MyCiTi", "Walk"),
-                20,
-                LocalTime.of(15, 45)
-            )
+                firstWalkMinutes = 5,
+                firstNodeType = TravelPoint.STOP,
+                routeSegments = listOf("Walk", "MyCiTi"),
+                nextDeparture = Duration.ofMinutes(12),
+                arrivalTime = Instant.now().plus(Duration.ofMinutes(45)),
+                fareTotal = 25.50f
+            ),
+
+            // Scenario 2: Train route with a transfer to a bus
+            JourneyDetails(
+                firstWalkMinutes = 8,
+                firstNodeType = TravelPoint.STATION,
+                routeSegments = listOf("Walk", "Metrorail", "Walk", "MyCiTi"),
+                nextDeparture = Duration.ofMinutes(3),
+                arrivalTime = Instant.now().plus(Duration.ofMinutes(75)),
+                fareTotal = 42.00f
+            ),
+
+            // Scenario 3: Longer walk, multiple bus segments
+            JourneyDetails(
+                firstWalkMinutes = 15,
+                firstNodeType = TravelPoint.STOP,
+                routeSegments = listOf("Walk", "MyCiTi", "Walk", "MyCiTi"),
+                nextDeparture = Duration.ofMinutes(25),
+                arrivalTime = Instant.now().plus(Duration.ofMinutes(60)),
+                fareTotal = 30.00f
+            ),
         )
-        state.journeyOptions.forEach { journey ->
-            JourneyCard(journey)
-            VerticalSpace(24)
+
+        if (state.journeyOptions == null) {
+            NoJourneyOptionsAvailable()
+        } else if (state.journeyOptions.isEmpty()) {
+            JourneyLoadingIndicator()
+        } else {
+            state.journeyOptions.forEach { journey ->
+                JourneyCard(journey)
+                VerticalSpace(24)
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TimeSlotSelector(state: JourneyState, actions: JourneySelectionActions) {
+    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterStart) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth(0.85f)
+        ) {
+            // Dropdown for Departure/Arrival
+            TimeSlotDropDown(
+                TimeType.entries,
+                state.filter.timeType.name,
+                { timeType -> timeType.name })
+            { timeType: String ->
+                actions.onSetTimeType(TimeType.valueOf(timeType))
+                actions.onGetJourneyOptions()
+            }
+
+            // Text in the middle
+            Text(
+                text = " at about ",
+                modifier = Modifier.padding(horizontal = 8.dp),
+                style = MaterialTheme.typography.bodyLarge
+            )
+
+            // Dropdown for Time Slots
+            TimeSlotDropDown(
+                TimeSlots,
+                state.selectedTimeString,
+                { hourString -> hourString })
+            { time: String ->
+                actions.onSetTime(time)
+                actions.onGetJourneyOptions()
+            }
         }
     }
 }
@@ -307,15 +401,20 @@ fun JourneyCard(journey: JourneyDetails) {
                 JourneyDetailRow(
                     icon = Icons.AutoMirrored.Filled.DirectionsWalk,
                     content = buildAnnotatedString {
-                        withStyle(
-                            style = SpanStyle(
-                                color = MaterialTheme.colorScheme.primary,
-                                fontWeight = FontWeight.Bold
-                            )
-                        ) {
-                            append("8 min")
+                        val walkDuration = journey.firstWalkMinutes
+                        if (walkDuration != null) {
+                            withStyle(
+                                style = SpanStyle(
+                                    color = MaterialTheme.colorScheme.primary,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            ) {
+                                append(journey.firstWalkMinutes.toString() + "m")
+                            }
+                            append(" walk to first station")
+                        } else {
+                            append("Unknown walk time to first station")
                         }
-                        append(" walk to first station")
                     }
                 )
                 VerticalSpace(8)
@@ -326,9 +425,14 @@ fun JourneyCard(journey: JourneyDetails) {
                 JourneyDetailRow(
                     icon = Icons.Default.HourglassEmpty,
                     content = buildAnnotatedString {
-                        append("Next Departure in ")
-                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                            append("20mins")
+                        val min = journey.nextDeparture?.toMinutes()?.toInt()
+                        if (min != null) {
+                            append("Next departure in ")
+                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                append("$min min")
+                            }
+                        } else {
+                            append("Next departure time unknown")
                         }
                     }
                 )
@@ -343,7 +447,7 @@ fun JourneyCard(journey: JourneyDetails) {
  * Composable for the blue header of the card.
  */
 @Composable
-fun TripHeader(cornerRadius: Dp, arrivalTime: LocalTime, fareTotal: Float) {
+fun TripHeader(cornerRadius: Dp, arrivalTime: Instant?, fareTotal: Float) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -363,7 +467,7 @@ fun TripHeader(cornerRadius: Dp, arrivalTime: LocalTime, fareTotal: Float) {
 
         // Arrival Time Text
         Text(
-            text = "Arrival Time: $arrivalTime",
+            text = "Arrival Time: ${arrivalTime?.toDisplayableLocalTime() ?: "N/A"}",
             color = MaterialTheme.colorScheme.onPrimary,
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.weight(1f)
@@ -407,15 +511,18 @@ fun JourneyDetailRow(icon: ImageVector, content: AnnotatedString) {
  * Composable for the complex, multi-line route description.
  */
 @Composable
-fun RouteDescriptionRow(routeSegments: List<String>) {
+fun RouteDescriptionRow(routeSegments: List<String>?) {
     Row(
         verticalAlignment = Alignment.Top,
-        modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min)
     ) {
         // Custom Bullet Point (Solid Circle)
         Box(
             modifier = Modifier
                 .fillMaxHeight()
+                .width(24.dp)
                 .offset(y = 4.dp)
         ) {
             Box(
@@ -457,8 +564,8 @@ fun StartJourneyButton() {
     ) {
         Text(
             text = "Start Journey",
-            color = MaterialTheme.colorScheme.secondary,
-            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onBackground,
+            style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
         )
@@ -467,13 +574,12 @@ fun StartJourneyButton() {
 
 @Composable
 fun createStyledRouteString(
-    routeSegments: List<String>,
+    routeSegments: List<String>?,
 ): AnnotatedString {
     return buildAnnotatedString {
-        routeSegments.forEachIndexed { index, segment ->
+        routeSegments?.forEachIndexed { index, segment ->
             // Assume any segment that is NOT "Walk" is a transit mode/station name
-            val isTransit = segment.trim().uppercase() != "WALK"
-            val style = if (isTransit) {
+            val style = if (segment.trim().uppercase() != "WALK") {
                 SpanStyle(
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.SemiBold
@@ -493,6 +599,132 @@ fun createStyledRouteString(
                 }
             }
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun <T> TimeSlotDropDown(
+    entries: List<T>,
+    defaultText: String,
+    getEntryText: (T) -> String,
+    onSelect: (String) -> Unit
+) {
+    // State for the TimeType dropdown (Departure/Arrival)
+    var expanded by remember { mutableStateOf(false) }
+    var text by remember { mutableStateOf(defaultText) }
+
+    Box(
+        modifier = Modifier
+            .background(
+                MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
+                RoundedCornerShape(8.dp)
+            )
+            .padding(0.dp, 0.dp, 4.dp, 0.dp)
+            .clickable { expanded = !expanded }
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            BasicTextField(
+                value = text,
+                onValueChange = {},
+                readOnly = true,
+                modifier = Modifier
+                    .width(IntrinsicSize.Min)
+                    .padding(8.dp),
+                interactionSource = remember { MutableInteractionSource() }
+                    .also { interactionSource ->
+                        LaunchedEffect(interactionSource) {
+                            interactionSource.interactions.collect {
+                                if (it is PressInteraction.Release) {
+                                    expanded = !expanded
+                                }
+                            }
+                        }
+                    },
+                singleLine = true,
+                textStyle = TextStyle(
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onBackground,
+                ),
+            )
+            Box(Modifier.fillMaxHeight()) {
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded)
+            }
+        }
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.wrapContentWidth()
+        ) {
+            entries.forEach { entry ->
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            getEntryText(entry),
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
+                    },
+                    onClick = {
+                        text = getEntryText(entry)
+                        onSelect(text)
+                        expanded = false
+                    },
+                    modifier = Modifier.background(
+                        MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                        RoundedCornerShape(5.dp)
+                    )
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun JourneyLoadingIndicator() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 48.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        CircularProgressIndicator()
+        VerticalSpace(16)
+        Text(
+            text = "Finding the best routes for you...",
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+@Composable
+fun NoJourneyOptionsAvailable() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 48.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Icon(
+            imageVector = Icons.Default.Info,
+            contentDescription = "No routes found",
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.size(32.dp)
+        )
+        VerticalSpace(16)
+        Text(
+            text = "No transit options were found for the selected locations and time.",
+            style = MaterialTheme.typography.bodyLarge,
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(horizontal = 32.dp)
+        )
     }
 }
 

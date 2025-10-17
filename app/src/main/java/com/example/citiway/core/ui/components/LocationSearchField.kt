@@ -38,7 +38,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.citiway.core.utils.mockPlacesActions
 import com.example.citiway.data.remote.PlacesActions
 import com.example.citiway.data.remote.PlacesState
 import com.google.android.libraries.places.api.model.AutocompletePrediction
@@ -113,7 +115,7 @@ fun LocationSearchField(
                 focusedPlaceholderColor = MaterialTheme.colorScheme.onSurface.copy(0.7f),
                 unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurface.copy(0.6f),
             ),
-            textStyle = MaterialTheme.typography.bodyMedium,
+            textStyle = MaterialTheme.typography.titleSmall,
             trailingIcon = {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -147,13 +149,12 @@ fun LocationSearchField(
         )
 
         /*
-    * Search suggestions dropdown card that appears below the search field
-    * when suggestions are available.
-    */
+        * Search suggestions dropdown card that appears below the search field
+        * when suggestions are available.
+        */
         ExposedDropdownMenu(
             expanded = expanded,
             onDismissRequest = { showPredictions = false },
-            modifier = Modifier,
             containerColor = MaterialTheme.colorScheme.surface
         ) {
             Card(
@@ -207,4 +208,10 @@ fun LocationSearchField(
             }
         }
     }
+}
+
+@Preview
+@Composable
+private fun LocationSearchFieldPreview() {
+    LocationSearchField(icon = {}, placesState = PlacesState(), placesActions = mockPlacesActions)
 }

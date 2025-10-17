@@ -85,9 +85,11 @@ fun HomeRoute(
         { prediction ->
             journeyViewModel.viewModelScope.launch {
                 val selectedLocation = placesActions.getPlace(prediction)
-                journeyViewModel.confirmLocationSelection(
-                    selectedLocation, LocationType.END, placesActions.onClearSearch
-                )
+                if (selectedLocation != null) {
+                    journeyViewModel.confirmLocationSelection(
+                        selectedLocation, LocationType.END, placesActions.onClearSearch
+                    )
+                }
             }
         }
 
@@ -97,8 +99,8 @@ fun HomeRoute(
         { navController.navigate(Screen.Schedules.route) },
         { navController.navigate(Screen.DestinationSelection.route) },
         onSelectPrediction,
-        onFavouritesTitleClick = {navController.navigate(Screen.Favourites.route)},
-        onRecentTitleClick = {navController.navigate(Screen.JourneyHistory.route)}
+        onFavouritesTitleClick = { navController.navigate(Screen.Favourites.route) },
+        onRecentTitleClick = { navController.navigate(Screen.JourneyHistory.route) }
     )
 
     // Render screen with bottom bar
