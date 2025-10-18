@@ -26,7 +26,7 @@ import com.example.citiway.data.local.entities.*
         MetrorailFare::class,     // Stores Metrorail fare prices
 //        SavedPlace::class         // Stores saved places and favorite journeys
     ],
-    version = 3,                  // Database version - increment when schema changes
+    version = 4,                  // Database version - increment when schema changes
     exportSchema = false          // Set to true to export schema for version control
 )
 abstract class CitiWayDatabase : RoomDatabase() {
