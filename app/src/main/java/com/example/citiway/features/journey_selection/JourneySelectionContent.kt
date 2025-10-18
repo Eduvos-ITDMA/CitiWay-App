@@ -115,7 +115,7 @@ fun JourneySelectionContent(
             modifier = Modifier.fillMaxWidth()
         )
 
-        VerticalSpace(13)
+        VerticalSpace(3)
 
         SelectedLocationFields(
             state,
@@ -125,6 +125,7 @@ fun JourneySelectionContent(
             destPlacesState,
             destPlacesActions
         )
+
         VerticalSpace(8)
 
         // "Choose your Journey:" title after location fields
@@ -135,10 +136,11 @@ fun JourneySelectionContent(
             color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier.fillMaxWidth()
         )
-        VerticalSpace(16)
+
+        VerticalSpace(12)
 
         JourneyOptionsSection(state, actions.journeySelectionActions)
-        VerticalSpace(24)
+
     }
 }
 
@@ -291,6 +293,7 @@ fun LocationFieldWithIcon(
 fun JourneyOptionsSection(state: JourneyState, actions: JourneySelectionActions) {
     Column {
         TimeSlotSelector(state, actions)
+
         VerticalSpace(12)
 
         val mockJourneyDetails = listOf(
@@ -391,7 +394,7 @@ fun JourneyCard(journey: JourneyDetails) {
             .fillMaxWidth()
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
-            TripHeader(cornerRadius, journey.arrivalTime, journey.fareTotal)
+            TripHeader(cornerRadius, journey.totalDurationMinutes, journey.arrivalTime, journey.fareTotal)
 
             Column(
                 modifier = Modifier
@@ -447,7 +450,7 @@ fun JourneyCard(journey: JourneyDetails) {
  * Composable for the blue header of the card.
  */
 @Composable
-fun TripHeader(cornerRadius: Dp, arrivalTime: Instant?, fareTotal: Float) {
+fun TripHeader(cornerRadius: Dp, totalDurationMinutes: Int?, arrivalTime: Instant?, fareTotal: Float) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -467,7 +470,7 @@ fun TripHeader(cornerRadius: Dp, arrivalTime: Instant?, fareTotal: Float) {
 
         // Arrival Time Text
         Text(
-            text = "Arrival Time: ${arrivalTime?.toDisplayableLocalTime() ?: "N/A"}",
+            text = "${totalDurationMinutes ?: "?"} min | ETA: ${arrivalTime?.toDisplayableLocalTime() ?: "N/A"}",
             color = MaterialTheme.colorScheme.onPrimary,
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.weight(1f)
