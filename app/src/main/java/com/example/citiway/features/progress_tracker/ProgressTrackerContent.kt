@@ -8,5 +8,5 @@ import androidx.navigation.NavController
 
 @Composable
 fun ProgressTrackerContent(navController: NavController, paddingValues: PaddingValues) {
-        // TODO: Make JourneySelectionScreen
+    // TODO: Make JourneySelectionScreen
 }
