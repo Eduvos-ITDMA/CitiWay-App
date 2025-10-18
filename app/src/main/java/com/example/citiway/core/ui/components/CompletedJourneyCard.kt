@@ -84,15 +84,18 @@ fun RowScope.CompletedJourneyCard(route: String, date: String, mode: String, dur
                         color = MaterialTheme.colorScheme.onPrimary,
                         style = MaterialTheme.typography.titleMedium
                     )
-                    Spacer(modifier = Modifier.width(4.dp))
+
+                    Spacer(modifier = Modifier.width(1.dp))
 
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.TrendingFlat,
                         contentDescription = "to",
                         tint = MaterialTheme.colorScheme.secondary,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(22.dp)
                     )
-                    Spacer(modifier = Modifier.width(4.dp))
+
+                    Spacer(modifier = Modifier.width(1.dp))
+
                     Text(
                         text = endLocation,
                         color = MaterialTheme.colorScheme.onPrimary,
@@ -115,7 +118,8 @@ fun RowScope.CompletedJourneyCard(route: String, date: String, mode: String, dur
                         color = MaterialTheme.colorScheme.background,
                         style = MaterialTheme.typography.bodyLarge
                     )
-                    Spacer(modifier = Modifier.width(18.dp))
+
+                    Spacer(modifier = Modifier.width(10.dp))
 
                     // ========== Duration Icon and Text ==========
                     Icon(
@@ -132,7 +136,7 @@ fun RowScope.CompletedJourneyCard(route: String, date: String, mode: String, dur
                         style = MaterialTheme.typography.bodyLarge
                     )
 
-                    Spacer(modifier = Modifier.width(18.dp))
+                    Spacer(modifier = Modifier.width(10.dp))
 
                     // ========== Mode of transport (conditional icon) ==========
                     Icon(

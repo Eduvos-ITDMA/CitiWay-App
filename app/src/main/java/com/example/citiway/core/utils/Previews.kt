@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
-import com.example.citiway.core.ui.components.LocationSearchField
 import com.example.citiway.core.ui.theme.CitiWayTheme
 import com.example.citiway.data.remote.PlacesActions
 import com.example.citiway.data.remote.PlacesState
@@ -16,20 +15,19 @@ import com.example.citiway.features.help.HelpContent
 import com.example.citiway.features.home.HomeActions
 import com.example.citiway.features.home.HomeContent
 import com.example.citiway.features.journey_history.JourneyHistoryContent
-import com.example.citiway.features.journey_selection.JourneySelectionActions
 import com.example.citiway.features.journey_selection.JourneySelectionContent
+import com.example.citiway.features.journey_selection.JourneySelectionScreenActions
 import com.example.citiway.features.journey_selection.LocationFieldActions
 import com.example.citiway.features.journey_summary.JourneySummaryContent
 import com.example.citiway.features.progress_tracker.ProgressTrackerContent
 import com.example.citiway.features.schedules.SchedulesContent
 import com.example.citiway.features.shared.CompletedJourneysState
+import com.example.citiway.features.shared.JourneySelectionActions
 import com.example.citiway.features.shared.JourneyState
 import com.example.citiway.features.shared.MapActions
 import com.example.citiway.features.shared.MapState
 import com.example.citiway.features.start_location_selection.StartLocationSelectionContent
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.libraries.places.api.model.AutocompletePrediction
-import com.google.android.libraries.places.api.model.kotlin.autocompletePrediction
 import com.google.maps.android.compose.rememberCameraPositionState
 
 private val mockMapActions = MapActions(
@@ -37,7 +35,7 @@ private val mockMapActions = MapActions(
     updateLocationPermission = {}
 )
 
-private val mockPlacesActions = PlacesActions(
+val mockPlacesActions = PlacesActions(
     onSetSearchText = {},
     onSearchPlaces = {},
     onSelectPlace = {},
@@ -61,7 +59,14 @@ private val mockPlacesActions = PlacesActions(
     }
 )
 
-private val mockJourneySelectionActions = JourneySelectionActions(
+private val mockJourneySelectionActions = JourneySelectionScreenActions(
+    JourneySelectionActions(
+        { timeType -> },
+        { string -> },
+        { location -> },
+        { location -> },
+        {},
+        {}),
     LocationFieldActions({}, { autocompletePrediction -> }),
     LocationFieldActions({}, { autocompletePrediction -> })
 )
@@ -152,8 +157,10 @@ fun JourneySelectionScreenPreview() {
         JourneySelectionContent(
             state = JourneyState(),
             actions = mockJourneySelectionActions,
-            placesState = PlacesState(),
-            placesActions = mockPlacesActions,
+            startPlacesState = PlacesState(),
+            startPlacesActions = mockPlacesActions,
+            destPlacesState = PlacesState(),
+            destPlacesActions = mockPlacesActions,
             paddingValues = PaddingValues(),
         )
     }

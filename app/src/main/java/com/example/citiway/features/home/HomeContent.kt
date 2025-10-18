@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Favorite
@@ -24,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.citiway.R
@@ -33,6 +36,8 @@ import com.example.citiway.core.ui.components.LocationSearchField
 import com.example.citiway.core.ui.components.Space
 import com.example.citiway.core.ui.components.Title
 import com.example.citiway.core.ui.components.VerticalSpace
+import com.example.citiway.core.utils.HomeScreenPreview
+import com.example.citiway.core.utils.JourneySelectionScreenPreview
 import com.example.citiway.data.local.CompletedJourney
 import com.example.citiway.data.remote.PlacesActions
 import com.example.citiway.data.remote.PlacesState
@@ -51,6 +56,7 @@ fun HomeContent(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
             .padding(paddingValues)
+            .verticalScroll(rememberScrollState())
             .padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -79,7 +85,8 @@ fun HomeContent(
         VerticalSpace(24)
 
         SchedulesLink(homeActions.onSchedulesLinkClick)
-        Space(1f)
+
+        VerticalSpace(18)
     }
 }
 
@@ -207,4 +214,10 @@ fun SchedulesLink(onSchedulesLinkClick: () -> Unit) {
             modifier = Modifier.size(20.dp)
         )
     }
+}
+
+@Preview
+@Composable
+fun HomePreview() {
+    HomeScreenPreview()
 }
