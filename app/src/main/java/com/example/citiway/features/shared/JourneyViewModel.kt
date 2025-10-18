@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.citiway.App
 import com.example.citiway.core.navigation.routes.Screen
-import com.example.citiway.core.utils.HOURS_MINUTES_FORMATTER
 import com.example.citiway.core.utils.convertHourToInstantIso
 import com.example.citiway.core.utils.convertIsoToHhmm
 import com.example.citiway.core.utils.getNearestHalfHour
@@ -66,8 +65,6 @@ class JourneyViewModel(
             }
         }
 
-        Log.d("Journey timeString", timeString)
-        Log.d("Journey formattedTime", formattedTime)
         _state.update { currentState ->
             currentState.copy(
                 selectedTimeString = timeString,
@@ -101,7 +98,11 @@ class JourneyViewModel(
             LocationType.END -> {
                 setDestination(selectedLocation)
                 clearSearch()
-                navController.navigate(Screen.StartLocationSelection.route)
+                if (_state.value.startLocation != null){
+                    navController.navigate(Screen.JourneySelection.route)
+                } else {
+                    navController.navigate(Screen.StartLocationSelection.route)
+                }
             }
         }
     }
@@ -192,9 +193,6 @@ class JourneyViewModel(
                         )
                     val departureTooSoonToWalk =
                         nextDeparture.toMinutes() < ceil(0.75 * firstWalkDuration)
-                    Log.d("Journey nextDeparture.isNegative", nextDeparture.isNegative.toString())
-                    Log.d("Journey departureTooSoonToWalk", departureTooSoonToWalk.toString())
-                    Log.d("Journey arrivalTooFarInFuture", arrivalTooFarInFuture.toString())
                     if (nextDeparture.isNegative || departureTooSoonToWalk || arrivalTooFarInFuture) return@mapNotNull null
 
                     // TODO: fareTotal
