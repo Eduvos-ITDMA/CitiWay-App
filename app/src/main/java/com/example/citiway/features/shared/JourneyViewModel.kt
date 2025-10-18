@@ -183,6 +183,7 @@ class JourneyViewModel(
 
                     // arrivalTime: current time + route.duration.value
                     val arrivalTime = calculateArrivalTime(steps)
+                    val totalDurationMinutes = steps.sumOf { it.staticDuration.toSecondsInt() } / 60
 
                     // Filter routes - nextDeparture must exceed walk duration, it must not be
                     // negative, and arrivalTime should not be more than 5 hours from the selected time
@@ -215,7 +216,8 @@ class JourneyViewModel(
                         routeSegments = segments,
                         nextDeparture = nextDeparture,
                         arrivalTime = arrivalTime,
-                        fareTotal = fare
+                        fareTotal = fare,
+                        totalDurationMinutes = totalDurationMinutes
                     )
                 }
 
@@ -260,6 +262,7 @@ data class JourneyDetails(
     val nextDeparture: Duration?,
     val arrivalTime: Instant?,
     val fareTotal: Float = 0f,
+    val totalDurationMinutes: Int? = null
 )
 
 data class JourneySelectionActions(
