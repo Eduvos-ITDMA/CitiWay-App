@@ -11,6 +11,7 @@ import com.example.citiway.core.utils.convertHourToInstantIso
 import com.example.citiway.core.utils.convertIsoToHhmm
 import com.example.citiway.core.utils.getNearestHalfHour
 import com.example.citiway.core.utils.toSecondsInt
+import com.example.citiway.data.remote.Route
 import com.example.citiway.data.remote.RoutesManager
 import com.example.citiway.data.remote.SelectedLocation
 import com.example.citiway.data.remote.Step
@@ -25,6 +26,7 @@ import java.time.Instant
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale.getDefault
+import java.util.UUID
 import kotlin.math.ceil
 
 class JourneyViewModel(
@@ -40,7 +42,8 @@ class JourneyViewModel(
         onSetDestination = ::setDestination,
         onSetStartLocation = ::setStartLocation,
         onGetJourneyOptions = ::getJourneyOptions,
-        onSetJourneyOptions = ::setJourneyOptions
+        onSetJourneyOptions = ::setJourneyOptions,
+        onSetJourney = ::setJourney
     )
 
     fun setTimeType(type: TimeType) {
@@ -51,13 +54,13 @@ class JourneyViewModel(
 
     fun setTime(time: String) {
         // Attempt to convert time to ISO format string
-        var formattedTime = time
+        var isoTimeString = time
         var timeString: String
         try {
             timeString = convertIsoToHhmm(time)
         } catch (e: Exception) {
             try {
-                formattedTime = convertHourToInstantIso(time)
+                isoTimeString = convertHourToInstantIso(time)
                 timeString = time
             } catch (e: Exception) {
                 Log.e("JourneyViewModel", "Failed to parse time string: ${e.message}")
@@ -68,7 +71,7 @@ class JourneyViewModel(
         _state.update { currentState ->
             currentState.copy(
                 selectedTimeString = timeString,
-                filter = currentState.filter.copy(time = formattedTime)
+                filter = currentState.filter.copy(time = isoTimeString)
             )
         }
     }
@@ -81,8 +84,18 @@ class JourneyViewModel(
         _state.update { it.copy(destination = selectedLocation) }
     }
 
-    fun setJourneyOptions(options: List<JourneyDetails>?) {
-        _state.update { it.copy(journeyOptions = options) }
+    fun setJourneyOptions(options: List<JourneyDetails>?, routesResponse: Map<String, Route>?) {
+        Log.d("Journey setJourneyOptions", options.toString())
+        _state.update {
+            it.copy(
+                journeyOptions = options ?: emptyList(),
+                routesResponse = routesResponse ?: emptyMap()
+            )
+        }
+    }
+
+    fun setJourney(id: String) {
+        _state.update { it.copy(journey = it.routesResponse[id]) }
     }
 
     fun confirmLocationSelection(
@@ -98,7 +111,7 @@ class JourneyViewModel(
             LocationType.END -> {
                 setDestination(selectedLocation)
                 clearSearch()
-                if (_state.value.startLocation != null){
+                if (_state.value.startLocation != null) {
                     navController.navigate(Screen.JourneySelection.route)
                 } else {
                     navController.navigate(Screen.StartLocationSelection.route)
@@ -108,7 +121,7 @@ class JourneyViewModel(
     }
 
     fun getJourneyOptions() {
-        setJourneyOptions(emptyList())
+        setJourneyOptions(null, null)
         val start: LatLng? = state.value.startLocation?.latLng
         val destination: LatLng? = state.value.destination?.latLng
         if (start != null && destination != null) {
@@ -122,9 +135,13 @@ class JourneyViewModel(
                         filter.timeType,
                         filter.resolveTime()
                     )
+                val routesResponseDataMap = mutableMapOf<String, Route>()
 
+                // Loop through each route in response to parse and filter into a the necessary
+                // journeyOptions state field for the UI
                 val journeyOptions = routes.mapNotNull { route ->
                     val steps = route.legs.firstOrNull()?.steps ?: emptyList()
+                    Log.d("Journey options steps", steps.toString())
 
                     fun getVehicle(step: Step?): Vehicle? {
                         return step?.transitDetails?.transitLine?.vehicle
@@ -179,8 +196,6 @@ class JourneyViewModel(
                         Instant.now(),
                         Instant.parse(firstTransitStep?.transitDetails?.stopDetails?.departureTime)
                     )
-                    Log.d("Journey Instant.now", Instant.now().toString())
-                    Log.d("Journey Instant.parse", Instant.parse(firstTransitStep?.transitDetails?.stopDetails?.departureTime).toString())
 
                     // arrivalTime: current time + route.duration.value
                     val arrivalTime = calculateArrivalTime(steps)
@@ -193,6 +208,12 @@ class JourneyViewModel(
                         )
                     val departureTooSoonToWalk =
                         nextDeparture.toMinutes() < ceil(0.75 * firstWalkDuration)
+                    Log.d("Journey Instant.now", Instant.now().toString())
+                    Log.d("Journey Instant.parse", Instant.parse(firstTransitStep?.transitDetails?.stopDetails?.departureTime).toString())
+
+                    Log.d("Journey nextDeparture.isNegative", nextDeparture.isNegative.toString())
+                    Log.d("Journey departureTooSoonToWalk", departureTooSoonToWalk.toString())
+                    Log.d("Journey arrivalTooFarInFuture", arrivalTooFarInFuture.toString())
                     if (nextDeparture.isNegative || departureTooSoonToWalk || arrivalTooFarInFuture) return@mapNotNull null
 
                     // TODO: fareTotal
@@ -207,7 +228,7 @@ class JourneyViewModel(
                         }
                     }
 
-                    JourneyDetails(
+                    val details = JourneyDetails(
                         firstWalkMinutes = firstWalkDuration,
                         firstNodeType = firstNodeType,
                         routeSegments = segments,
@@ -215,12 +236,18 @@ class JourneyViewModel(
                         arrivalTime = arrivalTime,
                         fareTotal = fare
                     )
+
+                    routesResponseDataMap[details.uuid] = route
+
+                    details
                 }
 
+                Log.d("Journey options", journeyOptions.toString())
+
                 if (journeyOptions.isEmpty()) {
-                    setJourneyOptions(null)
+                    setJourneyOptions(null, null)
                 } else {
-                    setJourneyOptions(journeyOptions)
+                    setJourneyOptions(journeyOptions, routesResponseDataMap)
                 }
             }
         }
@@ -246,12 +273,15 @@ class JourneyViewModel(
 data class JourneyState(
     val startLocation: SelectedLocation? = null,
     val destination: SelectedLocation? = null,
-    val journeyOptions: List<JourneyDetails>? = emptyList(),
+    val journeyOptions: List<JourneyDetails>? = null,
+    val journey: Route? = null,
+    val routesResponse: Map<String, Route> = emptyMap(),
     val selectedTimeString: String = "now",
     val filter: JourneyFilter = JourneyFilter()
 )
 
 data class JourneyDetails(
+    val uuid: String = UUID.randomUUID().toString(),
     val firstWalkMinutes: Int?,
     val firstNodeType: TravelPoint?,
     val routeSegments: List<String>?,
@@ -266,7 +296,8 @@ data class JourneySelectionActions(
     val onSetStartLocation: (SelectedLocation) -> Unit,
     val onSetDestination: (SelectedLocation) -> Unit,
     val onGetJourneyOptions: () -> Unit,
-    val onSetJourneyOptions: (List<JourneyDetails>) -> Unit
+    val onSetJourneyOptions: (List<JourneyDetails>, Map<String, Route>) -> Unit,
+    val onSetJourney: (id: String) -> Unit
 )
 
 data class JourneyFilter(

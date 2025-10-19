@@ -67,6 +67,10 @@ fun JourneySelectionRoute(
 
     val journeySelectionActions = JourneySelectionScreenActions(
         journeyViewModel.actions,
+        { id ->
+            journeyViewModel.actions.onSetJourney(id)
+            navController.navigate(Screen.ProgressTracker.route)
+        },
         LocationFieldActions(
             onFieldIconClick = {
                 val startLocation = journeyState.startLocation
@@ -114,13 +118,14 @@ fun JourneySelectionRoute(
             startPlacesActions,
             destPlacesState,
             destPlacesActions,
-            paddingValues
+            paddingValues,
         )
     })
 }
 
 data class JourneySelectionScreenActions(
     val journeySelectionActions: JourneySelectionActions,
+    val onConfirmJourneySelection: (journeyId: String) -> Unit,
     val startLocationFieldActions: LocationFieldActions,
     val destinationFieldActions: LocationFieldActions,
 )

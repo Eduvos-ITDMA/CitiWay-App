@@ -13,26 +13,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.material3.ButtonDefaults
-import com.example.citiway.core.ui.components.ConfirmationDialog
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.material3.ButtonColors
 import androidx.compose.foundation.border
-import androidx.compose.material3.ChipBorder
-
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.TextStyle
 
-
-//class PopupBox {
-//}
 @Composable
 fun ConfirmationDialog(
     visible: Boolean,
@@ -42,28 +28,24 @@ fun ConfirmationDialog(
     dismissText: String = "No, go back",
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
-    onClose: (() -> Unit)? = null,
-    // Style parameters you can add as needed:
+    // Style parameters
     dialogShape: Shape = RoundedCornerShape(16.dp),
     dialogBackground: Color = MaterialTheme.colorScheme.surface,
-    dialogBorderColor: Color=Color(0xFF109FD6),
+    dialogBorderColor: Color = MaterialTheme.colorScheme.primary,
     titleTextStyle: TextStyle = MaterialTheme.typography.titleLarge,
-    titleColor: Color = Color(0xFF0B3B4E),
+    titleColor: Color = MaterialTheme.colorScheme.onSecondary,
     messageTextStyle: TextStyle = MaterialTheme.typography.bodyMedium,
     messageColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
     confirmButtonColors: ButtonColors = ButtonDefaults.buttonColors(
-
-        containerColor = Color(0xFF0B3B4E)
+        containerColor = MaterialTheme.colorScheme.onSecondary
     ),
     dismissButtonColors: ButtonColors = ButtonDefaults.outlinedButtonColors(
-        contentColor = Color(0xFF0B3B4E),
+        contentColor = MaterialTheme.colorScheme.onSecondary,
         containerColor = Color.Transparent,
 
-    ),
-    dismissButtonBorderColor: Color=Color(0xFF0B3B4E),
-    buttonShape:Shape=RoundedCornerShape(6.dp),
-//    buttonShape: Shape = RoundedCornerShape(6.dp),
-//    iconTint: Color = Color(0xFF0B3B4E),
+        ),
+    dismissButtonBorderColor: Color = MaterialTheme.colorScheme.onSecondary,
+    buttonShape: Shape = RoundedCornerShape(6.dp),
 ) {
     if (visible) {
         AlertDialog(
@@ -74,18 +56,6 @@ fun ConfirmationDialog(
                 BorderStroke(2.dp, dialogBorderColor),
                 shape = dialogShape
             ),
-            // Custom close ("X") icon in top-right
-//            icon = if (onClose != null) {
-//                {
-//                    IconButton(onClick = onClose) {
-//                        Icon(
-//                            Icons.Default.Close,
-//                            contentDescription = "Close dialog",
-//                            tint = iconTint // Color of the X icon
-//                        )
-//                    }
-//                }
-//            } else null,
             title = {
                 Text(
                     text = title,
@@ -105,7 +75,7 @@ fun ConfirmationDialog(
                 Button(
                     onClick = onConfirm,
                     colors = confirmButtonColors,
-                    shape = buttonShape ,
+                    shape = buttonShape,
                     modifier = Modifier
                         .defaultMinSize(minWidth = 120.dp)
                         .padding(end = 8.dp)

@@ -13,7 +13,6 @@ import com.example.citiway.features.destination_selection.DestinationSelectionCo
 import com.example.citiway.features.favourites.FavouritesContent
 import com.example.citiway.features.help.HelpContent
 import com.example.citiway.features.home.HomeActions
-import androidx.compose.runtime.*
 import com.example.citiway.core.ui.components.ConfirmationDialog
 import com.example.citiway.features.home.HomeContent
 import com.example.citiway.features.journey_history.JourneyHistoryContent
@@ -68,7 +67,10 @@ private val mockJourneySelectionActions = JourneySelectionScreenActions(
         { location -> },
         { location -> },
         {},
-        {}),
+        { l, m -> },
+        {}
+    ),
+    {},
     LocationFieldActions({}, { autocompletePrediction -> }),
     LocationFieldActions({}, { autocompletePrediction -> })
 )
@@ -240,6 +242,7 @@ fun StartLocationScreenPreview() {
         )
     }
 }
+
 @Preview(showBackground = true)
 @Composable
 fun ConfirmationDialogPreview() {

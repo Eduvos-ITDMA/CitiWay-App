@@ -2,6 +2,7 @@ package com.example.citiway.core.utils
 
 import android.util.Log
 import com.example.citiway.data.remote.Time
+import com.google.android.libraries.places.api.model.kotlin.localDate
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -36,7 +37,11 @@ fun Instant.toDisplayableLocalTime(zoneId: ZoneId = ZoneId.systemDefault()): Str
  */
 fun convertHourToInstantIso(hourString: String): String {
     val localTime = LocalTime.parse(hourString, HOURS_MINUTES_FORMATTER).minusMinutes(30)
-    val localDate = LocalDate.now()
+    var localDate = LocalDate.now()
+
+    if (localTime < LocalTime.now()){
+        localDate = localDate.plusDays(1)
+    }
 
     // This is crucial for accurately converting to an Instant.
     val zoneId = ZoneId.systemDefault()
@@ -81,5 +86,7 @@ fun convertIsoToHhmm(isoString: String): String {
 }
 
 private fun convertLocalDateTimeToInstantString(localDateTime: LocalDateTime): String {
-    return localDateTime.atOffset(ZoneOffset.UTC).toInstant().toString()
+    val zoneId = ZoneId.systemDefault()
+    val zonedDateTime = ZonedDateTime.of(localDateTime, zoneId)
+    return zonedDateTime.toInstant().toString()
 }

@@ -86,8 +86,6 @@ import com.example.citiway.features.shared.JourneyState
 import com.example.citiway.features.shared.LocationType
 import com.example.citiway.features.shared.TimeSlots
 import com.example.citiway.features.shared.TimeType
-import com.example.citiway.features.shared.TravelPoint
-import java.time.Duration
 import java.time.Instant
 
 @Composable
@@ -98,7 +96,7 @@ fun JourneySelectionContent(
     startPlacesActions: PlacesActions,
     destPlacesState: PlacesState,
     destPlacesActions: PlacesActions,
-    paddingValues: PaddingValues
+    paddingValues: PaddingValues,
 ) {
     Column(
         modifier = Modifier
@@ -138,7 +136,7 @@ fun JourneySelectionContent(
         )
         VerticalSpace(16)
 
-        JourneyOptionsSection(state, actions.journeySelectionActions)
+        JourneyOptionsSection(state, actions)
         VerticalSpace(24)
     }
 }
@@ -289,50 +287,21 @@ fun LocationFieldWithIcon(
 }
 
 @Composable
-fun JourneyOptionsSection(state: JourneyState, actions: JourneySelectionActions) {
+fun JourneyOptionsSection(
+    state: JourneyState,
+    actions: JourneySelectionScreenActions,
+) {
     Column {
-        TimeSlotSelector(state, actions)
+        TimeSlotSelector(state, actions.journeySelectionActions)
         VerticalSpace(12)
 
-        val mockJourneyDetails = listOf(
-            // Scenario 1: Simple Bus route
-            JourneyDetails(
-                firstWalkMinutes = 5,
-                firstNodeType = TravelPoint.STOP,
-                routeSegments = listOf("Walk", "MyCiTi"),
-                nextDeparture = Duration.ofMinutes(12),
-                arrivalTime = Instant.now().plus(Duration.ofMinutes(45)),
-                fareTotal = 25.50f
-            ),
-
-            // Scenario 2: Train route with a transfer to a bus
-            JourneyDetails(
-                firstWalkMinutes = 8,
-                firstNodeType = TravelPoint.STATION,
-                routeSegments = listOf("Walk", "Metrorail", "Walk", "MyCiTi"),
-                nextDeparture = Duration.ofMinutes(3),
-                arrivalTime = Instant.now().plus(Duration.ofMinutes(75)),
-                fareTotal = 42.00f
-            ),
-
-            // Scenario 3: Longer walk, multiple bus segments
-            JourneyDetails(
-                firstWalkMinutes = 15,
-                firstNodeType = TravelPoint.STOP,
-                routeSegments = listOf("Walk", "MyCiTi", "Walk", "MyCiTi"),
-                nextDeparture = Duration.ofMinutes(25),
-                arrivalTime = Instant.now().plus(Duration.ofMinutes(60)),
-                fareTotal = 30.00f
-            ),
-        )
-
         if (state.journeyOptions == null) {
-            NoJourneyOptionsAvailable()
-        } else if (state.journeyOptions.isEmpty()) {
             JourneyLoadingIndicator()
+        } else if (state.journeyOptions.isEmpty()) {
+            NoJourneyOptionsAvailable()
         } else {
             state.journeyOptions.forEach { journey ->
-                JourneyCard(journey)
+                JourneyCard(journey, actions)
                 VerticalSpace(24)
             }
         }
@@ -381,8 +350,12 @@ fun TimeSlotSelector(state: JourneyState, actions: JourneySelectionActions) {
  * Main Composable function for the entire Trip Summary UI card.
  */
 @Composable
-fun JourneyCard(journey: JourneyDetails) {
+fun JourneyCard(
+    journey: JourneyDetails,
+    actions: JourneySelectionScreenActions,
+) {
     val cornerRadius = 12.dp
+    var showDialog by remember { mutableStateOf(false) }
 
     Card(
         shape = RoundedCornerShape(cornerRadius),
@@ -439,9 +412,19 @@ fun JourneyCard(journey: JourneyDetails) {
                 )
             }
 
-            StartJourneyButton()
+            StartJourneyButton { showDialog = true }
         }
     }
+
+    ConfirmationDialog(
+        visible = showDialog,
+        title = "Are you sure you want to start this journey?",
+        message = "Journeys can be canceled at any time",
+        onConfirm = { actions.onConfirmJourneySelection(journey.uuid) },
+        onDismiss = {
+            showDialog = false
+        },
+    )
 }
 
 /**
@@ -552,15 +535,13 @@ fun RouteDescriptionRow(routeSegments: List<String>?) {
  * Composable for the interactive "Start Journey" area at the bottom.
  */
 @Composable
-fun StartJourneyButton() {
-    var showDialog by remember { mutableStateOf(false) }
-
+fun StartJourneyButton(onStartClick: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(48.dp)
             .background(color = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f))
-            .clickable { showDialog = true }
+            .clickable { onStartClick() }
             .padding(vertical = 10.dp),
         contentAlignment = Alignment.Center
     ) {
@@ -570,24 +551,6 @@ fun StartJourneyButton() {
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
-        )
-    }
-
-    if (showDialog) {
-        ConfirmationDialog(
-            visible = showDialog,
-            title = "Are you sure you want to start this journey?",
-            message = "Journeys can be canceled at any time",
-            onConfirm = {
-                // Put your confirmation logic here
-
-            },
-            onDismiss = {
-                showDialog = false
-            },
-            onClose = {
-                showDialog = false
-            }
         )
     }
 }

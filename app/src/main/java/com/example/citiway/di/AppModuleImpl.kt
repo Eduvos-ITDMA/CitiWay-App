@@ -47,6 +47,7 @@ class AppModuleImpl(
         val retrofit = Retrofit.Builder()
             .baseUrl(BASE_MAPS_URL)
             .addConverterFactory(GsonConverterFactory.create())
+            .client(okHttpClient)
             .build()
         retrofit.create(GeocodingService::class.java)
     }
