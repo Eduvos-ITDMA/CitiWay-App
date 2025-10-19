@@ -294,12 +294,7 @@ fun JourneyOptionsSection(
     actions: JourneySelectionScreenActions,
 ) {
     Column {
-<<<<<<< HEAD
         TimeSlotSelector(state, actions.journeySelectionActions)
-=======
-        TimeSlotSelector(state, actions)
-
->>>>>>> main
         VerticalSpace(12)
 
         if (state.journeyOptions == null) {
