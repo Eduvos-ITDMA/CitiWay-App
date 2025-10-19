@@ -79,7 +79,15 @@ class PlacesManager(
     * autocompleteSessionToken - Session token for billing - regenerated after fetchPlaces() call
     * placesClient - Main interface for Google Places API calls
     * locationBounds - Rectangular bounds that determine the area within which we accept location predictions
+
+    * Location Bounds Configuration:
+    * - Southwest: -34.3°, 18.0° (Cape Point/Simon's Town area)
+    * - Northeast: -33.5°, 18.9° (Melkbosstrand/Table View area)
+    * - Coverage: ~89km N-S × ~83km E-W (~7,400 km²)
+    * - Includes: Entire Cape Town metro area, Peninsula, Northern/Southern suburbs
+    * - Uses locationRestriction (not locationBias) to enforce hard boundary limits
     */
+
     private var autocompleteSessionToken = AutocompleteSessionToken.newInstance()
     private val placesClient: PlacesClient = Places.createClient(application)
     private val locationBounds = RectangularBounds.newInstance(
@@ -165,7 +173,7 @@ class PlacesManager(
                 // Fetch autocomplete predictions (returns up to 5 results by default)
                 val response = placesClient.awaitFindAutocompletePredictions {
                     sessionToken = autocompleteSessionToken
-                    locationBias = locationBounds
+                    locationRestriction = locationBounds
                     query = queryText
                     countries = listOf("ZA")
                 }
