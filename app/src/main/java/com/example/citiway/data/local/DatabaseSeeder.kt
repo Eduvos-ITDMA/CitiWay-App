@@ -53,20 +53,29 @@ class DatabaseSeeder(private val repository: CitiWayRepository) {
 
         // 3. Create MyCiti fare structure
         val myCitiFare1 = repository.insertMyCitiFares(listOf(
-            MyCitiFare(distance_band = "0-5km", peak_fare = 10.00, offpeak_fare = 8.00),
-            MyCitiFare(distance_band = "5-10km", peak_fare = 15.00, offpeak_fare = 12.00),
-            MyCitiFare(distance_band = "10-15km", peak_fare = 20.00, offpeak_fare = 16.00)
+            MyCitiFare(distance_band = "0-5km", peak_fare = 13.50, offpeak_fare = 10.50),
+            MyCitiFare(distance_band = "5-10km", peak_fare = 18.50, offpeak_fare = 13.50),
+            MyCitiFare(distance_band = "10-20km", peak_fare = 23.50, offpeak_fare = 18.50),
+            MyCitiFare(distance_band = "20-30km", peak_fare = 25.50, offpeak_fare = 21.50),
+            MyCitiFare(distance_band = "30-40km", peak_fare = 27.50, offpeak_fare = 23.50),
+            MyCitiFare(distance_band = "40-50km", peak_fare = 31.50, offpeak_fare = 28.50),
+            MyCitiFare(distance_band = "50-60km", peak_fare = 38.50, offpeak_fare = 31.50),
+            MyCitiFare(distance_band = "60km+", peak_fare = 39.50, offpeak_fare = 33.50)
         ))
-        println("✅ Created 3 MyCiti fare bands")
+        println("✅ Created 8 MyCiti fare bands")
 
-        // 4. Create Metrorail fare structure
+// 4. Create Metrorail fare structure
         repository.insertMetrorailFares(listOf(
-            MetrorailFare(zone = "Zone 1", ticket_type = "single", fare = 10.50, includes_return = false),
-            MetrorailFare(zone = "Zone 1", ticket_type = "return", fare = 18.00, includes_return = true),
-            MetrorailFare(zone = "Zone 2", ticket_type = "single", fare = 15.00, includes_return = false),
-            MetrorailFare(zone = "Zone 2", ticket_type = "return", fare = 26.00, includes_return = true)
+            MetrorailFare(zone = "Zone 1", ticket_type = "single", fare = 10.00, includes_return = false),
+            MetrorailFare(zone = "Zone 1", ticket_type = "return", fare = 20.00, includes_return = true),
+            MetrorailFare(zone = "Zone 2", ticket_type = "single", fare = 12.00, includes_return = false),
+            MetrorailFare(zone = "Zone 2", ticket_type = "return", fare = 20.00, includes_return = true),
+            MetrorailFare(zone = "Zone 3", ticket_type = "single", fare = 14.00, includes_return = false),
+            MetrorailFare(zone = "Zone 3", ticket_type = "return", fare = 20.00, includes_return = true),
+            MetrorailFare(zone = "Zone 4", ticket_type = "single", fare = 16.00, includes_return = false),
+            MetrorailFare(zone = "Zone 4", ticket_type = "return", fare = 30.00, includes_return = true)
         ))
-        println("✅ Created 4 Metrorail fares")
+        println("✅ Created 8 Metrorail fares (4 zones x 2 ticket types)")
 
         // 5. Creating 10 TRIPS - Mix of Bus, Train, and Multi
 
