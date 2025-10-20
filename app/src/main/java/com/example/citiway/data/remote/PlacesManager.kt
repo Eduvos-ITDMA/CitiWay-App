@@ -188,7 +188,7 @@ class PlacesManager(
                 setPredictions(emptyList())
                 _state.update { currentState ->
                     currentState.copy(
-                        selectedLocation = selectedLocation, userLocation = selectedLocation.latLng
+                        selectedLocation = selectedLocation
                     )
                 }
             }
