@@ -13,6 +13,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 import kotlin.getValue
 import com.example.citiway.data.repository.CitiWayRepository
 import com.example.citiway.data.local.CitiWayDatabase
+import com.google.android.libraries.places.api.Places
+import com.google.android.libraries.places.api.net.PlacesClient
 
 private const val BASE_MAPS_URL = "https://maps.googleapis.com/"
 private const val BASE_ROUTES_URL = "https://routes.googleapis.com/"
@@ -31,7 +33,8 @@ class AppModuleImpl(
         PlacesManager(
             appContext,
             MAPS_API_KEY,
-            geocodingService
+            geocodingService,
+            placesClient
         )
     }
 
@@ -63,4 +66,7 @@ class AppModuleImpl(
 
     override val okHttpClient: OkHttpClient
         get() = provideOkHttpClient()
+
+    override val placesClient: PlacesClient
+        get() = Places.createClient(appContext)
 }

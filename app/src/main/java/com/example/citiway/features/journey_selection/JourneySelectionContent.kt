@@ -77,6 +77,7 @@ import com.example.citiway.core.ui.components.HorizontalSpace
 import com.example.citiway.core.ui.components.LocationSearchField
 import com.example.citiway.core.ui.components.VerticalSpace
 import com.example.citiway.core.utils.JourneySelectionScreenPreview
+import com.example.citiway.core.utils.formatMinutesToHoursAndMinutes
 import com.example.citiway.core.utils.toDisplayableLocalTime
 import com.example.citiway.data.remote.PlacesActions
 import com.example.citiway.data.remote.PlacesState
@@ -405,7 +406,7 @@ fun JourneyCard(
                         if (min != null) {
                             append("Next departure in ")
                             withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                                append("$min min")
+                                append(formatMinutesToHoursAndMinutes(min))
                             }
                         } else {
                             append("Next departure time unknown")
