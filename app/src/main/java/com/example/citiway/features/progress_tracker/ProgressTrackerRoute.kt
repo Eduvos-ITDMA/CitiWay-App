@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.citiway.core.utils.ScreenWrapper
+import com.example.citiway.features.journey_progress.ProgressTrackerContent
 import com.example.citiway.di.viewModelFactory
 import com.example.citiway.features.shared.JourneyViewModel
 

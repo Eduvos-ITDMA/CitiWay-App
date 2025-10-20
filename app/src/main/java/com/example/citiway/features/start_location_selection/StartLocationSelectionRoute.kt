@@ -117,14 +117,14 @@ fun StartLocationSelectionRoute(
             placesActions = placesActions,
             onPermissionRequest = {
                 // This old handler is now replaced by smart logic in the content
-                // But keep it for backward compatibility or remove if not used elsewhere
+                // But keep it for backward compatibility
                 permissionJustRequested = true
                 locationPermissionState.launchPermissionRequest()
             },
             cameraPositionState = mapViewModel.cameraPositionState,
             onConfirmLocation = onConfirmLocation,
             locationEnabledInApp = locationEnabledInApp,
-            // ADD THESE NEW PARAMETERS:
+            // ADDED THESE NEW PARAMETERS:
             isLocationPermissionGranted = locationPermissionState.status.isGranted,
             onEnableLocation = { drawerViewModel.toggleLocation(true) },
             onRequestSystemPermission = {
