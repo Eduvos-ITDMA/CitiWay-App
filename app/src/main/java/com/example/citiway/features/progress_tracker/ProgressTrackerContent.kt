@@ -1,5 +1,6 @@
-package com.example.citiway.features.journey_progress
+package com.example.citiway.features.progress_tracker
 
+import android.icu.text.DecimalFormat
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -13,7 +14,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,18 +30,28 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.citiway.R
+import com.example.citiway.core.navigation.routes.Screen
 import com.example.citiway.core.ui.components.HorizontalSpace
 import com.example.citiway.core.ui.components.VerticalSpace
+import com.example.citiway.core.utils.convertIsoToHhmm
+import com.example.citiway.features.shared.Instruction
+import com.example.citiway.features.shared.JourneyState
 
 @Composable
-fun ProgressTrackerContent(navController: NavController, paddingValues: PaddingValues) {
+fun ProgressTrackerContent(
+    journeyState: JourneyState,
+    paddingValues: PaddingValues,
+    navController: NavController
+) {
 
     // Track coordinates for progress line
     var stepCoordinates by remember { mutableStateOf<List<Offset>>(emptyList()) }
     var boxOffset by remember { mutableStateOf(Offset.Zero) } //  Tracks the Box position, stops the bug when i scroll
+    val connectorColour = MaterialTheme.colorScheme.secondary
+
+    val journey = journeyState.journey
 
     Column(
         modifier = Modifier
@@ -59,185 +69,202 @@ fun ProgressTrackerContent(navController: NavController, paddingValues: PaddingV
             color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier.fillMaxWidth()
         )
-
         VerticalSpace(16)
 
-        // ETA and Distance Card will take data from the selection screen. To be injected with data from API
-        ETACard(eta = "11:34 am", distance = "27km")
-
-        VerticalSpace(24)
-
-        // Journey Steps with Progress Line ####################################################################
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .onGloballyPositioned { coordinates ->
-                    // Tracking the Box's position
-                    boxOffset = coordinates.positionInRoot()
+        if (journey != null) {
+            // ETA and Distance Card
+            val distanceText =
+                if (journey.distanceMeters > 1000) {
+                    "${DecimalFormat("0.0").format(journey.distanceMeters / 1000.0)}km"
+                } else {
+                    "${journey.distanceMeters}m"
                 }
-        )
-        {
-            // Progress Line Canvas
-            Canvas(
+
+            ETACard(
+                eta = convertIsoToHhmm(journey.arrivalTime.toString()),
+                distance = distanceText
+            )
+            VerticalSpace(24)
+
+            // Container for all progress tracker data, including connector lines
+            Box(
                 modifier = Modifier
-                    .fillMaxSize() // This makes the canvas cover the entire Box
-                    .align(Alignment.TopStart) // CentreStart broke it,  goes to first circle.
-            ) {
-                // Draw connecting lines between steps
-                for (i in 0 until stepCoordinates.size - 1) {
-                    val start = stepCoordinates[i]
-                    val end = stepCoordinates[i + 1]
+                    .fillMaxWidth()
+                    .onGloballyPositioned { coordinates ->
+                        boxOffset = coordinates.positionInRoot()
+                    }
+            )
+            {
+                // Canvas on which to draw connector lines
+                Canvas(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .align(Alignment.TopStart) // CentreStart broke it,  goes to first circle.
+                ) {
+                    // Draw connecting lines between steps
+                    for (i in 0 until stepCoordinates.size - 1) {
+                        val start = stepCoordinates[i]
+                        val end = stepCoordinates[i + 1]
 
-                    // Only draw if coordinates are valid
-                    if (start != Offset.Zero && end != Offset.Zero) {
-                        // Now adjustss coordinates relative to the Box
-                        val adjustedStart = Offset(
-                            x = start.x - boxOffset.x,
-                            y = start.y - boxOffset.y
-                        )
-                        val adjustedEnd = Offset(
-                            x = end.x - boxOffset.x,
-                            y = end.y - boxOffset.y
-                        )
+                        // Only draw if coordinates are valid
+                        if (start != Offset.Zero && end != Offset.Zero) {
+                            val adjustedStart = Offset(
+                                x = start.x - boxOffset.x,
+                                y = start.y - boxOffset.y
+                            )
+                            val adjustedEnd = Offset(
+                                x = end.x - boxOffset.x,
+                                y = end.y - boxOffset.y
+                            )
 
-                        // Dashed line between steps
-                        drawLine(
-                            color = Color(0xFFFFB74D), // Making the line Orange
-                            start = adjustedStart,
-                            end = adjustedEnd,
-                            strokeWidth = 4.dp.toPx(),  // Line thickness
-                            pathEffect = PathEffect.dashPathEffect(floatArrayOf(15f, 15f))  // First number = dash length, second = gap length
-                        )
+                            // Dashed line between steps
+                            drawLine(
+                                color = connectorColour,
+                                start = adjustedStart,
+                                end = adjustedEnd,
+                                strokeWidth = 4.dp.toPx(),
+                                pathEffect = PathEffect.dashPathEffect(floatArrayOf(15f, 15f))
+                            )
+                        }
                     }
                 }
-            }
 
-            Column(modifier = Modifier.fillMaxWidth()) {
+
                 // Start Location
                 JourneyStep(
-                    isStart = true, // Cirle when true, location pin when false. For end destination.
-                    title = "52 Pienaar Rd, Milnerton", // will be injected from api object/viewmodel
+                    isStart = true,
+                    title = journeyState.startLocation?.primaryText ?: "Error: Unknown Location",
                     hasEditIcon = true,
-                    onCoordinatesChanged = { offset ->
+                    onCoordinatesChanged = { offset -> // Still need to figure out what's going on here
                         stepCoordinates = stepCoordinates.toMutableList().apply {
                             if (isEmpty()) add(offset) else set(0, offset)
                         }
                     }
                 )
-
                 VerticalSpace(8)
+                InstructionStep(journey.instructions.first())
 
-                // Walk step
-                WalkStep(
-                    duration = "400m",
-                    time = "approx. 5min"
-                )
+                // ======================================================================
+                // Currently assuming start location and destination are not also stops
+                // e.g. when a user starts at a station
+                // TODO: Adjust UI if start location is first stop or destination is last stop
+                // ======================================================================
 
-                VerticalSpace(8)
+                // ======================================================================
+                // Cards should take in a journey Stop from journey.stops and InstructionSteps should
+                // take a Instruction from journey.instructions
+                // There will always be at least one instruction, so the first InstructionStep
+                // composable is included OUTSIDE the loop (see above). In the forEach loop, first
+                // a Card must be made and then an instruction
+                // ======================================================================
 
-                // Narwhal Bus Stop
-                TransitStopCard(
-                    stopName = "Narwhal Bus Stop",
-                    nextTransit = "Next bus in 11min",
-                    routeName = "Route T04",
-                    transitDetail = "Take MyCiTi bus for 6 stops",
-                    transitTime = "approx. 9 min",
-                    onCoordinatesChanged = { offset ->
-                        stepCoordinates = stepCoordinates.toMutableList().apply {
-                            while (size < 2) add(Offset.Zero)
-                            set(1, offset)
-                        }
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    journey.stops.forEachIndexed { index, stop ->
+                        // TODO: Refactored Card -> takes stop
+                        VerticalSpace(12)
+                        val instruction = journey.instructions[index + 1]
+                        InstructionStep(instruction)
                     }
-                )
 
-                VerticalSpace(8)
+                    // TODO: Refactor Card to simply take in a stop
+                    // Can then clean all these up
+                    // Annoying to test UI - can make mock journeyState in Previews.kt and use preview maybe? Will do tmr
 
-                // Woodstock Station
-                TransitStopCard(
-                    stopName = "Woodstock Station",
-                    nextTransit = "Next train in 22min",
-                    routeName = "Southern Line",
-                    transitDetail = "Take train for 3 stations",
-                    transitTime = "approx. 12 min",
-                    isStation = true,
-                    onCoordinatesChanged = { offset ->
-                        stepCoordinates = stepCoordinates.toMutableList().apply {
-                            while (size < 3) add(Offset.Zero)
-                            set(2, offset)
+                    // Narwhal Bus Stop
+                    TransitStopCard(
+                        stopName = "Narwhal Bus Stop",
+                        nextTransit = "Next bus in 11min",
+                        routeName = "Route T04",
+                        transitDetail = "Take MyCiTi bus for 6 stops",
+                        transitTime = "approx. 9 min",
+                        onCoordinatesChanged = { offset ->
+                            stepCoordinates = stepCoordinates.toMutableList().apply {
+                                while (size < 2) add(Offset.Zero)
+                                set(1, offset)
+                            }
                         }
-                    }
-                )
+                    )
 
-                VerticalSpace(8)
+                    VerticalSpace(8)
 
-                // Mowbray Station
-                TransitStopCard(
-                    stopName = "Mowbray Station",
-                    nextTransit = "Next train in 22min",
-                    routeName = "Disembark",
-                    routeColor = Color(0xFFB0BEC5),
-                    transitDetail = null,
-                    isStation = true,
-                    onCoordinatesChanged = { offset ->
-                        stepCoordinates = stepCoordinates.toMutableList().apply {
-                            while (size < 4) add(Offset.Zero)
-                            set(3, offset)
+                    // Woodstock Station
+                    TransitStopCard(
+                        stopName = "Woodstock Station",
+                        nextTransit = "Next train in 22min",
+                        routeName = "Southern Line",
+                        transitDetail = "Take train for 3 stations",
+                        transitTime = "approx. 12 min",
+                        isStation = true,
+                        onCoordinatesChanged = { offset ->
+                            stepCoordinates = stepCoordinates.toMutableList().apply {
+                                while (size < 3) add(Offset.Zero)
+                                set(2, offset)
+                            }
                         }
-                    }
-                )
+                    )
 
-                VerticalSpace(8)
+                    VerticalSpace(8)
 
-                // Final walk
-                WalkStep(
-                    duration = "250m",
-                    time = "approx. 4 min"
-                )
-
-                VerticalSpace(8)
-
-                // End Location
-                JourneyStep(
-                    isStart = false,
-                    title = "Eduvos Cape Town - Mowbray",
-                    hasEditIcon = true,
-                    onCoordinatesChanged = { offset ->
-                        stepCoordinates = stepCoordinates.toMutableList().apply {
-                            while (size < 5) add(Offset.Zero)
-                            set(4, offset)
+                    // Mowbray Station
+                    TransitStopCard(
+                        stopName = "Mowbray Station",
+                        nextTransit = "Next train in 22min",
+                        routeName = "Disembark",
+                        transitDetail = null,
+                        isStation = true,
+                        onCoordinatesChanged = { offset ->
+                            stepCoordinates = stepCoordinates.toMutableList().apply {
+                                while (size < 4) add(Offset.Zero)
+                                set(3, offset)
+                            }
                         }
-                    }
-                )
+                    )
+
+                    // End Location
+                    JourneyStep(
+                        isStart = false,
+                        title = "Eduvos Cape Town - Mowbray",
+                        hasEditIcon = true,
+                        onCoordinatesChanged = { offset ->
+                            stepCoordinates = stepCoordinates.toMutableList().apply {
+                                while (size < 5) add(Offset.Zero)
+                                set(4, offset)
+                            }
+                        }
+                    )
+                }
             }
-        }
 
-        VerticalSpace(24)
+            VerticalSpace(24)
 
-        // Cancel Journey Button
-        Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center // Centering the button horizontally
-        ) {
-            Button(
-                onClick = { /* TODO: Handle cancel */ }, // Ask caleb cancel to where. Back to home or dest would be best.
-                modifier = Modifier
-                    .fillMaxWidth(0.6f) // Using 60% of available width for better proportions
-                    .height(50.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.error
-                ),
-                shape = RoundedCornerShape(25.dp)
+            // Cancel Journey Button
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center // Centering the button horizontally
             ) {
-                Text(
-                    text = "Cancel Journey",
-                    color = Color.White,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium
-                )
+                Button(
+                    // TODO: Reckon we just go back to home screen.
+                    // In future check if first stop has been reached, if so go back home, otherwise go back to journey selection
+                    onClick = { navController.navigate(Screen.Home.route) },
+                    modifier = Modifier
+                        .fillMaxWidth(0.6f)
+                        .height(50.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.error.copy(0.5f)
+                    ),
+                    border = BorderStroke(2.dp, MaterialTheme.colorScheme.error),
+                    shape = RoundedCornerShape(25.dp)
+                ) {
+                    Text(
+                        text = "Cancel Journey",
+                        color = Color.White,
+                        style = MaterialTheme.typography.labelLarge
+                    )
+                }
             }
-        }
 
-        VerticalSpace(24)
+            VerticalSpace(24)
+        }
     }
 }
 
@@ -376,6 +403,60 @@ fun JourneyStep(
 }
 
 @Composable
+fun InstructionStep(instruction: Instruction) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Empty space for progress line ....
+        Box(
+            modifier = Modifier
+                .width(40.dp)
+                .fillMaxHeight()
+        )
+
+        HorizontalSpace(12) // gap for alignment leave space for the tracker
+
+        Row(
+            modifier = Modifier.weight(1f),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            val painterResourceName = when (instruction.travelMode) {
+                "WALK" -> R.drawable.ic_walk
+                "BUS" -> R.drawable.ic_bus
+                "TRAIN" -> R.drawable.ic_train
+                else -> R.drawable.ic_question_mark
+            }
+
+            Icon(
+                painter = painterResource(painterResourceName),
+                contentDescription = "instruction",
+                tint = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier.size(24.dp)
+            )
+
+            HorizontalSpace(8)
+
+            Column {
+                Text(
+                    text = instruction.text,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+                Text(
+                    text = "approx. ${instruction.durationMinutes} min",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
+                )
+            }
+        }
+    }
+}
+
+@Composable
 fun WalkStep(duration: String, time: String) {
     Row(
         modifier = Modifier
@@ -384,7 +465,11 @@ fun WalkStep(duration: String, time: String) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Empty space for progress line ....
-        Box(modifier = Modifier.width(40.dp).fillMaxHeight())
+        Box(
+            modifier = Modifier
+                .width(40.dp)
+                .fillMaxHeight()
+        )
 
         HorizontalSpace(12) // gap for alignment leave space for the tracker
 
@@ -423,12 +508,15 @@ fun TransitStopCard( // ui done. card with details. *Ask caleb for commponent
     stopName: String,
     nextTransit: String,
     routeName: String,
-    routeColor: Color = MaterialTheme.colorScheme.secondary,
     transitDetail: String?,
     transitTime: String? = null,
     isStation: Boolean = false,
+    lastStop: Boolean = false,
     onCoordinatesChanged: (Offset) -> Unit
 ) {
+    val routeColor =
+        if (lastStop) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSurfaceVariant
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -493,7 +581,8 @@ fun TransitStopCard( // ui done. card with details. *Ask caleb for commponent
                             val parts = nextTransit.split(" ")
                             parts.forEachIndexed { index, part ->
                                 if (part.contains("min", ignoreCase = true) ||
-                                    part.any { it.isDigit() }) {
+                                    part.any { it.isDigit() }
+                                ) {
                                     withStyle(
                                         style = SpanStyle(
                                             color = MaterialTheme.colorScheme.secondary,
@@ -505,7 +594,9 @@ fun TransitStopCard( // ui done. card with details. *Ask caleb for commponent
                                 } else {
                                     withStyle(
                                         style = SpanStyle(
-                                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
+                                            color = MaterialTheme.colorScheme.onBackground.copy(
+                                                alpha = 0.7f
+                                            )
                                         )
                                     ) {
                                         append(part)

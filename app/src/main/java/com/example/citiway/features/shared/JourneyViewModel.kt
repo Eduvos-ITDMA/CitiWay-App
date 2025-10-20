@@ -2,6 +2,7 @@ package com.example.citiway.features.shared
 
 import android.util.Log
 import androidx.compose.runtime.Stable
+import androidx.compose.ui.semantics.getOrNull
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
@@ -16,6 +17,7 @@ import com.example.citiway.data.remote.RoutesManager
 import com.example.citiway.data.remote.SelectedLocation
 import com.example.citiway.data.remote.Step
 import com.example.citiway.data.remote.Vehicle
+import com.example.citiway.features.progress_tracker.InstructionStep
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -58,8 +60,7 @@ class JourneyViewModel(
                 _state.update { currentState ->
                     val updatedOptions = currentState.journeyOptions?.map { details ->
                         val newNextDeparture = Duration.between(
-                            Instant.now(),
-                            details.departureTimeInstant
+                            Instant.now(), details.departureTimeInstant
                         )
                         details.copy(nextDeparture = newNextDeparture)
                     }
@@ -121,8 +122,7 @@ class JourneyViewModel(
     }
 
     fun setJourneyOptions(
-        options: List<JourneyDetails> = emptyList(),
-        routesResponse: Map<String, Route> = emptyMap()
+        options: List<JourneyDetails> = emptyList(), routesResponse: Map<String, Route> = emptyMap()
     ) {
         _state.update {
             it.copy(journeyOptions = options, routesResponse = routesResponse)
@@ -138,9 +138,16 @@ class JourneyViewModel(
     }
 
     fun setJourney(id: String) {
-        if (_state.value.routesResponse?.containsKey(id) ?: false) {
-            _state.update { it.copy(journey = it.routesResponse!![id]) }
+        val route = _state.value.routesResponse?.get(id)
+
+        if (route != null) {
+            val journey = routeToJourney(route)
+            _state.update { it.copy(journey = journey) }
         }
+    }
+
+    fun getVehicle(step: Step?): Vehicle? {
+        return step?.transitDetails?.transitLine?.vehicle
     }
 
     fun confirmLocationSelection(
@@ -178,13 +185,9 @@ class JourneyViewModel(
             viewModelScope.launch {
                 val filter = state.value.filter
 
-                val routes =
-                    routesManager.getTransitRoutes(
-                        start,
-                        destination,
-                        filter.timeType,
-                        filter.resolveTime()
-                    )
+                val routes = routesManager.getTransitRoutes(
+                    start, destination, filter.timeType, filter.resolveTime()
+                )
                 val routesResponseDataMap = mutableMapOf<String, Route>()
 
                 // Loop through each route in response to parse and filter into a the necessary
@@ -194,19 +197,14 @@ class JourneyViewModel(
                     journeyOptions = routes.mapNotNull { route ->
                         val steps = route.legs.firstOrNull()?.steps ?: emptyList()
 
-                        fun getVehicle(step: Step?): Vehicle? {
-                            return step?.transitDetails?.transitLine?.vehicle
-                        }
-
                         // firstNodeType: find first TRANSIT step and decide STOP vs STATION
                         val firstTransitStep = steps.firstOrNull { it.travelMode == "TRANSIT" }
-                        val firstNodeType =
-                            getVehicle(firstTransitStep)?.type?.let { vehicleType ->
-                                when (vehicleType.uppercase()) {
-                                    "HEAVY_RAIL", "RAIL", "SUBWAY", "COMMUTER_RAIL" -> TravelPoint.STATION
-                                    else -> TravelPoint.STOP
-                                }
-                            } ?: TravelPoint.STOP
+                        val firstNodeType = getVehicle(firstTransitStep)?.type?.let { vehicleType ->
+                            when (vehicleType.uppercase()) {
+                                "HEAVY_RAIL", "RAIL", "SUBWAY", "COMMUTER_RAIL" -> TravelPoint.STATION
+                                else -> TravelPoint.STOP
+                            }
+                        } ?: TravelPoint.STOP
 
                         // routeSegments: iterate through steps to build string segments
                         var firstWalkOver = false
@@ -258,11 +256,10 @@ class JourneyViewModel(
 
                         // Filter routes - nextDeparture must exceed walk duration, it must not be
                         // negative, and arrivalTime should not be more than 5 hours from the selected time
-                        val arrivalTooFarInFuture =
-                            (arrivalTime?.minus(Duration.ofHours(5))
-                                ?: Instant.MAX) > Instant.parse(
-                                _state.value.filter.resolveTime()
-                            )
+                        val arrivalTooFarInFuture = (arrivalTime?.minus(Duration.ofHours(5))
+                            ?: Instant.MAX) > Instant.parse(
+                            _state.value.filter.resolveTime()
+                        )
                         val departureTooSoonToWalk =
                             nextDeparture.toMinutes() < ceil(0.75 * firstWalkDuration)
                         if (nextDeparture.isNegative || departureTooSoonToWalk || arrivalTooFarInFuture) return@mapNotNull null
@@ -317,6 +314,85 @@ class JourneyViewModel(
 
         return null
     }
+
+    private fun routeToJourney(route: Route): Journey {
+        var instructions: MutableList<Instruction> = mutableListOf()
+        var stops: MutableList<Stop> = mutableListOf()
+        var fromWalk = false
+        var distance = 0
+        var duration = 0
+        val steps = route.legs.firstOrNull()?.steps ?: emptyList()
+        val distanceMeters = route.distanceMeters
+        val arrivalTime = calculateArrivalTime(steps)
+
+        steps.forEachIndexed { index, step ->
+            val minutes = duration / 60
+            when (step.travelMode) {
+                "WALK" -> {
+                    distance += step.distanceMeters
+                    duration += step.staticDuration.toSecondsInt()
+                    fromWalk = true
+                }
+
+                "TRANSIT" -> {
+                    if (fromWalk) {
+                        instructions.add(Instruction("Walk ${distance}m", minutes, "WALK"))
+                    }
+
+                    val vehicle = getVehicle(step)
+                    val stopCount = step.transitDetails?.stopCount ?: 1
+                    var instruction = when (vehicle?.name?.text ?: "") {
+                        "HEAVY_RAIL" -> Instruction(
+                            "Take train for $stopCount stations",
+                            minutes,
+                            "TRAIN"
+                        )
+
+                        "BUS" -> Instruction(
+                            "Take MyCiTi bus for $stopCount stops",
+                            minutes,
+                            "BUS"
+                        )
+
+                        else -> Instruction("Take transport ", minutes)
+                    }
+                    if (stopCount > 1) {
+                        instruction.text = instruction.text.dropLast(1)
+                    }
+
+                    val stopName =
+                        step.transitDetails?.stopDetails?.arrivalStop?.name ?: "Transport stop"
+                    val nextDeparture = Duration.between(
+                        Instant.now(),
+                        Instant.parse(step.transitDetails?.stopDetails?.departureTime)
+                    )
+                    val nextMode = steps.getOrNull(index + 1)?.travelMode
+                    val routeName = step.transitDetails?.transitLine?.name ?: ""
+                    val latLng = step.transitDetails?.stopDetails?.departureStop?.location?.latLng
+
+                    // Add stop
+                    stops.add(
+                        Stop(
+                            stopName, nextDeparture, nextMode, routeName, latLng
+                        )
+                    )
+
+                    distance = 0
+                    duration = 0
+                    fromWalk = false
+                }
+
+                else -> throw Exception("Unexpected travel mode '${step.travelMode}'")
+            }
+        }
+
+        // Add final walk instruction, if applicable
+        if (fromWalk) {
+            instructions.add(Instruction("Walk ${distance}m", duration / 60, "WALK"))
+        }
+
+        return Journey(stops, instructions, arrivalTime, distanceMeters)
+    }
 }
 
 @Stable
@@ -324,7 +400,7 @@ data class JourneyState(
     val startLocation: SelectedLocation? = null,
     val destination: SelectedLocation? = null,
     val journeyOptions: List<JourneyDetails>? = null,
-    val journey: Route? = null,
+    val journey: Journey? = null,
     val routesResponse: Map<String, Route>? = null,
     val selectedTimeString: String = "now",
     val filter: JourneyFilter = JourneyFilter()
@@ -353,13 +429,31 @@ data class JourneySelectionActions(
 )
 
 data class JourneyFilter(
-    val timeType: TimeType = TimeType.Departure,
-    val time: String? = null
+    val timeType: TimeType = TimeType.Departure, val time: String? = null
 ) {
     fun resolveTime(): String {
         return if (this.time != null) time else getNearestHalfHour()
     }
 }
+
+data class Journey(
+    val stops: List<Stop>,
+    val instructions: List<Instruction>,
+    val arrivalTime: Instant?,
+    val distanceMeters: Int
+)
+
+data class Stop(
+    val name: String,
+    val nextDeparture: Duration?,
+    val nextMode: String?,
+    val routeName: String,
+    val latLng: LatLng?
+)
+
+data class Instruction(
+    var text: String, val durationMinutes: Int, val travelMode: String = "WALK"
+)
 
 /**
  * A string list of time slots from "04:30" to "23:00"
