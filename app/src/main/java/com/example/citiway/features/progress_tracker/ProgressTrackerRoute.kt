@@ -4,10 +4,11 @@ import android.annotation.SuppressLint
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.citiway.core.utils.ScreenWrapper
-import com.example.citiway.features.journey_progress.ProgressTrackerContent
 import com.example.citiway.di.viewModelFactory
 import com.example.citiway.features.shared.JourneyViewModel
 
@@ -22,10 +23,11 @@ fun ProgressTrackerRoute(
             JourneyViewModel(navController)
         }
     )
+    val journeyState by journeyViewModel.state.collectAsStateWithLifecycle()
 
     ScreenWrapper(navController, true) { paddingValues ->
         ProgressTrackerContent(
-            navController = navController,
+            journeyState = journeyState,
             paddingValues = paddingValues
         )
     }
