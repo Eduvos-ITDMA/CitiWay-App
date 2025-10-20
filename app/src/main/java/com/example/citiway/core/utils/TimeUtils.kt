@@ -1,17 +1,15 @@
 package com.example.citiway.core.utils
 
-import android.util.Log
-import com.example.citiway.data.remote.Time
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
-import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 val HOURS_MINUTES_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+val ZONE_ID = ZoneId.systemDefault()
 
 /**
  * Helper extension to convert V2 duration string (e.g., "1234s") to seconds (Int)
@@ -36,11 +34,14 @@ fun Instant.toDisplayableLocalTime(zoneId: ZoneId = ZoneId.systemDefault()): Str
  */
 fun convertHourToInstantIso(hourString: String): String {
     val localTime = LocalTime.parse(hourString, HOURS_MINUTES_FORMATTER).minusMinutes(30)
-    val localDate = LocalDate.now()
+    var localDate = LocalDate.now()
+
+    if (localTime < LocalTime.now()) {
+        localDate = localDate.plusDays(1)
+    }
 
     // This is crucial for accurately converting to an Instant.
-    val zoneId = ZoneId.systemDefault()
-    val zonedDateTime = ZonedDateTime.of(localDate, localTime, zoneId)
+    val zonedDateTime = ZonedDateTime.of(localDate, localTime, ZONE_ID)
 
     return zonedDateTime.toInstant().toString()
 }
@@ -77,9 +78,34 @@ fun getNearestHalfHour(): String {
 
 fun convertIsoToHhmm(isoString: String): String {
     val zonedDateTime = ZonedDateTime.parse(isoString)
-    return zonedDateTime.toLocalTime().format(HOURS_MINUTES_FORMATTER)
+    val targetZoneDateTime =  zonedDateTime.withZoneSameInstant(ZONE_ID)
+    return targetZoneDateTime.toLocalTime().format(HOURS_MINUTES_FORMATTER)
 }
 
 private fun convertLocalDateTimeToInstantString(localDateTime: LocalDateTime): String {
-    return localDateTime.atOffset(ZoneOffset.UTC).toInstant().toString()
+    val zonedDateTime = ZonedDateTime.of(localDateTime, ZONE_ID)
+    return zonedDateTime.toInstant().toString()
+}
+
+fun formatMinutesToHoursAndMinutes(totalMinutes: Int): String {
+    if (totalMinutes <= 0) return "now"
+
+    val hours = totalMinutes / 60
+    val remainingMinutes = totalMinutes % 60
+
+    return buildString {
+        if (hours > 0) {
+            append("${hours}h")
+        }
+
+        // Add a space only if hours were added AND there are remaining minutes
+        if (hours > 0 && remainingMinutes > 0) {
+            append(" ")
+        }
+
+        if (remainingMinutes > 0 || hours == 0) {
+            // Include minutes if non-zero, or if minutes is the only component (e.g., "45 min")
+            append("${remainingMinutes}min")
+        }
+    }
 }

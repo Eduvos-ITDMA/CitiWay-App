@@ -13,6 +13,7 @@ import com.example.citiway.features.destination_selection.DestinationSelectionCo
 import com.example.citiway.features.favourites.FavouritesContent
 import com.example.citiway.features.help.HelpContent
 import com.example.citiway.features.home.HomeActions
+import com.example.citiway.core.ui.components.ConfirmationDialog
 import com.example.citiway.features.home.HomeContent
 import com.example.citiway.features.journey_history.JourneyHistoryContent
 import com.example.citiway.features.journey_progress.ProgressTrackerContent
@@ -67,7 +68,10 @@ private val mockJourneySelectionActions = JourneySelectionScreenActions(
         { location -> },
         { location -> },
         {},
-        {}),
+        { l, m -> },
+        {}
+    ),
+    {},
     LocationFieldActions({}, { autocompletePrediction -> }),
     LocationFieldActions({}, { autocompletePrediction -> })
 )
@@ -145,7 +149,6 @@ fun HelpScreenPreview() {
     CitiWayTheme {
         HelpContent(
             paddingValues = PaddingValues(),
-//            navController = rememberNavController(), // Or specific callbacks like onLinkClicked
         )
     }
 }
@@ -239,4 +242,19 @@ fun StartLocationScreenPreview() {
             onRequestSystemPermission = {}
         )
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ConfirmationDialogPreview() {
+    ConfirmationDialog(
+        visible = true,
+        title = "Are you sure you want to cancel your trip?",
+        message = "You will be redirected to the Home Page",
+        confirmText = "Continue",
+        dismissText = "No, go back",
+        onConfirm = {},
+        onDismiss = {},
+//        onClose = {}
+    )
 }

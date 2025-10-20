@@ -14,7 +14,6 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.AutocompletePrediction
 import com.google.android.libraries.places.api.model.AutocompleteSessionToken
 import com.google.android.libraries.places.api.model.Place
@@ -30,8 +29,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
-import java.util.Timer
-import kotlin.concurrent.schedule
 import kotlin.coroutines.resumeWithException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -59,7 +56,8 @@ class PlacesActions(
 class PlacesManager(
     private val application: Application,
     private val apiKey: String,
-    private val geocodingService: GeocodingService
+    private val geocodingService: GeocodingService,
+    private val placesClient: PlacesClient
 ) {
     private val _state = MutableStateFlow(PlacesState())
     val state: StateFlow<PlacesState> = _state
@@ -89,7 +87,6 @@ class PlacesManager(
     */
 
     private var autocompleteSessionToken = AutocompleteSessionToken.newInstance()
-    private val placesClient: PlacesClient = Places.createClient(application)
     private val locationBounds = RectangularBounds.newInstance(
         LatLng(BuildConfig.SOUTHWEST_CAPE_TOWN_LAT, BuildConfig.SOUTHWEST_CAPE_TOWN_LNG),
         LatLng(BuildConfig.NORTHEAST_CAPE_TOWN_LAT, BuildConfig.NORTHEAST_CAPE_TOWN_LNG)
