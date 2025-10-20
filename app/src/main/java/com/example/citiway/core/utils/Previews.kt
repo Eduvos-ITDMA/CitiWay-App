@@ -15,11 +15,12 @@ import com.example.citiway.features.help.HelpContent
 import com.example.citiway.features.home.HomeActions
 import com.example.citiway.features.home.HomeContent
 import com.example.citiway.features.journey_history.JourneyHistoryContent
+import com.example.citiway.features.journey_progress.ProgressTrackerContent
 import com.example.citiway.features.journey_selection.JourneySelectionContent
 import com.example.citiway.features.journey_selection.JourneySelectionScreenActions
 import com.example.citiway.features.journey_selection.LocationFieldActions
 import com.example.citiway.features.journey_summary.JourneySummaryContent
-import com.example.citiway.features.progress_tracker.ProgressTrackerContent
+import com.example.citiway.features.progress_tracker.ProgressTrackerRoute
 import com.example.citiway.features.schedules.SchedulesContent
 import com.example.citiway.features.shared.CompletedJourneysState
 import com.example.citiway.features.shared.JourneySelectionActions
