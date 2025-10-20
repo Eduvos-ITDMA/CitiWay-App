@@ -53,6 +53,7 @@ import com.google.maps.android.compose.MapType
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberMarkerState
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
@@ -75,7 +76,7 @@ fun StartLocationSelectionContent(
     // State Variables from StartLocationViewModel. Same as in destination_selection
     val selectedLocation = state.selectedLocation
     val userLocation = state.userLocation
-    val isLocationPermissionGranted = state.isLocationPermissionGranted
+    // Note: We using the parameter isLocationPermissionGranted that is passed in, not from one from state
 
     // ========= CONTENT ===========
     Column(
@@ -225,11 +226,12 @@ fun StartLocationSelectionContent(
                         locationEnabledInApp &&
                         selectedLocation?.latLng == userLocation
 
-            // Then in your code:
+            // Showing BLUE marker for manually selected locations (search or map tap)
             if (selectedLocation != null && !isShowingUserLocationWithBlueDot) {
                 Marker(
                     state = rememberMarkerState(position = selectedLocation.latLng),
-                    title = "Selected Location"
+                    title = "Selected Location",
+                    icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)
                 )
             }
         }
