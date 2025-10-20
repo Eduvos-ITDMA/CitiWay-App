@@ -14,7 +14,6 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.AutocompletePrediction
 import com.google.android.libraries.places.api.model.AutocompleteSessionToken
 import com.google.android.libraries.places.api.model.Place
@@ -30,8 +29,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
-import java.util.Timer
-import kotlin.concurrent.schedule
 import kotlin.coroutines.resumeWithException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -59,7 +56,8 @@ class PlacesActions(
 class PlacesManager(
     private val application: Application,
     private val apiKey: String,
-    private val geocodingService: GeocodingService
+    private val geocodingService: GeocodingService,
+    private val placesClient: PlacesClient
 ) {
     private val _state = MutableStateFlow(PlacesState())
     val state: StateFlow<PlacesState> = _state
@@ -79,9 +77,16 @@ class PlacesManager(
     * autocompleteSessionToken - Session token for billing - regenerated after fetchPlaces() call
     * placesClient - Main interface for Google Places API calls
     * locationBounds - Rectangular bounds that determine the area within which we accept location predictions
+
+    * Location Bounds Configuration:
+    * - Southwest: -34.3°, 18.0° (Cape Point/Simon's Town area)
+    * - Northeast: -33.5°, 18.9° (Melkbosstrand/Table View area)
+    * - Coverage: ~89km N-S × ~83km E-W (~7,400 km²)
+    * - Includes: Entire Cape Town metro area, Peninsula, Northern/Southern suburbs
+    * - Uses locationRestriction (not locationBias) to enforce hard boundary limits
     */
+
     private var autocompleteSessionToken = AutocompleteSessionToken.newInstance()
-    private val placesClient: PlacesClient = Places.createClient(application)
     private val locationBounds = RectangularBounds.newInstance(
         LatLng(BuildConfig.SOUTHWEST_CAPE_TOWN_LAT, BuildConfig.SOUTHWEST_CAPE_TOWN_LNG),
         LatLng(BuildConfig.NORTHEAST_CAPE_TOWN_LAT, BuildConfig.NORTHEAST_CAPE_TOWN_LNG)
@@ -165,7 +170,7 @@ class PlacesManager(
                 // Fetch autocomplete predictions (returns up to 5 results by default)
                 val response = placesClient.awaitFindAutocompletePredictions {
                     sessionToken = autocompleteSessionToken
-                    locationBias = locationBounds
+                    locationRestriction = locationBounds
                     query = queryText
                     countries = listOf("ZA")
                 }

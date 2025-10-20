@@ -1,5 +1,6 @@
 package com.example.citiway.features.journey_selection
 
+import android.annotation.SuppressLint
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
@@ -21,6 +22,7 @@ import com.example.citiway.features.shared.JourneyViewModel
 import com.google.android.libraries.places.api.model.AutocompletePrediction
 import kotlinx.coroutines.launch
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun JourneySelectionRoute(
     navController: NavController,
@@ -67,6 +69,10 @@ fun JourneySelectionRoute(
 
     val journeySelectionActions = JourneySelectionScreenActions(
         journeyViewModel.actions,
+        { id ->
+            journeyViewModel.actions.onSetJourney(id)
+            navController.navigate(Screen.ProgressTracker.route)
+        },
         LocationFieldActions(
             onFieldIconClick = {
                 val startLocation = journeyState.startLocation
@@ -114,13 +120,14 @@ fun JourneySelectionRoute(
             startPlacesActions,
             destPlacesState,
             destPlacesActions,
-            paddingValues
+            paddingValues,
         )
     })
 }
 
 data class JourneySelectionScreenActions(
     val journeySelectionActions: JourneySelectionActions,
+    val onConfirmJourneySelection: (journeyId: String) -> Unit,
     val startLocationFieldActions: LocationFieldActions,
     val destinationFieldActions: LocationFieldActions,
 )

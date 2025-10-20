@@ -1,6 +1,5 @@
 package com.example.citiway.data.remote
 
-import android.util.Log
 import com.example.citiway.features.shared.TimeType
 import com.google.android.gms.maps.model.LatLng
 import java.util.Timer
@@ -19,7 +18,6 @@ class RoutesManager(
         timeType: TimeType,
         time: String
     ): List<Route> {
-        Log.d("Routes requestAllowed", requestAllowed.toString())
         if (!requestAllowed) return emptyList()
         requestAllowed = false
 

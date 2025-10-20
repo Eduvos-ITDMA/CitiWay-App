@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
@@ -71,11 +72,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.example.citiway.R
+import com.example.citiway.core.ui.components.ConfirmationDialog
 import com.example.citiway.core.ui.components.HorizontalSpace
 import com.example.citiway.core.ui.components.LocationSearchField
-import com.example.citiway.core.ui.components.Title
 import com.example.citiway.core.ui.components.VerticalSpace
 import com.example.citiway.core.utils.JourneySelectionScreenPreview
+import com.example.citiway.core.utils.formatMinutesToHoursAndMinutes
 import com.example.citiway.core.utils.toDisplayableLocalTime
 import com.example.citiway.data.remote.PlacesActions
 import com.example.citiway.data.remote.PlacesState
@@ -85,8 +87,6 @@ import com.example.citiway.features.shared.JourneyState
 import com.example.citiway.features.shared.LocationType
 import com.example.citiway.features.shared.TimeSlots
 import com.example.citiway.features.shared.TimeType
-import com.example.citiway.features.shared.TravelPoint
-import java.time.Duration
 import java.time.Instant
 
 @Composable
@@ -97,7 +97,7 @@ fun JourneySelectionContent(
     startPlacesActions: PlacesActions,
     destPlacesState: PlacesState,
     destPlacesActions: PlacesActions,
-    paddingValues: PaddingValues
+    paddingValues: PaddingValues,
 ) {
     Column(
         modifier = Modifier
@@ -139,8 +139,8 @@ fun JourneySelectionContent(
 
         VerticalSpace(12)
 
-        JourneyOptionsSection(state, actions.journeySelectionActions)
-
+        JourneyOptionsSection(state, actions)
+        VerticalSpace(24)
     }
 }
 
@@ -290,51 +290,21 @@ fun LocationFieldWithIcon(
 }
 
 @Composable
-fun JourneyOptionsSection(state: JourneyState, actions: JourneySelectionActions) {
+fun JourneyOptionsSection(
+    state: JourneyState,
+    actions: JourneySelectionScreenActions,
+) {
     Column {
-        TimeSlotSelector(state, actions)
-
+        TimeSlotSelector(state, actions.journeySelectionActions)
         VerticalSpace(12)
 
-        val mockJourneyDetails = listOf(
-            // Scenario 1: Simple Bus route
-            JourneyDetails(
-                firstWalkMinutes = 5,
-                firstNodeType = TravelPoint.STOP,
-                routeSegments = listOf("Walk", "MyCiTi"),
-                nextDeparture = Duration.ofMinutes(12),
-                arrivalTime = Instant.now().plus(Duration.ofMinutes(45)),
-                fareTotal = 25.50f
-            ),
-
-            // Scenario 2: Train route with a transfer to a bus
-            JourneyDetails(
-                firstWalkMinutes = 8,
-                firstNodeType = TravelPoint.STATION,
-                routeSegments = listOf("Walk", "Metrorail", "Walk", "MyCiTi"),
-                nextDeparture = Duration.ofMinutes(3),
-                arrivalTime = Instant.now().plus(Duration.ofMinutes(75)),
-                fareTotal = 42.00f
-            ),
-
-            // Scenario 3: Longer walk, multiple bus segments
-            JourneyDetails(
-                firstWalkMinutes = 15,
-                firstNodeType = TravelPoint.STOP,
-                routeSegments = listOf("Walk", "MyCiTi", "Walk", "MyCiTi"),
-                nextDeparture = Duration.ofMinutes(25),
-                arrivalTime = Instant.now().plus(Duration.ofMinutes(60)),
-                fareTotal = 30.00f
-            ),
-        )
-
         if (state.journeyOptions == null) {
-            NoJourneyOptionsAvailable()
-        } else if (state.journeyOptions.isEmpty()) {
             JourneyLoadingIndicator()
+        } else if (state.journeyOptions.isEmpty()) {
+            NoJourneyOptionsAvailable()
         } else {
             state.journeyOptions.forEach { journey ->
-                JourneyCard(journey)
+                JourneyCard(journey, actions)
                 VerticalSpace(24)
             }
         }
@@ -383,8 +353,12 @@ fun TimeSlotSelector(state: JourneyState, actions: JourneySelectionActions) {
  * Main Composable function for the entire Trip Summary UI card.
  */
 @Composable
-fun JourneyCard(journey: JourneyDetails) {
+fun JourneyCard(
+    journey: JourneyDetails,
+    actions: JourneySelectionScreenActions,
+) {
     val cornerRadius = 12.dp
+    var showDialog by remember { mutableStateOf(false) }
 
     Card(
         shape = RoundedCornerShape(cornerRadius),
@@ -432,7 +406,7 @@ fun JourneyCard(journey: JourneyDetails) {
                         if (min != null) {
                             append("Next departure in ")
                             withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                                append("$min min")
+                                append(formatMinutesToHoursAndMinutes(min))
                             }
                         } else {
                             append("Next departure time unknown")
@@ -441,9 +415,19 @@ fun JourneyCard(journey: JourneyDetails) {
                 )
             }
 
-            StartJourneyButton()
+            StartJourneyButton { showDialog = true }
         }
     }
+
+    ConfirmationDialog(
+        visible = showDialog,
+        title = "Are you sure you want to start this journey?",
+        message = "Journeys can be canceled at any time",
+        onConfirm = { actions.onConfirmJourneySelection(journey.uuid) },
+        onDismiss = {
+            showDialog = false
+        },
+    )
 }
 
 /**
@@ -533,7 +517,7 @@ fun RouteDescriptionRow(routeSegments: List<String>?) {
                     .size(12.dp)
                     .background(
                         MaterialTheme.colorScheme.onBackground,
-                        shape = androidx.compose.foundation.shape.CircleShape
+                        shape = CircleShape
                     )
                     .align(Alignment.TopCenter)
                     .offset(y = 6.dp)
@@ -554,14 +538,13 @@ fun RouteDescriptionRow(routeSegments: List<String>?) {
  * Composable for the interactive "Start Journey" area at the bottom.
  */
 @Composable
-fun StartJourneyButton() {
-    // This uses the bottom rounded corners of the main card
+fun StartJourneyButton(onStartClick: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(48.dp)
-            .background(color = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)) // Light blue background
-            .clickable { /* TODO: Handle journey start click */ }
+            .background(color = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f))
+            .clickable { onStartClick() }
             .padding(vertical = 10.dp),
         contentAlignment = Alignment.Center
     ) {
@@ -574,6 +557,7 @@ fun StartJourneyButton() {
         )
     }
 }
+
 
 @Composable
 fun createStyledRouteString(
