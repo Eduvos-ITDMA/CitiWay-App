@@ -67,10 +67,10 @@ fun HomeRoute(
         }
     )
 
-    // Get user name from database
+    // Get user name from database (2nd element for now) as mock data need user Id 1.
     val userName by remember {
         repository.getAllUsers().map { users ->
-            users.firstOrNull()?.name ?: "Commuter"
+            users.getOrNull(1)?.name ?: "Commuter"
         }
     }.collectAsStateWithLifecycle(initialValue = "Commuter")
 
