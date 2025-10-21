@@ -11,7 +11,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -76,11 +75,12 @@ fun ProgressTrackerContent(
 
         if (journey != null) {
             // ETA and Distance Card
+            val meters = journey.distanceMeters
             val distanceText =
-                if (journey.distanceMeters > 1000) {
-                    "${DecimalFormat("0.0").format(journey.distanceMeters / 1000.0)}km"
+                if (meters >= 1000) {
+                    "${DecimalFormat("0.0").format(meters / 1000.0)}km"
                 } else {
-                    "${journey.distanceMeters}m"
+                    "${meters}m"
                 }
 
             ETACard(
@@ -131,97 +131,40 @@ fun ProgressTrackerContent(
                         }
                     }
                 }
-
-
-                // Start Location
-                JourneyStep(
-                    isStart = true,
-                    title = journeyState.startLocation?.primaryText ?: "Error: Unknown Location",
-                    hasEditIcon = true,
-                    onCoordinatesChanged = { offset -> // Still need to figure out what's going on here
-                        stepCoordinates = stepCoordinates.toMutableList().apply {
-                            if (isEmpty()) add(offset) else set(0, offset)
-                        }
-                    }
-                )
-                VerticalSpace(8)
-                InstructionStep(journey.instructions.first())
-
                 // ======================================================================
                 // Currently assuming start location and destination are not also stops
                 // e.g. when a user starts at a station
                 // TODO: Adjust UI if start location is first stop or destination is last stop
                 // ======================================================================
 
-                // ======================================================================
-                // Cards should take in a journey Stop from journey.stops and InstructionSteps should
-                // take a Instruction from journey.instructions
-                // There will always be at least one instruction, so the first InstructionStep
-                // composable is included OUTSIDE the loop (see above). In the forEach loop, first
-                // a Card must be made and then an instruction
-                // ======================================================================
-
                 Column(modifier = Modifier.fillMaxWidth()) {
+                    // Start Location
+                    JourneyStep(
+                        isStart = true,
+                        title = journeyState.startLocation?.primaryText
+                            ?: "Error: Unknown Location",
+                        hasEditIcon = true,
+                        onCoordinatesChanged = { offset -> // Still need to figure out what's going on here
+                            stepCoordinates = stepCoordinates.toMutableList().apply {
+                                if (isEmpty()) add(offset) else set(0, offset)
+                            }
+                        }
+                    )
+                    VerticalSpace(12)
+                    InstructionStep(journey.instructions.first())
+
+                    // Create card for each stop with instruction below it
                     journey.stops.forEachIndexed { index, stop ->
-                        // TODO: Refactored Card -> takes stop
-                        VerticalSpace(12)
-                        val instruction = journey.instructions[index + 1]
-                        InstructionStep(instruction)
-                    }
-
-                    // TODO: Refactor Card to simply take in a stop
-                    // Can then clean all these up
-                    // Annoying to test UI - can make mock journeyState in Previews.kt and use preview maybe? Will do tmr
-
-                    // Narwhal Bus Stop
-                    TransitStopCard(
-                        stopName = "Narwhal Bus Stop",
-                        nextTransit = "Next bus in 11min",
-                        routeName = "Route T04",
-                        transitDetail = "Take MyCiTi bus for 6 stops",
-                        transitTime = "approx. 9 min",
-                        onCoordinatesChanged = { offset ->
+                        TransitStopCard(stop) { offset ->
                             stepCoordinates = stepCoordinates.toMutableList().apply {
                                 while (size < 2) add(Offset.Zero)
                                 set(1, offset)
                             }
                         }
-                    )
 
-                    VerticalSpace(8)
-
-                    // Woodstock Station
-                    TransitStopCard(
-                        stopName = "Woodstock Station",
-                        nextTransit = "Next train in 22min",
-                        routeName = "Southern Line",
-                        transitDetail = "Take train for 3 stations",
-                        transitTime = "approx. 12 min",
-                        isStation = true,
-                        onCoordinatesChanged = { offset ->
-                            stepCoordinates = stepCoordinates.toMutableList().apply {
-                                while (size < 3) add(Offset.Zero)
-                                set(2, offset)
-                            }
-                        }
-                    )
-
-                    VerticalSpace(8)
-
-                    // Mowbray Station
-                    TransitStopCard(
-                        stopName = "Mowbray Station",
-                        nextTransit = "Next train in 22min",
-                        routeName = "Disembark",
-                        transitDetail = null,
-                        isStation = true,
-                        onCoordinatesChanged = { offset ->
-                            stepCoordinates = stepCoordinates.toMutableList().apply {
-                                while (size < 4) add(Offset.Zero)
-                                set(3, offset)
-                            }
-                        }
-                    )
+                        val instruction = journey.instructions[index + 1]
+                        InstructionStep(instruction)
+                    }
 
                     // End Location
                     JourneyStep(
@@ -301,7 +244,7 @@ fun ETACard(eta: String, distance: String) {
                 )
             }
 
-            Divider(
+            VerticalDivider(
                 modifier = Modifier
                     .height(40.dp)
                     .width(2.dp),
@@ -353,7 +296,7 @@ fun JourneyStep(
                     modifier = Modifier
                         .size(16.dp)
                         .background(
-                            MaterialTheme.colorScheme.primary,
+                            MaterialTheme.colorScheme.onBackground,
                             shape = CircleShape
                         )
                 )
@@ -361,7 +304,7 @@ fun JourneyStep(
                 Icon(
                     painter = painterResource(R.drawable.ic_location_on),
                     contentDescription = "Destination",
-                    tint = MaterialTheme.colorScheme.primary,
+                    tint = MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -374,7 +317,7 @@ fun JourneyStep(
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.background
             ),
-            border = CardDefaults.outlinedCardBorder(),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground),
             shape = RoundedCornerShape(8.dp)
         ) {
             Row(
@@ -407,6 +350,7 @@ fun JourneyStep(
 
 @Composable
 fun InstructionStep(instruction: Instruction) {
+    VerticalSpace(12)
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -426,15 +370,8 @@ fun InstructionStep(instruction: Instruction) {
             modifier = Modifier.weight(1f),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            val painterResourceName = when (instruction.travelMode) {
-                "WALK" -> R.drawable.ic_walk
-                "BUS" -> R.drawable.ic_bus
-                "TRAIN" -> R.drawable.ic_train
-                else -> R.drawable.ic_question_mark
-            }
-
             Icon(
-                painter = painterResource(painterResourceName),
+                painter = painterResource(modeIcon(instruction.travelMode)),
                 contentDescription = "instruction",
                 tint = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.size(24.dp)
@@ -457,62 +394,20 @@ fun InstructionStep(instruction: Instruction) {
             }
         }
     }
+    VerticalSpace(18)
 }
 
 @Composable
-fun WalkStep(duration: String, time: String) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(IntrinsicSize.Min),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        // Empty space for progress line ....
-        Box(
-            modifier = Modifier
-                .width(40.dp)
-                .fillMaxHeight()
-        )
-
-        HorizontalSpace(12) // gap for alignment leave space for the tracker
-
-        Row(
-            modifier = Modifier.weight(1f),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.DirectionsWalk,
-                contentDescription = "Walk",
-                tint = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.size(24.dp)
-            )
-
-            HorizontalSpace(8)
-
-            Column {
-                Text(
-                    text = "Walk $duration", // would inject data here from api object/viewmodel
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-                Text(
-                    text = time,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun TransitStopCard( // ui done. card with details. *Ask caleb for commponent
+fun TransitStopCard(
     stop: Stop,
     onCoordinatesChanged: (Offset) -> Unit
 ) {
-    val routeColor =
-        if (stop.toMode == "WALK") MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSurfaceVariant
+    var routeName = stop.routeName
+    var routeColor = MaterialTheme.colorScheme.secondary
+    if (stop.toMode == "WALK") {
+        routeColor = MaterialTheme.colorScheme.onSurfaceVariant
+        routeName = "Disembark"
+    }
 
     Row(
         modifier = Modifier
@@ -573,12 +468,12 @@ fun TransitStopCard( // ui done. card with details. *Ask caleb for commponent
 
                         VerticalSpace(2)
 
-                        var duration = stop.nextDepartureMinutes
+                        var duration = stop.nextDepartureMin
                         // "Next bus in 11min" with orange color for time
                         val annotatedString = buildAnnotatedString {
                             withStyle(
                                 style = SpanStyle(
-                                    color = MaterialTheme.colorScheme.secondary,
+                                    color = MaterialTheme.colorScheme.onBackground.copy(0.8f),
                                     fontWeight = FontWeight.Bold
                                 )
                             ) {
@@ -599,12 +494,11 @@ fun TransitStopCard( // ui done. card with details. *Ask caleb for commponent
                             }
                             withStyle(
                                 style = SpanStyle(
-                                    color = MaterialTheme.colorScheme.onBackground.copy(
-                                        alpha = 0.7f
-                                    )
+                                    color = MaterialTheme.colorScheme.secondary,
+                                    fontWeight = FontWeight.ExtraBold
                                 )
                             ) {
-                                append("${duration}min")
+                                append("$duration min")
                             }
                         }
 
@@ -645,7 +539,7 @@ fun TransitStopCard( // ui done. card with details. *Ask caleb for commponent
                             Icon(
                                 painter = painterResource(R.drawable.double_arrow_right), // Downloaded icon from site fonts.google, can be customised.
                                 contentDescription = "To",
-                                tint = routeColor,
+                                tint = MaterialTheme.colorScheme.secondary,
                                 modifier = Modifier.size(28.dp)
                             )
 
@@ -670,46 +564,12 @@ fun TransitStopCard( // ui done. card with details. *Ask caleb for commponent
                         }
 
                         Text(
-                            text = stop.routeName,
+                            text = routeName,
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = routeColor,
                             textAlign = TextAlign.End
                         )
-                    }
-                }
-            }
-
-            // Transit details below card
-            if (transitDetail != null) {
-                VerticalSpace(8)
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        painter = painterResource(
-                            if (isStation) R.drawable.ic_train else R.drawable.ic_bus
-                        ),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onBackground,
-                        modifier = Modifier.size(20.dp)
-                    )
-
-                    HorizontalSpace(8)
-
-                    Column {
-                        Text(
-                            text = transitDetail,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onBackground
-                        )
-                        if (transitTime != null) {
-                            Text(
-                                text = transitTime,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
-                            )
-                        }
                     }
                 }
             }
@@ -721,7 +581,7 @@ private fun modeIcon(travelMode: String?): Int {
     return when (travelMode) {
         "WALK" -> R.drawable.ic_walk
         "BUS" -> R.drawable.ic_bus
-        "TRAIN" -> R.drawable.ic_train
+        "HEAVY_RAIL" -> R.drawable.ic_train
         else -> R.drawable.ic_question_mark
     }
 }

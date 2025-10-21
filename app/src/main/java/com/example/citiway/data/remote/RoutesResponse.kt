@@ -76,12 +76,6 @@ data class Vehicle(
     val type: String
 )
 
-data class Time(
-    val text: String,
-    val timeZone: String,
-    val value: String
-)
-
 data class LocalizedTime(
     val time: LocalizedText,
     val timeZone: String

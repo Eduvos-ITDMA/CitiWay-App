@@ -73,7 +73,7 @@ class JourneyViewModel(
                             stop.copy(
                                 nextDeparture = newNextDeparture,
                                 arrivesIn = newArrivesIn,
-                                nextDepartureMinutes = newNextDeparture?.toMinutes()?.toInt() ?: 0,
+                                nextDepartureMin = newNextDeparture?.toMinutes()?.toInt() ?: 0,
                                 arrivesInMin = newArrivesIn?.toMinutes()?.toInt() ?: 0
                             )
                         }
@@ -332,6 +332,7 @@ class JourneyViewModel(
     }
 
     private fun routeToJourney(route: Route): Journey {
+        Log.d("Tracker route", route.toString())
         val instructions: MutableList<Instruction> = mutableListOf()
         val stops: MutableList<Stop> = mutableListOf()
         var fromWalk = false
@@ -342,7 +343,7 @@ class JourneyViewModel(
         val arrivalTime = calculateArrivalTime(steps)
 
         steps.forEachIndexed { index, step ->
-            val minutes = duration / 60
+            Log.d("Tracker step", step.toString())
             when (step.travelMode) {
                 "WALK" -> {
                     distance += step.distanceMeters
@@ -351,30 +352,23 @@ class JourneyViewModel(
                 }
 
                 "TRANSIT" -> {
+                    val minutes = duration / 60
                     if (fromWalk) {
                         instructions.add(Instruction("Walk ${distance}m", minutes, "WALK"))
                     }
 
                     val vehicle = getVehicle(step)
                     val stopCount = step.transitDetails?.stopCount ?: 1
-                    val instruction = when (vehicle?.name?.text ?: "") {
-                        "HEAVY_RAIL" -> Instruction(
-                            "Take train for $stopCount stations",
-                            minutes,
-                            "TRAIN"
-                        )
-
-                        "BUS" -> Instruction(
-                            "Take MyCiTi bus for $stopCount stops",
-                            minutes,
-                            "BUS"
-                        )
-
-                        else -> Instruction("Take transport ", minutes)
+                    var instructionText = when (vehicle?.name?.text ?: "") {
+                        "HEAVY_RAIL" -> "Take train for $stopCount stations"
+                        "BUS" -> "Take MyCiTi bus for $stopCount stops"
+                        else -> "Take transport "
                     }
-                    if (stopCount > 1) {
-                        instruction.text = instruction.text.dropLast(1)
-                    }
+
+                    if (stopCount <= 1) instructionText = instructionText.dropLast(1)
+
+                    val instruction =
+                        Instruction(instructionText, minutes, vehicle?.name?.text ?: "")
 
                     val stopName =
                         step.transitDetails?.stopDetails?.arrivalStop?.name ?: "Transport stop"
@@ -389,6 +383,9 @@ class JourneyViewModel(
                     val nextMode = steps.getOrNull(index + 1)?.travelMode
                     val routeName = step.transitDetails?.transitLine?.name ?: ""
                     val latLng = step.transitDetails?.stopDetails?.departureStop?.location?.latLng
+
+                    // Add instruction
+                    instructions.add(instruction)
 
                     // Add stop
                     stops.add(
@@ -476,7 +473,7 @@ data class Stop(
     val fromMode: String,
     val toMode: String?,
     val nextDeparture: Duration?,
-    val nextDepartureMinutes: Int,
+    val nextDepartureMin: Int,
     val arrivesIn: Duration?,
     val arrivesInMin: Int,
     val routeName: String,
