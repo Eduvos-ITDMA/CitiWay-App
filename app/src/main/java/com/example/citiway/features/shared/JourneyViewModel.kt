@@ -2,7 +2,6 @@ package com.example.citiway.features.shared
 
 import android.util.Log
 import androidx.compose.runtime.Stable
-import androidx.compose.ui.semantics.getOrNull
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
@@ -17,7 +16,6 @@ import com.example.citiway.data.remote.RoutesManager
 import com.example.citiway.data.remote.SelectedLocation
 import com.example.citiway.data.remote.Step
 import com.example.citiway.data.remote.Vehicle
-import com.example.citiway.features.progress_tracker.InstructionStep
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -55,17 +53,35 @@ class JourneyViewModel(
             // Recalculate the nextDeparture duration from the original departure time
             // This triggers a recomposition in the UI when the minute ticks down
             ticker.collect {
-                if (_state.value.journeyOptions.isNullOrEmpty()) return@collect
-
-                _state.update { currentState ->
-                    val updatedOptions = currentState.journeyOptions?.map { details ->
-                        val newNextDeparture = Duration.between(
-                            Instant.now(), details.departureTimeInstant
-                        )
-                        details.copy(nextDeparture = newNextDeparture)
+                if (_state.value.journeyOptions.isNullOrEmpty()) {
+                    _state.update { currentState ->
+                        val updatedOptions = currentState.journeyOptions?.map { details ->
+                            val newNextDeparture = Duration.between(
+                                Instant.now(), details.departureTimeInstant
+                            )
+                            details.copy(nextDeparture = newNextDeparture)
+                        }
+                        currentState.copy(journeyOptions = updatedOptions)
                     }
-                    currentState.copy(journeyOptions = updatedOptions)
                 }
+
+                if (_state.value.journey != null) {
+                    _state.update { currentState ->
+                        val stops = currentState.journey?.stops?.map { stop ->
+                            val newNextDeparture = stop.nextDeparture?.minusSeconds(1)
+                            val newArrivesIn = stop.arrivesIn?.minusSeconds(1)
+                            stop.copy(
+                                nextDeparture = newNextDeparture,
+                                arrivesIn = newArrivesIn,
+                                nextDepartureMinutes = newNextDeparture?.toMinutes()?.toInt() ?: 0,
+                                arrivesInMin = newArrivesIn?.toMinutes()?.toInt() ?: 0
+                            )
+                        }
+                        val newState = currentState.journey?.copy(stops = stops ?: emptyList())
+                        currentState.copy(journey = newState)
+                    }
+                }
+
             }
         }
     }
@@ -316,8 +332,8 @@ class JourneyViewModel(
     }
 
     private fun routeToJourney(route: Route): Journey {
-        var instructions: MutableList<Instruction> = mutableListOf()
-        var stops: MutableList<Stop> = mutableListOf()
+        val instructions: MutableList<Instruction> = mutableListOf()
+        val stops: MutableList<Stop> = mutableListOf()
         var fromWalk = false
         var distance = 0
         var duration = 0
@@ -341,7 +357,7 @@ class JourneyViewModel(
 
                     val vehicle = getVehicle(step)
                     val stopCount = step.transitDetails?.stopCount ?: 1
-                    var instruction = when (vehicle?.name?.text ?: "") {
+                    val instruction = when (vehicle?.name?.text ?: "") {
                         "HEAVY_RAIL" -> Instruction(
                             "Take train for $stopCount stations",
                             minutes,
@@ -366,6 +382,10 @@ class JourneyViewModel(
                         Instant.now(),
                         Instant.parse(step.transitDetails?.stopDetails?.departureTime)
                     )
+                    val arrivesIn = Duration.between(
+                        Instant.now(),
+                        Instant.parse(step.transitDetails?.stopDetails?.arrivalTime)
+                    )
                     val nextMode = steps.getOrNull(index + 1)?.travelMode
                     val routeName = step.transitDetails?.transitLine?.name ?: ""
                     val latLng = step.transitDetails?.stopDetails?.departureStop?.location?.latLng
@@ -373,7 +393,15 @@ class JourneyViewModel(
                     // Add stop
                     stops.add(
                         Stop(
-                            stopName, nextDeparture, nextMode, routeName, latLng
+                            stopName,
+                            step.travelMode,
+                            nextMode,
+                            nextDeparture,
+                            nextDeparture.toMinutes().toInt(),
+                            arrivesIn,
+                            arrivesIn.toMinutes().toInt(),
+                            routeName,
+                            latLng
                         )
                     )
 
@@ -445,8 +473,12 @@ data class Journey(
 
 data class Stop(
     val name: String,
+    val fromMode: String,
+    val toMode: String?,
     val nextDeparture: Duration?,
-    val nextMode: String?,
+    val nextDepartureMinutes: Int,
+    val arrivesIn: Duration?,
+    val arrivesInMin: Int,
     val routeName: String,
     val latLng: LatLng?
 )

@@ -28,7 +28,8 @@ fun ProgressTrackerRoute(
     ScreenWrapper(navController, true) { paddingValues ->
         ProgressTrackerContent(
             journeyState = journeyState,
-            paddingValues = paddingValues
+            paddingValues = paddingValues,
+            navController = navController
         )
     }
 }
