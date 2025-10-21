@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
+import com.example.citiway.core.ui.components.ConfirmationDialog
 import com.example.citiway.core.ui.theme.CitiWayTheme
 import com.example.citiway.data.remote.PlacesActions
 import com.example.citiway.data.remote.PlacesState
@@ -13,24 +14,27 @@ import com.example.citiway.features.destination_selection.DestinationSelectionCo
 import com.example.citiway.features.favourites.FavouritesContent
 import com.example.citiway.features.help.HelpContent
 import com.example.citiway.features.home.HomeActions
-import com.example.citiway.core.ui.components.ConfirmationDialog
 import com.example.citiway.features.home.HomeContent
 import com.example.citiway.features.journey_history.JourneyHistoryContent
-import com.example.citiway.features.journey_progress.ProgressTrackerContent
 import com.example.citiway.features.journey_selection.JourneySelectionContent
 import com.example.citiway.features.journey_selection.JourneySelectionScreenActions
 import com.example.citiway.features.journey_selection.LocationFieldActions
 import com.example.citiway.features.journey_summary.JourneySummaryContent
-import com.example.citiway.features.progress_tracker.ProgressTrackerRoute
+import com.example.citiway.features.progress_tracker.ProgressTrackerContent
 import com.example.citiway.features.schedules.SchedulesContent
 import com.example.citiway.features.shared.CompletedJourneysState
+import com.example.citiway.features.shared.Instruction
+import com.example.citiway.features.shared.Journey
 import com.example.citiway.features.shared.JourneySelectionActions
 import com.example.citiway.features.shared.JourneyState
 import com.example.citiway.features.shared.MapActions
 import com.example.citiway.features.shared.MapState
+import com.example.citiway.features.shared.Stop
 import com.example.citiway.features.start_location_selection.StartLocationSelectionContent
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.rememberCameraPositionState
+import java.time.Duration
+import java.time.Instant
 
 private val mockMapActions = MapActions(
     selectLocationOnMap = {},
@@ -186,8 +190,91 @@ fun JourneySummaryScreenPreview() {
 @Preview(showBackground = true, name = "Progress Tracker Screen")
 @Composable
 fun ProgressTrackerScreenPreview() {
+    val mockJourneyState = JourneyState(
+        SelectedLocation(LatLng(0.0, 0.0), "mock_id", "Mowbray"),
+        SelectedLocation(LatLng(0.0, 0.0), "mock_id_2", "Century City"),
+        null,
+        Journey(
+            stops = listOf(
+                Stop(
+                    name = "Mowbray Station",
+                    nextDeparture = Duration.ofMinutes(5), // Placeholder
+                    nextMode = "WALK",
+                    routeName = "Southern Line",
+                    latLng = LatLng(-33.9455, 18.4756) // Approximate coordinate
+                ),
+                Stop(
+                    name = "Salt River Station",
+                    nextDeparture = Duration.ofMinutes(5), // Placeholder
+                    nextMode = "WALK",
+                    routeName = "Southern Line",
+                    latLng = LatLng(-33.9295, 18.4528) // Approximate coordinate
+                ),
+                Stop(
+                    name = "Salt River Rail North",
+                    nextDeparture = Duration.ofMinutes(22), // Placeholder
+                    nextMode = "TRANSIT", // Assuming bus is next
+                    routeName = "261 260 Omuramba",
+                    latLng = LatLng(-33.9275, 18.4533) // Approximate coordinate
+                ),
+                Stop(
+                    name = "Quest",
+                    nextDeparture = Duration.ofMinutes(13), // Placeholder
+                    nextMode = "TRANSIT", // Assuming bus is next
+                    routeName = "262 262 SummerGreens",
+                    latLng = LatLng(-33.8953, 18.5147) // Approximate coordinate
+                ),
+                Stop(
+                    name = "Oasis",
+                    nextDeparture = Duration.ofMinutes(1), // Placeholder
+                    nextMode = "WALK",
+                    routeName = "262 262 SummerGreens",
+                    latLng = LatLng(-33.8935, 18.5085) // Approximate coordinate
+                )
+            ),
+            instructions = listOf(
+                Instruction(
+                    text = "Walk 350m",
+                    durationMinutes = 6,
+                    travelMode = "WALK"
+                ),
+                Instruction(
+                    text = "Take train for 2 stations",
+                    durationMinutes = 5,
+                    travelMode = "TRAIN"
+                ),
+                Instruction(
+                    text = "Walk 329m", // Sum of 19+290+10+10
+                    durationMinutes = 5,
+                    travelMode = "WALK"
+                ),
+                Instruction(
+                    text = "Take MyCiTi bus for 13 stops",
+                    durationMinutes = 22,
+                    travelMode = "BUS"
+                ),
+                Instruction(
+                    text = "Take MyCiTi bus for 5 stops",
+                    durationMinutes = 13,
+                    travelMode = "BUS"
+                ),
+                Instruction(
+                    text = "Walk 89m",
+                    durationMinutes = 1,
+                    travelMode = "WALK"
+                )
+            ),
+            // The arrival time in the screenshot is "4:06 PM". We'll represent this as an Instant.
+            // This is a placeholder for a specific date, adjust if necessary.
+            arrivalTime = Instant.parse("2025-10-21T16:06:00Z"),
+            distanceMeters = 5000
+        ),
+        null,
+    )
+
     CitiWayTheme {
         ProgressTrackerContent(
+            journeyState = mockJourneyState,
             paddingValues = PaddingValues(),
             navController = rememberNavController(), // Or callbacks like onCancelJourney
         )

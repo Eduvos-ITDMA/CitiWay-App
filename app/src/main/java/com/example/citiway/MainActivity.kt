@@ -38,7 +38,7 @@ class MainActivity : ComponentActivity() {
 
         // Seed database on first launch
         lifecycleScope.launch {
-            //seeder.seedDatabase()  // comment this line out after 1st app launch to avoid duplicated data
+//            seeder.seedDatabase()  // comment this line out after 1st app launch to avoid duplicated data
         }
 
         enableEdgeToEdge()

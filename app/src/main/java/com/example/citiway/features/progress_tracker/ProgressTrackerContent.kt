@@ -29,15 +29,18 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.citiway.R
 import com.example.citiway.core.navigation.routes.Screen
 import com.example.citiway.core.ui.components.HorizontalSpace
 import com.example.citiway.core.ui.components.VerticalSpace
+import com.example.citiway.core.utils.ProgressTrackerScreenPreview
 import com.example.citiway.core.utils.convertIsoToHhmm
 import com.example.citiway.features.shared.Instruction
 import com.example.citiway.features.shared.JourneyState
+import com.example.citiway.features.shared.Stop
 
 @Composable
 fun ProgressTrackerContent(
@@ -505,17 +508,11 @@ fun WalkStep(duration: String, time: String) {
 
 @Composable
 fun TransitStopCard( // ui done. card with details. *Ask caleb for commponent
-    stopName: String,
-    nextTransit: String,
-    routeName: String,
-    transitDetail: String?,
-    transitTime: String? = null,
-    isStation: Boolean = false,
-    lastStop: Boolean = false,
+    stop: Stop,
     onCoordinatesChanged: (Offset) -> Unit
 ) {
     val routeColor =
-        if (lastStop) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSurfaceVariant
+        if (stop.toMode == "WALK") MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSurfaceVariant
 
     Row(
         modifier = Modifier
@@ -568,7 +565,7 @@ fun TransitStopCard( // ui done. card with details. *Ask caleb for commponent
                             .padding(12.dp)
                     ) {
                         Text(
-                            text = stopName,
+                            text = stop.name,
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onBackground
@@ -576,33 +573,38 @@ fun TransitStopCard( // ui done. card with details. *Ask caleb for commponent
 
                         VerticalSpace(2)
 
+                        var duration = stop.nextDepartureMinutes
                         // "Next bus in 11min" with orange color for time
                         val annotatedString = buildAnnotatedString {
-                            val parts = nextTransit.split(" ")
-                            parts.forEachIndexed { index, part ->
-                                if (part.contains("min", ignoreCase = true) ||
-                                    part.any { it.isDigit() }
-                                ) {
-                                    withStyle(
-                                        style = SpanStyle(
-                                            color = MaterialTheme.colorScheme.secondary,
-                                            fontWeight = FontWeight.Bold
-                                        )
-                                    ) {
-                                        append(part)
+                            withStyle(
+                                style = SpanStyle(
+                                    color = MaterialTheme.colorScheme.secondary,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            ) {
+                                when (stop.toMode) {
+                                    "WALK" -> {
+                                        append("Arrives in ")
+                                        duration = stop.arrivesInMin
                                     }
-                                } else {
-                                    withStyle(
-                                        style = SpanStyle(
-                                            color = MaterialTheme.colorScheme.onBackground.copy(
-                                                alpha = 0.7f
-                                            )
-                                        )
-                                    ) {
-                                        append(part)
+
+                                    "HEAVY_RAIL" -> {
+                                        append("Next train in ")
+                                    }
+
+                                    "BUS" -> {
+                                        append("Next bus in ")
                                     }
                                 }
-                                if (index < parts.lastIndex) append(" ")
+                            }
+                            withStyle(
+                                style = SpanStyle(
+                                    color = MaterialTheme.colorScheme.onBackground.copy(
+                                        alpha = 0.7f
+                                    )
+                                )
+                            ) {
+                                append("${duration}min")
                             }
                         }
 
@@ -632,8 +634,8 @@ fun TransitStopCard( // ui done. card with details. *Ask caleb for commponent
                             modifier = Modifier.weight(1f)
                         ) {
                             Icon(
-                                imageVector = Icons.AutoMirrored.Filled.DirectionsWalk,
-                                contentDescription = "Walk",
+                                painter = painterResource(modeIcon(stop.fromMode)),
+                                contentDescription = stop.fromMode,
                                 tint = MaterialTheme.colorScheme.onBackground,
                                 modifier = Modifier.size(24.dp)
                             )
@@ -650,10 +652,8 @@ fun TransitStopCard( // ui done. card with details. *Ask caleb for commponent
                             HorizontalSpace(8)
 
                             Icon(
-                                painter = painterResource(
-                                    if (isStation) R.drawable.ic_train else R.drawable.ic_bus
-                                ),
-                                contentDescription = if (isStation) "Train" else "Bus",
+                                painter = painterResource(modeIcon(stop.toMode)),
+                                contentDescription = stop.toMode,
                                 tint = MaterialTheme.colorScheme.onBackground,
                                 modifier = Modifier.size(24.dp)
                             )
@@ -670,7 +670,7 @@ fun TransitStopCard( // ui done. card with details. *Ask caleb for commponent
                         }
 
                         Text(
-                            text = routeName,
+                            text = stop.routeName,
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = routeColor,
@@ -715,4 +715,19 @@ fun TransitStopCard( // ui done. card with details. *Ask caleb for commponent
             }
         }
     }
+}
+
+private fun modeIcon(travelMode: String?): Int {
+    return when (travelMode) {
+        "WALK" -> R.drawable.ic_walk
+        "BUS" -> R.drawable.ic_bus
+        "TRAIN" -> R.drawable.ic_train
+        else -> R.drawable.ic_question_mark
+    }
+}
+
+@Preview
+@Composable
+fun ProgressTrackerContentPreview() {
+    ProgressTrackerScreenPreview()
 }
