@@ -11,9 +11,10 @@ fun JourneySummaryRoute(
 //    val state by viewModel.screenState.collectAsState()
 
     ScreenWrapper(navController, true, { paddingValues ->
-        // JourneySummaryContent(
+         JourneySummaryContent(
         //    state = state,
-        //    paddingValues = paddingValues
-        //)
+            paddingValues = paddingValues,
+             navController = navController,
+        )
     })
 }

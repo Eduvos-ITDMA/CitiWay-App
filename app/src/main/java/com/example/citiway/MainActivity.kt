@@ -1,5 +1,6 @@
 package com.example.citiway
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -14,6 +15,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.citiway.data.local.CitiWayDatabase
 import com.example.citiway.core.navigation.graphs.SetupNavGraph
 import com.example.citiway.core.navigation.routes.HOME_ROUTE
+import com.example.citiway.core.navigation.routes.Screen
 import com.example.citiway.core.ui.theme.CitiWayTheme
 import com.example.citiway.features.shared.DrawerViewModel
 import com.google.android.libraries.places.api.Places
@@ -54,7 +56,8 @@ class MainActivity : ComponentActivity() {
                 // Setting up navigation
                 val navController = rememberNavController()
 
-                CitiWayApp(navController)
+                // TEMPORARY: Start at onboarding to test the UI
+                CitiWayApp(navController, Screen.Onboarding.route)
             }
         }
     }
