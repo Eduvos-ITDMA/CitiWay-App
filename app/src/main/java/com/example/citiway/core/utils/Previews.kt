@@ -198,38 +198,58 @@ fun ProgressTrackerScreenPreview() {
             stops = listOf(
                 Stop(
                     name = "Mowbray Station",
-                    nextDeparture = Duration.ofMinutes(5), // Placeholder
-                    nextMode = "WALK",
+                    nextDeparture = Duration.ofMinutes(5),
+                    nextDepartureMin = 5,
+                    arrivesIn = Duration.ofMinutes(10),
+                    arrivesInMin = 10,
+                    fromMode = "WALK",
+                    toMode = "HEAVY_RAIL",
                     routeName = "Southern Line",
-                    latLng = LatLng(-33.9455, 18.4756) // Approximate coordinate
+                    latLng = LatLng(-33.9455, 18.4756)
                 ),
                 Stop(
                     name = "Salt River Station",
-                    nextDeparture = Duration.ofMinutes(5), // Placeholder
-                    nextMode = "WALK",
+                    nextDeparture = Duration.ofMinutes(10),
+                    nextDepartureMin = 10,
+                    arrivesIn = Duration.ofMinutes(20),
+                    arrivesInMin = 20,
+                    fromMode = "HEAVY_RAIL",
+                    toMode = "BUS",
                     routeName = "Southern Line",
-                    latLng = LatLng(-33.9295, 18.4528) // Approximate coordinate
+                    latLng = LatLng(-33.9295, 18.4528)
                 ),
                 Stop(
                     name = "Salt River Rail North",
-                    nextDeparture = Duration.ofMinutes(22), // Placeholder
-                    nextMode = "TRANSIT", // Assuming bus is next
-                    routeName = "261 260 Omuramba",
-                    latLng = LatLng(-33.9275, 18.4533) // Approximate coordinate
+                    nextDeparture = Duration.ofMinutes(22),
+                    nextDepartureMin = 22,
+                    arrivesIn = Duration.ofMinutes(44),
+                    arrivesInMin = 44,
+                    fromMode = "BUS",
+                    toMode = "BUS",
+                    routeName = "260 Omuramba",
+                    latLng = LatLng(-33.9275, 18.4533)
                 ),
                 Stop(
                     name = "Quest",
-                    nextDeparture = Duration.ofMinutes(13), // Placeholder
-                    nextMode = "TRANSIT", // Assuming bus is next
-                    routeName = "262 262 SummerGreens",
-                    latLng = LatLng(-33.8953, 18.5147) // Approximate coordinate
+                    nextDeparture = Duration.ofMinutes(44),
+                    nextDepartureMin = 44,
+                    arrivesIn = Duration.ofMinutes(57),
+                    arrivesInMin = 57,
+                    fromMode = "BUS",
+                    toMode = "BUS",
+                    routeName = "262 SummerGreens",
+                    latLng = LatLng(-33.8953, 18.5147)
                 ),
                 Stop(
                     name = "Oasis",
-                    nextDeparture = Duration.ofMinutes(1), // Placeholder
-                    nextMode = "WALK",
-                    routeName = "262 262 SummerGreens",
-                    latLng = LatLng(-33.8935, 18.5085) // Approximate coordinate
+                    nextDeparture = Duration.ofMinutes(67),
+                    nextDepartureMin = 67,
+                    arrivesIn = Duration.ofMinutes(76),
+                    arrivesInMin = 76,
+                    fromMode = "BUS",
+                    toMode = "WALK",
+                    routeName = "262 SummerGreens",
+                    latLng = LatLng(-33.8935, 18.5085)
                 )
             ),
             instructions = listOf(
@@ -241,11 +261,11 @@ fun ProgressTrackerScreenPreview() {
                 Instruction(
                     text = "Take train for 2 stations",
                     durationMinutes = 5,
-                    travelMode = "TRAIN"
+                    travelMode = "HEAVY_RAIL"
                 ),
                 Instruction(
-                    text = "Walk 329m", // Sum of 19+290+10+10
-                    durationMinutes = 5,
+                    text = "Walk 329m",
+                    durationMinutes = 8,
                     travelMode = "WALK"
                 ),
                 Instruction(
