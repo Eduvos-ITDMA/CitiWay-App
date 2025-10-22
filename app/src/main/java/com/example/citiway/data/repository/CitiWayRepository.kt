@@ -30,6 +30,10 @@ class CitiWayRepository(private val database: CitiWayDatabase) {
     private val metrorailFareDao = database.metrorailFareDao()
     // TripRouteDao REMOVED - no longer needed
 
+    // Launch Check if DB has a user, for onboarding purposes
+    suspend fun hasUser(): Boolean {
+        return database.userDao().getUserCount() > 0
+    }
 
     // ========== USER OPERATIONS ==========
     suspend fun insertUser(user: User) = userDao.insertUser(user)

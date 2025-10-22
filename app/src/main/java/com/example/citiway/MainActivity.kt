@@ -1,12 +1,17 @@
 package com.example.citiway
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -14,6 +19,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.citiway.data.local.CitiWayDatabase
 import com.example.citiway.core.navigation.graphs.SetupNavGraph
 import com.example.citiway.core.navigation.routes.HOME_ROUTE
+import com.example.citiway.core.navigation.routes.Screen
 import com.example.citiway.core.ui.theme.CitiWayTheme
 import com.example.citiway.features.shared.DrawerViewModel
 import com.google.android.libraries.places.api.Places
@@ -54,7 +60,22 @@ class MainActivity : ComponentActivity() {
                 // Setting up navigation
                 val navController = rememberNavController()
 
-                CitiWayApp(navController)
+                // Check if user exists to determine start route
+                var startRoute by remember { mutableStateOf<String?>(null) }
+
+                LaunchedEffect(Unit) {
+                    val hasUser = repository.hasUser()
+                    startRoute = if (hasUser) {
+                        HOME_ROUTE
+                    } else {
+                        Screen.Onboarding.route
+                    }
+                }
+
+                // Only show app once we've determined the start route
+                startRoute?.let { route ->
+                    CitiWayApp(navController, route)
+                }
             }
         }
     }

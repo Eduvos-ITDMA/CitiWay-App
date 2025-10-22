@@ -17,6 +17,7 @@ sealed class Screen(val route: String) {
     object Help : Screen(route = "help_screen")
     object JourneyHistory : Screen(route = "journey_history_screen")
     object Splash : Screen(route = "splash_screen")
+    object Onboarding : Screen(route = "onboarding_screen") // New screen for onboarding
 }
 
 // --- Navigation Utility Maps ---
@@ -54,5 +55,6 @@ val ScreenToGraphMap: Map<String, String> = mapOf(
     Screen.ProgressTracker.route to TRIPS_ROUTE,
 
     // ROOT_ROUTE
-    Screen.Splash.route to ROOT_ROUTE
+    Screen.Splash.route to ROOT_ROUTE,
+    Screen.Onboarding.route to ROOT_ROUTE // Added this now, for onboarding navigation
 )

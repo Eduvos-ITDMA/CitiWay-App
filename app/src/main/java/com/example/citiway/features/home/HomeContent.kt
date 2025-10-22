@@ -31,13 +31,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.citiway.R
 import com.example.citiway.core.ui.components.CompletedJourneyCardWithButton
-import com.example.citiway.core.ui.components.Heading
 import com.example.citiway.core.ui.components.LocationSearchField
-import com.example.citiway.core.ui.components.Space
 import com.example.citiway.core.ui.components.Title
 import com.example.citiway.core.ui.components.VerticalSpace
 import com.example.citiway.core.utils.HomeScreenPreview
-import com.example.citiway.core.utils.JourneySelectionScreenPreview
 import com.example.citiway.data.local.CompletedJourney
 import com.example.citiway.data.remote.PlacesActions
 import com.example.citiway.data.remote.PlacesState
@@ -50,6 +47,7 @@ fun HomeContent(
     placesState: PlacesState,
     placesActions: PlacesActions,
     paddingValues: PaddingValues,
+    userName: String = "Commuter",
 ) {
     Column(
         modifier = Modifier
@@ -60,7 +58,8 @@ fun HomeContent(
             .padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        HeaderSection()
+        HeaderSection(userName) // Pass the name
+
         VerticalSpace(24)
 
         DestinationSearchBar(homeActions, placesState, placesActions)
@@ -125,11 +124,11 @@ fun SectionTitleWithArrow( //Added small arrow so users know they can click it t
 
 
 @Composable
-private fun HeaderSection() {
+private fun HeaderSection(userName: String) {
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
-        Title("Hi, Commuter 👋")
+        Title("Hi, $userName 👋")
         VerticalSpace(4)
         Text(
             text = "Where would you like to go today?",
