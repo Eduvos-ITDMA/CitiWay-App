@@ -280,8 +280,11 @@ fun OnboardingContent(
                         isLoading = true
                         errorMessage = null
 
+                        // Extract first name (split by space, take first part)
+                        val firstName = name.trim().split(" ").firstOrNull() ?: name.trim()
+
                         viewModel.saveUser(
-                            name = name.trim(),
+                            name = firstName,
                             email = email.trim(),
                             preferredLanguage = selectedLanguage,
                             onSuccess = {
