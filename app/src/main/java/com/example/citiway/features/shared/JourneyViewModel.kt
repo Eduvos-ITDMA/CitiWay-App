@@ -331,44 +331,54 @@ class JourneyViewModel(
         return null
     }
 
-    private fun routeToJourney(route: Route): Journey {
-        Log.d("Tracker route", route.toString())
+    fun routeToJourney(route: Route): Journey {
         val instructions: MutableList<Instruction> = mutableListOf()
         val stops: MutableList<Stop> = mutableListOf()
-        var fromWalk = false
         var distance = 0
         var duration = 0
+        var fromMode = ""
         val steps = route.legs.firstOrNull()?.steps ?: emptyList()
         val distanceMeters = route.distanceMeters
         val arrivalTime = calculateArrivalTime(steps)
 
         steps.forEachIndexed { index, step ->
-            Log.d("Tracker step", step.toString())
             when (step.travelMode) {
                 "WALK" -> {
                     distance += step.distanceMeters
                     duration += step.staticDuration.toSecondsInt()
-                    fromWalk = true
+                    fromMode = "WALK"
                 }
 
                 "TRANSIT" -> {
                     val minutes = duration / 60
-                    if (fromWalk) {
+                    if (fromMode == "WALK") {
                         instructions.add(Instruction("Walk ${distance}m", minutes, "WALK"))
                     }
 
                     val vehicle = getVehicle(step)
                     val stopCount = step.transitDetails?.stopCount ?: 1
-                    var instructionText = when (vehicle?.name?.text ?: "") {
-                        "HEAVY_RAIL" -> "Take train for $stopCount stations"
-                        "BUS" -> "Take MyCiTi bus for $stopCount stops"
-                        else -> "Take transport "
+                    var instructionText = "Take transport"
+                    var toMode = ""
+                    when (vehicle?.type ?: "") {
+                        "HEAVY_RAIL" -> {
+                            instructionText = "Take train for $stopCount stations"
+                            toMode = "HEAVY_RAIL"
+                        }
+
+                        "BUS" -> {
+                            instructionText = "Take MyCiTi bus for $stopCount stops"
+                            toMode = "BUS"
+                        }
                     }
 
                     if (stopCount <= 1) instructionText = instructionText.dropLast(1)
 
                     val instruction =
-                        Instruction(instructionText, minutes, vehicle?.name?.text ?: "")
+                        Instruction(
+                            instructionText,
+                            step.staticDuration.toSecondsInt() / 60,
+                            vehicle?.type ?: ""
+                        )
 
                     val stopName =
                         step.transitDetails?.stopDetails?.arrivalStop?.name ?: "Transport stop"
@@ -377,10 +387,8 @@ class JourneyViewModel(
                         Instant.parse(step.transitDetails?.stopDetails?.departureTime)
                     )
                     val arrivesIn = Duration.between(
-                        Instant.now(),
-                        Instant.parse(step.transitDetails?.stopDetails?.arrivalTime)
+                        Instant.now(), Instant.parse(step.transitDetails?.stopDetails?.arrivalTime)
                     )
-                    val nextMode = steps.getOrNull(index + 1)?.travelMode
                     val routeName = step.transitDetails?.transitLine?.name ?: ""
                     val latLng = step.transitDetails?.stopDetails?.departureStop?.location?.latLng
 
@@ -391,8 +399,8 @@ class JourneyViewModel(
                     stops.add(
                         Stop(
                             stopName,
-                            step.travelMode,
-                            nextMode,
+                            fromMode,
+                            toMode,
                             nextDeparture,
                             nextDeparture.toMinutes().toInt(),
                             arrivesIn,
@@ -404,7 +412,6 @@ class JourneyViewModel(
 
                     distance = 0
                     duration = 0
-                    fromWalk = false
                 }
 
                 else -> throw Exception("Unexpected travel mode '${step.travelMode}'")
@@ -412,7 +419,7 @@ class JourneyViewModel(
         }
 
         // Add final walk instruction, if applicable
-        if (fromWalk) {
+        if (fromMode == "WALK") {
             instructions.add(Instruction("Walk ${distance}m", duration / 60, "WALK"))
         }
 
