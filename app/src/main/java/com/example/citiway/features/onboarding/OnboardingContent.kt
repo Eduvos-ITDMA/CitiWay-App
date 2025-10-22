@@ -3,6 +3,7 @@ package com.example.citiway.features.onboarding
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,7 +27,10 @@ import androidx.navigation.NavController
 import com.example.citiway.R
 import com.example.citiway.core.navigation.routes.Screen
 import com.example.citiway.features.shared.OnboardingViewModel
-
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.ArrowDropUp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -192,11 +196,12 @@ fun OnboardingContent(
                 Column(
                     modifier = Modifier.padding(20.dp)
                 ) {
-                    // Name Input
+                    // Name Input Field
                     OutlinedTextField(
                         value = name,
                         onValueChange = { name = it },
                         label = { Text("Name") },
+                        placeholder = { Text("e.g., John or Sarah-Jane", color = darkCharcoal.copy(alpha = 0.4f)) }, // Added this to be more informative
                         modifier = Modifier.fillMaxWidth(),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = celestialBlue,
@@ -215,6 +220,7 @@ fun OnboardingContent(
                         value = email,
                         onValueChange = { email = it },
                         label = { Text("Email") },
+                        placeholder = { Text("e.g., john@example.com", color = darkCharcoal.copy(alpha = 0.4f)) }, // Added this to be more informative
                         modifier = Modifier.fillMaxWidth(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                         colors = OutlinedTextFieldDefaults.colors(
@@ -229,41 +235,63 @@ fun OnboardingContent(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Language Dropdown
-                    ExposedDropdownMenuBox(
-                        expanded = expanded,
-                        onExpandedChange = { expanded = it }
-                    ) {
+                    // Language Dropdown (FIXED)
+                    Box(modifier = Modifier.fillMaxWidth()) {
+                        // The text field - marked readOnly but clickable to open menu
                         OutlinedTextField(
                             value = selectedLanguage,
                             onValueChange = {},
                             readOnly = true,
                             label = { Text("Preferred Language") },
                             trailingIcon = {
-                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                                Icon(
+                                    imageVector = if (expanded) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
+                                    contentDescription = null
+                                )
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .menuAnchor(type = MenuAnchorType.PrimaryNotEditable, enabled = true),
+                                .clickable(
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    indication = null
+                                ) {
+                                    expanded = !expanded
+                                },
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedBorderColor = celestialBlue,
                                 focusedLabelColor = celestialBlue,
-                                unfocusedBorderColor = darkCharcoal.copy(alpha = 0.2f)
+                                unfocusedBorderColor = darkCharcoal.copy(alpha = 0.2f),
+                                disabledBorderColor = darkCharcoal.copy(alpha = 0.2f),
+                                disabledTextColor = darkCharcoal
                             ),
-                            shape = RoundedCornerShape(12.dp)
+                            shape = RoundedCornerShape(12.dp),
+                            enabled = false  // Makes entire field clickable without keyboard
                         )
 
-                        ExposedDropdownMenu(
+                        DropdownMenu(
                             expanded = expanded,
-                            onDismissRequest = { expanded = false }
+                            onDismissRequest = { expanded = false },
+                            modifier = Modifier
+                                .fillMaxWidth(0.75f)  // 85% width to match the text field visually
+                                .background(Color.White)
                         ) {
                             languages.forEach { language ->
                                 DropdownMenuItem(
-                                    text = { Text(language) },
+                                    text = {
+                                        Text(
+                                            language,
+                                            modifier = Modifier.fillMaxWidth(),
+                                            color = darkCharcoal
+                                        )
+                                    },
                                     onClick = {
                                         selectedLanguage = language
                                         expanded = false
-                                    }
+                                    },
+                                    modifier = Modifier.fillMaxWidth(),
+                                    colors = MenuDefaults.itemColors(
+                                        textColor = darkCharcoal
+                                    )
                                 )
                             }
                         }

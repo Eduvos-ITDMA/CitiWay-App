@@ -6,8 +6,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -56,8 +60,22 @@ class MainActivity : ComponentActivity() {
                 // Setting up navigation
                 val navController = rememberNavController()
 
-                // TEMPORARY: Start at onboarding to test the UI
-                CitiWayApp(navController, Screen.Onboarding.route)
+                // Check if user exists to determine start route
+                var startRoute by remember { mutableStateOf<String?>(null) }
+
+                LaunchedEffect(Unit) {
+                    val hasUser = repository.hasUser()
+                    startRoute = if (hasUser) {
+                        HOME_ROUTE
+                    } else {
+                        Screen.Onboarding.route
+                    }
+                }
+
+                // Only show app once we've determined the start route
+                startRoute?.let { route ->
+                    CitiWayApp(navController, route)
+                }
             }
         }
     }

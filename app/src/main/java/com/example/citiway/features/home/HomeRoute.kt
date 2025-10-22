@@ -67,12 +67,13 @@ fun HomeRoute(
         }
     )
 
-    // Get user name from database (2nd element for now) as mock data need user Id 1.
+    // Get user name from database (first user and only user)
     val userName by remember {
         repository.getAllUsers().map { users ->
-            users.getOrNull(1)?.name ?: "Commuter"
+            users.firstOrNull()?.name ?: "Commuter"
         }
     }.collectAsStateWithLifecycle(initialValue = "Commuter")
+
 
     // PlacesManager for Google Places API (search/autocomplete)
     val placesManager = App.appModule.placesManager

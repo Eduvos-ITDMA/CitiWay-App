@@ -56,5 +56,5 @@ val ScreenToGraphMap: Map<String, String> = mapOf(
 
     // ROOT_ROUTE
     Screen.Splash.route to ROOT_ROUTE,
-    Screen.Onboarding.route to ROOT_ROUTE // Added this now, for splash navigation
+    Screen.Onboarding.route to ROOT_ROUTE // Added this now, for onboarding navigation
 )
