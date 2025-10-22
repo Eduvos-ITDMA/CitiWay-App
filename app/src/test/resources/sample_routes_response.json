@@ -1,0 +1,3555 @@
+{
+  "routes": [
+    {
+      "legs": [
+        {
+          "steps": [
+            {
+              "distanceMeters": 249,
+              "staticDuration": "182s",
+              "polyline": {
+                "encodedPolyline": "vghnE}owoB|CvN"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.9623572,
+                  "longitude": 18.475669099999998
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.963147899999996,
+                  "longitude": 18.473147
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "DEPART",
+                "instructions": "Head west on College Rd toward Queen Rd"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "0.2 km"
+                },
+                "staticDuration": {
+                  "text": "3 mins"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 125,
+              "staticDuration": "98s",
+              "polyline": {
+                "encodedPolyline": "tlhnEe`woBsEvA"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.963147899999996,
+                  "longitude": 18.473147
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.9620867,
+                  "longitude": 18.4727074
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "TURN_RIGHT",
+                "instructions": "Turn right onto Station Rd\nDestination will be on the left"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "0.1 km"
+                },
+                "staticDuration": {
+                  "text": "2 mins"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 4198,
+              "staticDuration": "540s",
+              "polyline": {
+                "encodedPolyline": "pfhnEe{voB?A}R{@gbA}FoAE}B?}DNmCRiANakA|U{N|CuA^oB~@aBnAiBvBkAvBg@pA[lA]dBa@tDMtBB?"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.9621694,
+                  "longitude": 18.47235
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.92735,
+                  "longitude": 18.4643472
+                }
+              },
+              "navigationInstruction": {
+                "instructions": "Train towards Cape Town Station"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "4.2 km"
+                },
+                "staticDuration": {
+                  "text": "9 mins"
+                }
+              },
+              "transitDetails": {
+                "stopDetails": {
+                  "arrivalStop": {
+                    "name": "Salt River Station",
+                    "location": {
+                      "latLng": {
+                        "latitude": -33.92735,
+                        "longitude": 18.4643472
+                      }
+                    }
+                  },
+                  "arrivalTime": "2025-10-16T15:26:30Z",
+                  "departureStop": {
+                    "name": "Rondebosch Station",
+                    "location": {
+                      "latLng": {
+                        "latitude": -33.9621694,
+                        "longitude": 18.47235
+                      }
+                    }
+                  },
+                  "departureTime": "2025-10-16T15:17:30Z"
+                },
+                "localizedValues": {
+                  "arrivalTime": {
+                    "time": {
+                      "text": "5:26 PM"
+                    },
+                    "timeZone": "Africa/Johannesburg"
+                  },
+                  "departureTime": {
+                    "time": {
+                      "text": "5:17 PM"
+                    },
+                    "timeZone": "Africa/Johannesburg"
+                  }
+                },
+                "headsign": "Cape Town Station",
+                "transitLine": {
+                  "agencies": [
+                    {
+                      "name": "Prasa",
+                      "phoneNumber": "+27 11 013 6700",
+                      "uri": "https://linktr.ee/PRASA.WC"
+                    }
+                  ],
+                  "name": "Southern Line",
+                  "color": "#f20000",
+                  "textColor": "#ffffff",
+                  "vehicle": {
+                    "name": {
+                      "text": "Train"
+                    },
+                    "type": "HEAVY_RAIL",
+                    "iconUri": "//maps.gstatic.com/mapfiles/transit/iw2/6/rail2.png"
+                  }
+                },
+                "stopCount": 5
+              },
+              "travelMode": "TRANSIT"
+            },
+            {
+              "distanceMeters": 19,
+              "staticDuration": "15s",
+              "polyline": {
+                "encodedPolyline": "foanE{juoBJe@"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.9277192,
+                  "longitude": 18.464621599999997
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.9277786,
+                  "longitude": 18.4648142
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "DEPART",
+                "instructions": "Head east on Foundry Rd"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "19 m"
+                },
+                "staticDuration": {
+                  "text": "1 min"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 293,
+              "staticDuration": "248s",
+              "polyline": {
+                "encodedPolyline": "roanEaluoBWYNw@Bi@NFAJQ^EC@q@{BWgBTSoA"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.9277786,
+                  "longitude": 18.4648142
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.926476199999996,
+                  "longitude": 18.4658525
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "TURN_LEFT",
+                "instructions": "Turn left"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "0.3 km"
+                },
+                "staticDuration": {
+                  "text": "4 mins"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 19,
+              "staticDuration": "20s",
+              "polyline": {
+                "encodedPolyline": "nganEqruoBI@CMK@"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.926476199999996,
+                  "longitude": 18.4658525
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.9263536,
+                  "longitude": 18.465899699999998
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "TURN_LEFT",
+                "instructions": "Turn left toward Voortrekker Rd/R102"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "19 m"
+                },
+                "staticDuration": {
+                  "text": "1 min"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 10,
+              "staticDuration": "7s",
+              "polyline": {
+                "encodedPolyline": "tfanE{ruoBCS"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.9263536,
+                  "longitude": 18.465899699999998
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.9263306,
+                  "longitude": 18.4660021
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "TURN_RIGHT",
+                "instructions": "Turn right onto Voortrekker Rd/R102\nDestination will be on the left"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "10 m"
+                },
+                "staticDuration": {
+                  "text": "1 min"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 7298,
+              "staticDuration": "1440s",
+              "polyline": {
+                "encodedPolyline": "hfanEmsuoBFAyAyMyEoi@{@oJ]yDYwB}@wKQsASGWJuDb@oCHQJqEZc@NaAd@i@Lc@?SGsA{@YIaBYsAOsAAI@oAbAaAx@a@J_@Ba@KYOUU[q@Oy@c@sA[k@e@YaAi@UIgAg@oi@}R{McFiDkAsPgGcMuEiO_GeFqBeNcG{DuAgA]s@Ik@SoCk@{Bo@mGwAuLwCwAQiHk@qBIu@Kk@OoDqAsB_AcBeAkFuDyB{AyHuF{RaNAD"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.926293,
+                  "longitude": 18.465992
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.8754333,
+                  "longitude": 18.5013243
+                }
+              },
+              "navigationInstruction": {
+                "instructions": "Bus towards 260 Omuramba"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "7.3 km"
+                },
+                "staticDuration": {
+                  "text": "24 mins"
+                }
+              },
+              "transitDetails": {
+                "stopDetails": {
+                  "arrivalStop": {
+                    "name": "Zastron",
+                    "location": {
+                      "latLng": {
+                        "latitude": -33.8754333,
+                        "longitude": 18.5013243
+                      }
+                    }
+                  },
+                  "arrivalTime": "2025-10-16T16:01:00Z",
+                  "departureStop": {
+                    "name": "Salt River Rail North",
+                    "location": {
+                      "latLng": {
+                        "latitude": -33.926293,
+                        "longitude": 18.465992
+                      }
+                    }
+                  },
+                  "departureTime": "2025-10-16T15:37:00Z"
+                },
+                "localizedValues": {
+                  "arrivalTime": {
+                    "time": {
+                      "text": "6:01 PM"
+                    },
+                    "timeZone": "Africa/Johannesburg"
+                  },
+                  "departureTime": {
+                    "time": {
+                      "text": "5:37 PM"
+                    },
+                    "timeZone": "Africa/Johannesburg"
+                  }
+                },
+                "headsign": "260 Omuramba",
+                "transitLine": {
+                  "agencies": [
+                    {
+                      "name": "MyCiTi",
+                      "uri": "https://myciti.org.za/"
+                    }
+                  ],
+                  "name": "Century City Rail - Omuramba - Salt River - Adderley",
+                  "uri": "https://myciti.org.za/en/routes/interactive-routes/century-city-rail-omuramba-salt-river-adderley/",
+                  "color": "#c3d82d",
+                  "nameShort": "261",
+                  "textColor": "#231f20",
+                  "vehicle": {
+                    "name": {
+                      "text": "Bus"
+                    },
+                    "type": "BUS",
+                    "iconUri": "//maps.gstatic.com/mapfiles/transit/iw2/6/bus2.png"
+                  }
+                },
+                "stopCount": 15
+              },
+              "travelMode": "TRANSIT"
+            },
+            {
+              "distanceMeters": 93,
+              "staticDuration": "93s",
+              "polyline": {
+                "encodedPolyline": "hhwmE_p|oB`Dx@"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.875411299999996,
+                  "longitude": 18.501281499999997
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.8762167,
+                  "longitude": 18.5009893
+                }
+              },
+              "navigationInstruction": {},
+              "localizedValues": {
+                "distance": {
+                  "text": "93 m"
+                },
+                "staticDuration": {
+                  "text": "2 mins"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 1704,
+              "staticDuration": "300s",
+              "polyline": {
+                "encodedPolyline": "hmwmEan|oBEHlIvFlAsCnBuEfBeEZ}@XaAXsA^kDt@sJZqCXqExAsQnCZtCf@~IdA"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.876208999999996,
+                  "longitude": 18.500974
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.8840994,
+                  "longitude": 18.510334399999998
+                }
+              },
+              "navigationInstruction": {
+                "instructions": "Bus towards T04 Century City"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "1.7 km"
+                },
+                "staticDuration": {
+                  "text": "5 mins"
+                }
+              },
+              "transitDetails": {
+                "stopDetails": {
+                  "arrivalStop": {
+                    "name": "Sanddrift",
+                    "location": {
+                      "latLng": {
+                        "latitude": -33.8840994,
+                        "longitude": 18.510334399999998
+                      }
+                    }
+                  },
+                  "arrivalTime": "2025-10-16T16:14:00Z",
+                  "departureStop": {
+                    "name": "Zastron",
+                    "location": {
+                      "latLng": {
+                        "latitude": -33.876208999999996,
+                        "longitude": 18.500974
+                      }
+                    }
+                  },
+                  "departureTime": "2025-10-16T16:09:00Z"
+                },
+                "localizedValues": {
+                  "arrivalTime": {
+                    "time": {
+                      "text": "6:14 PM"
+                    },
+                    "timeZone": "Africa/Johannesburg"
+                  },
+                  "departureTime": {
+                    "time": {
+                      "text": "6:09 PM"
+                    },
+                    "timeZone": "Africa/Johannesburg"
+                  }
+                },
+                "headsign": "T04 Century City",
+                "transitLine": {
+                  "agencies": [
+                    {
+                      "name": "MyCiTi",
+                      "uri": "https://myciti.org.za/"
+                    }
+                  ],
+                  "name": "Dunoon - Omuramba - Century City",
+                  "uri": "https://myciti.org.za/en/routes/interactive-routes/dunoon-omuramba-century-city/",
+                  "color": "#da1931",
+                  "nameShort": "T04",
+                  "textColor": "#ffffff",
+                  "vehicle": {
+                    "name": {
+                      "text": "Bus"
+                    },
+                    "type": "BUS",
+                    "iconUri": "//maps.gstatic.com/mapfiles/transit/iw2/6/bus2.png"
+                  }
+                },
+                "stopCount": 4
+              },
+              "travelMode": "TRANSIT"
+            },
+            {
+              "distanceMeters": 569,
+              "staticDuration": "458s",
+              "polyline": {
+                "encodedPolyline": "r~xmEqh~oBxFz@rCp@pCfBpJjH"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.884099299999995,
+                  "longitude": 18.5103334
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.8886654,
+                  "longitude": 18.507763999999998
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "DEPART",
+                "instructions": "Head south on Ratanga Rd toward Ocean Spirit Ave\nDestination will be on the left"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "0.6 km"
+                },
+                "staticDuration": {
+                  "text": "8 mins"
+                }
+              },
+              "travelMode": "WALK"
+            }
+          ]
+        }
+      ],
+      "distanceMeters": 14577,
+      "duration": "4128s",
+      "polyline": {
+        "encodedPolyline": "vghnE}owoB|CvNsEvANfA?A}R{@gbA}FoAE}B?}DNmCRiANakA|U{N|CuA^oB~@aBnAiBvBkAvBg@pA[lA]dBa@tDMtBB?hAu@Je@WYNw@Bi@NFAJQ^EC@q@{BWgBTSoAI@CMK@CSG@FAyAyMyEoi@{@oJ]yDYwB}@wKQsASGWJuDb@oCHQJqEZc@NaAd@i@Lc@?SGsA{@YIaBYsAOsAAI@oAbAaAx@a@J_@Ba@KYOUU[q@Oy@c@sA[k@e@YaAi@UIgAg@oi@}R{McFiDkAsPgGcMuEiO_GeFqBeNcG{DuAgA]s@Ik@SoCk@{Bo@mGwAuLwCwAQiHk@qBIu@Kk@OoDqAsB_AcBeAkFuDyB{AyHuF{RaNADCF`Dx@ABEHlIvFlAsCnBuEfBeEZ}@XaAXsA^kDt@sJZqCXqExAsQnCZtCf@~IdAxFz@rCp@pCfBpJjH"
+      }
+    },
+    {
+      "legs": [
+        {
+          "steps": [
+            {
+              "distanceMeters": 249,
+              "staticDuration": "182s",
+              "polyline": {
+                "encodedPolyline": "vghnE}owoB|CvN"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.9623572,
+                  "longitude": 18.475669099999998
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.963147899999996,
+                  "longitude": 18.473147
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "DEPART",
+                "instructions": "Head west on College Rd toward Queen Rd"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "0.2 km"
+                },
+                "staticDuration": {
+                  "text": "3 mins"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 125,
+              "staticDuration": "98s",
+              "polyline": {
+                "encodedPolyline": "tlhnEe`woBsEvA"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.963147899999996,
+                  "longitude": 18.473147
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.9620867,
+                  "longitude": 18.4727074
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "TURN_RIGHT",
+                "instructions": "Turn right onto Station Rd\nDestination will be on the left"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "0.1 km"
+                },
+                "staticDuration": {
+                  "text": "2 mins"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 4198,
+              "staticDuration": "540s",
+              "polyline": {
+                "encodedPolyline": "pfhnEe{voB?A}R{@gbA}FoAE}B?}DNmCRiANakA|U{N|CuA^oB~@aBnAiBvBkAvBg@pA[lA]dBa@tDMtBB?"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.9621694,
+                  "longitude": 18.47235
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.92735,
+                  "longitude": 18.4643472
+                }
+              },
+              "navigationInstruction": {
+                "instructions": "Train towards Cape Town Station"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "4.2 km"
+                },
+                "staticDuration": {
+                  "text": "9 mins"
+                }
+              },
+              "transitDetails": {
+                "stopDetails": {
+                  "arrivalStop": {
+                    "name": "Salt River Station",
+                    "location": {
+                      "latLng": {
+                        "latitude": -33.92735,
+                        "longitude": 18.4643472
+                      }
+                    }
+                  },
+                  "arrivalTime": "2025-10-16T15:26:30Z",
+                  "departureStop": {
+                    "name": "Rondebosch Station",
+                    "location": {
+                      "latLng": {
+                        "latitude": -33.9621694,
+                        "longitude": 18.47235
+                      }
+                    }
+                  },
+                  "departureTime": "2025-10-16T15:17:30Z"
+                },
+                "localizedValues": {
+                  "arrivalTime": {
+                    "time": {
+                      "text": "5:26 PM"
+                    },
+                    "timeZone": "Africa/Johannesburg"
+                  },
+                  "departureTime": {
+                    "time": {
+                      "text": "5:17 PM"
+                    },
+                    "timeZone": "Africa/Johannesburg"
+                  }
+                },
+                "headsign": "Cape Town Station",
+                "transitLine": {
+                  "agencies": [
+                    {
+                      "name": "Prasa",
+                      "phoneNumber": "+27 11 013 6700",
+                      "uri": "https://linktr.ee/PRASA.WC"
+                    }
+                  ],
+                  "name": "Southern Line",
+                  "color": "#f20000",
+                  "textColor": "#ffffff",
+                  "vehicle": {
+                    "name": {
+                      "text": "Train"
+                    },
+                    "type": "HEAVY_RAIL",
+                    "iconUri": "//maps.gstatic.com/mapfiles/transit/iw2/6/rail2.png"
+                  }
+                },
+                "stopCount": 5
+              },
+              "travelMode": "TRANSIT"
+            },
+            {
+              "distanceMeters": 19,
+              "staticDuration": "15s",
+              "polyline": {
+                "encodedPolyline": "foanE{juoBJe@"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.9277192,
+                  "longitude": 18.464621599999997
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.9277786,
+                  "longitude": 18.4648142
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "DEPART",
+                "instructions": "Head east on Foundry Rd"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "19 m"
+                },
+                "staticDuration": {
+                  "text": "1 min"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 293,
+              "staticDuration": "248s",
+              "polyline": {
+                "encodedPolyline": "roanEaluoBWYNw@Bi@NFAJQ^EC@q@{BWgBTSoA"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.9277786,
+                  "longitude": 18.4648142
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.926476199999996,
+                  "longitude": 18.4658525
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "TURN_LEFT",
+                "instructions": "Turn left"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "0.3 km"
+                },
+                "staticDuration": {
+                  "text": "4 mins"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 19,
+              "staticDuration": "20s",
+              "polyline": {
+                "encodedPolyline": "nganEqruoBI@CMK@"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.926476199999996,
+                  "longitude": 18.4658525
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.9263536,
+                  "longitude": 18.465899699999998
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "TURN_LEFT",
+                "instructions": "Turn left toward Voortrekker Rd/R102"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "19 m"
+                },
+                "staticDuration": {
+                  "text": "1 min"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 10,
+              "staticDuration": "7s",
+              "polyline": {
+                "encodedPolyline": "tfanE{ruoBCS"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.9263536,
+                  "longitude": 18.465899699999998
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.9263306,
+                  "longitude": 18.4660021
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "TURN_RIGHT",
+                "instructions": "Turn right onto Voortrekker Rd/R102\nDestination will be on the left"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "10 m"
+                },
+                "staticDuration": {
+                  "text": "1 min"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 7298,
+              "staticDuration": "1440s",
+              "polyline": {
+                "encodedPolyline": "hfanEmsuoBFAyAyMyEoi@{@oJ]yDYwB}@wKQsASGWJuDb@oCHQJqEZc@NaAd@i@Lc@?SGsA{@YIaBYsAOsAAI@oAbAaAx@a@J_@Ba@KYOUU[q@Oy@c@sA[k@e@YaAi@UIgAg@oi@}R{McFiDkAsPgGcMuEiO_GeFqBeNcG{DuAgA]s@Ik@SoCk@{Bo@mGwAuLwCwAQiHk@qBIu@Kk@OoDqAsB_AcBeAkFuDyB{AyHuF{RaNAD"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.926293,
+                  "longitude": 18.465992
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.8754333,
+                  "longitude": 18.5013243
+                }
+              },
+              "navigationInstruction": {
+                "instructions": "Bus towards 260 Omuramba"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "7.3 km"
+                },
+                "staticDuration": {
+                  "text": "24 mins"
+                }
+              },
+              "transitDetails": {
+                "stopDetails": {
+                  "arrivalStop": {
+                    "name": "Zastron",
+                    "location": {
+                      "latLng": {
+                        "latitude": -33.8754333,
+                        "longitude": 18.5013243
+                      }
+                    }
+                  },
+                  "arrivalTime": "2025-10-16T16:01:00Z",
+                  "departureStop": {
+                    "name": "Salt River Rail North",
+                    "location": {
+                      "latLng": {
+                        "latitude": -33.926293,
+                        "longitude": 18.465992
+                      }
+                    }
+                  },
+                  "departureTime": "2025-10-16T15:37:00Z"
+                },
+                "localizedValues": {
+                  "arrivalTime": {
+                    "time": {
+                      "text": "6:01 PM"
+                    },
+                    "timeZone": "Africa/Johannesburg"
+                  },
+                  "departureTime": {
+                    "time": {
+                      "text": "5:37 PM"
+                    },
+                    "timeZone": "Africa/Johannesburg"
+                  }
+                },
+                "headsign": "260 Omuramba",
+                "transitLine": {
+                  "agencies": [
+                    {
+                      "name": "MyCiTi",
+                      "uri": "https://myciti.org.za/"
+                    }
+                  ],
+                  "name": "Century City Rail - Omuramba - Salt River - Adderley",
+                  "uri": "https://myciti.org.za/en/routes/interactive-routes/century-city-rail-omuramba-salt-river-adderley/",
+                  "color": "#c3d82d",
+                  "nameShort": "261",
+                  "textColor": "#231f20",
+                  "vehicle": {
+                    "name": {
+                      "text": "Bus"
+                    },
+                    "type": "BUS",
+                    "iconUri": "//maps.gstatic.com/mapfiles/transit/iw2/6/bus2.png"
+                  }
+                },
+                "stopCount": 15
+              },
+              "travelMode": "TRANSIT"
+            },
+            {
+              "distanceMeters": 93,
+              "staticDuration": "93s",
+              "polyline": {
+                "encodedPolyline": "hhwmE_p|oB`Dx@"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.875411299999996,
+                  "longitude": 18.501281499999997
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.8762167,
+                  "longitude": 18.5009893
+                }
+              },
+              "navigationInstruction": {},
+              "localizedValues": {
+                "distance": {
+                  "text": "93 m"
+                },
+                "staticDuration": {
+                  "text": "2 mins"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 2874,
+              "staticDuration": "480s",
+              "polyline": {
+                "encodedPolyline": "hmwmEan|oBEHlIvFlAsCnBuEfBeEZ}@XaAXsA^kDt@sJZqCXqExAsQnCZtCf@~IdA?DfCZNEnCf@rA\\|Av@vPpM|GjFnAoCtBdBp@v@KPwC{BDK"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.876208999999996,
+                  "longitude": 18.500974
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.89119,
+                  "longitude": 18.50657
+                }
+              },
+              "navigationInstruction": {
+                "instructions": "Bus towards T03 Century City"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "2.9 km"
+                },
+                "staticDuration": {
+                  "text": "8 mins"
+                }
+              },
+              "transitDetails": {
+                "stopDetails": {
+                  "arrivalStop": {
+                    "name": "Century City",
+                    "location": {
+                      "latLng": {
+                        "latitude": -33.89119,
+                        "longitude": 18.50657
+                      }
+                    }
+                  },
+                  "arrivalTime": "2025-10-16T16:20:00Z",
+                  "departureStop": {
+                    "name": "Zastron",
+                    "location": {
+                      "latLng": {
+                        "latitude": -33.876208999999996,
+                        "longitude": 18.500974
+                      }
+                    }
+                  },
+                  "departureTime": "2025-10-16T16:12:00Z"
+                },
+                "localizedValues": {
+                  "arrivalTime": {
+                    "time": {
+                      "text": "6:20 PM"
+                    },
+                    "timeZone": "Africa/Johannesburg"
+                  },
+                  "departureTime": {
+                    "time": {
+                      "text": "6:12 PM"
+                    },
+                    "timeZone": "Africa/Johannesburg"
+                  }
+                },
+                "headsign": "T03 Century City",
+                "transitLine": {
+                  "agencies": [
+                    {
+                      "name": "MyCiTi",
+                      "uri": "https://myciti.org.za/"
+                    }
+                  ],
+                  "name": "Atlantis - Melkbosstrand - Table View - Century City",
+                  "uri": "https://myciti.org.za/en/routes/interactive-routes/atlantis-melkbosstrand-table-view-century-city/",
+                  "color": "#da1931",
+                  "nameShort": "T03",
+                  "textColor": "#ffffff",
+                  "vehicle": {
+                    "name": {
+                      "text": "Bus"
+                    },
+                    "type": "BUS",
+                    "iconUri": "//maps.gstatic.com/mapfiles/transit/iw2/6/bus2.png"
+                  }
+                },
+                "stopCount": 5
+              },
+              "travelMode": "TRANSIT"
+            },
+            {
+              "distanceMeters": 77,
+              "staticDuration": "61s",
+              "polyline": {
+                "encodedPolyline": "tjzmEsp}oBQMC@o@pAUR"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.8911537,
+                  "longitude": 18.5065046
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.8906862,
+                  "longitude": 18.506048399999997
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "DEPART",
+                "instructions": "Head northeast toward Ratanga Rd"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "77 m"
+                },
+                "staticDuration": {
+                  "text": "1 min"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 275,
+              "staticDuration": "228s",
+              "polyline": {
+                "encodedPolyline": "xgzmEym}oBsKuI"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.8906862,
+                  "longitude": 18.506048399999997
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.8886654,
+                  "longitude": 18.507763999999998
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "TURN_RIGHT",
+                "instructions": "Turn right onto Ratanga Rd\nDestination will be on the right"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "0.3 km"
+                },
+                "staticDuration": {
+                  "text": "4 mins"
+                }
+              },
+              "travelMode": "WALK"
+            }
+          ]
+        }
+      ],
+      "distanceMeters": 15530,
+      "duration": "4354s",
+      "polyline": {
+        "encodedPolyline": "vghnE}owoB|CvNsEvANfA?A}R{@gbA}FoAE}B?}DNmCRiANakA|U{N|CuA^oB~@aBnAiBvBkAvBg@pA[lA]dBa@tDMtBB?hAu@Je@WYNw@Bi@NFAJQ^EC@q@{BWgBTSoAI@CMK@CSG@FAyAyMyEoi@{@oJ]yDYwB}@wKQsASGWJuDb@oCHQJqEZc@NaAd@i@Lc@?SGsA{@YIaBYsAOsAAI@oAbAaAx@a@J_@Ba@KYOUU[q@Oy@c@sA[k@e@YaAi@UIgAg@oi@}R{McFiDkAsPgGcMuEiO_GeFqBeNcG{DuAgA]s@Ik@SoCk@{Bo@mGwAuLwCwAQiHk@qBIu@Kk@OoDqAsB_AcBeAkFuDyB{AyHuF{RaNADCF`Dx@ABEHlIvFlAsCnBuEfBeEZ}@XaAXsA^kDt@sJZqCXqExAsQnCZtCf@~IdA?DfCZNEnCf@rA\\|Av@vPpM|GjFnAoCtBdBp@v@KPwC{BDKGLQMC@o@pAURsKuI"
+      }
+    },
+    {
+      "legs": [
+        {
+          "steps": [
+            {
+              "distanceMeters": 249,
+              "staticDuration": "182s",
+              "polyline": {
+                "encodedPolyline": "vghnE}owoB|CvN"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.9623572,
+                  "longitude": 18.475669099999998
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.963147899999996,
+                  "longitude": 18.473147
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "DEPART",
+                "instructions": "Head west on College Rd toward Queen Rd"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "0.2 km"
+                },
+                "staticDuration": {
+                  "text": "3 mins"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 125,
+              "staticDuration": "98s",
+              "polyline": {
+                "encodedPolyline": "tlhnEe`woBsEvA"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.963147899999996,
+                  "longitude": 18.473147
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.9620867,
+                  "longitude": 18.4727074
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "TURN_RIGHT",
+                "instructions": "Turn right onto Station Rd\nDestination will be on the left"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "0.1 km"
+                },
+                "staticDuration": {
+                  "text": "2 mins"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 5933,
+              "staticDuration": "1020s",
+              "polyline": {
+                "encodedPolyline": "pfhnEe{voB?A}R{@gbA}FoAE}B?}DNmCRiANakA|U{N|CuA^oB~@aBnAiBvBkAvBg@pA[lA]dBa@tDM|Bo@fHOfIMtCiAhRuAhVQvB}AvXQlDE~B@nIC?"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.9621694,
+                  "longitude": 18.47235
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.925452799999995,
+                  "longitude": 18.4457083
+                }
+              },
+              "navigationInstruction": {
+                "instructions": "Train towards Cape Town Station"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "5.9 km"
+                },
+                "staticDuration": {
+                  "text": "17 mins"
+                }
+              },
+              "transitDetails": {
+                "stopDetails": {
+                  "arrivalStop": {
+                    "name": "Woodstock Station",
+                    "location": {
+                      "latLng": {
+                        "latitude": -33.925452799999995,
+                        "longitude": 18.4457083
+                      }
+                    }
+                  },
+                  "arrivalTime": "2025-10-16T15:34:30Z",
+                  "departureStop": {
+                    "name": "Rondebosch Station",
+                    "location": {
+                      "latLng": {
+                        "latitude": -33.9621694,
+                        "longitude": 18.47235
+                      }
+                    }
+                  },
+                  "departureTime": "2025-10-16T15:17:30Z"
+                },
+                "localizedValues": {
+                  "arrivalTime": {
+                    "time": {
+                      "text": "5:34 PM"
+                    },
+                    "timeZone": "Africa/Johannesburg"
+                  },
+                  "departureTime": {
+                    "time": {
+                      "text": "5:17 PM"
+                    },
+                    "timeZone": "Africa/Johannesburg"
+                  }
+                },
+                "headsign": "Cape Town Station",
+                "transitLine": {
+                  "agencies": [
+                    {
+                      "name": "Prasa",
+                      "phoneNumber": "+27 11 013 6700",
+                      "uri": "https://linktr.ee/PRASA.WC"
+                    }
+                  ],
+                  "name": "Southern Line",
+                  "color": "#f20000",
+                  "textColor": "#ffffff",
+                  "vehicle": {
+                    "name": {
+                      "text": "Train"
+                    },
+                    "type": "HEAVY_RAIL",
+                    "iconUri": "//maps.gstatic.com/mapfiles/transit/iw2/6/rail2.png"
+                  }
+                },
+                "stopCount": 6
+              },
+              "travelMode": "TRANSIT"
+            },
+            {
+              "distanceMeters": 95,
+              "staticDuration": "91s",
+              "polyline": {
+                "encodedPolyline": "v~`nEiwqoB?NzCA"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.9250751,
+                  "longitude": 18.4461331
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.9258568,
+                  "longitude": 18.4460573
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "DEPART",
+                "instructions": "Head southwest toward Grey St\nTake the stairs"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "0.1 km"
+                },
+                "staticDuration": {
+                  "text": "2 mins"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 35,
+              "staticDuration": "28s",
+              "polyline": {
+                "encodedPolyline": "rcanE{vqoB?iA"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.9258568,
+                  "longitude": 18.4460573
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.9258643,
+                  "longitude": 18.4464336
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "TURN_LEFT",
+                "instructions": "Turn left onto Grey St"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "35 m"
+                },
+                "staticDuration": {
+                  "text": "1 min"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 68,
+              "staticDuration": "55s",
+              "polyline": {
+                "encodedPolyline": "rcanEeyqoBxB@"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.9258643,
+                  "longitude": 18.4464336
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.926473,
+                  "longitude": 18.446416
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "TURN_RIGHT",
+                "instructions": "Turn right onto Davison Rd"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "68 m"
+                },
+                "staticDuration": {
+                  "text": "1 min"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 50,
+              "staticDuration": "42s",
+              "polyline": {
+                "encodedPolyline": "lganEcyqoBJiB"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.926473,
+                  "longitude": 18.446416
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.9265262,
+                  "longitude": 18.4469513
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "TURN_LEFT",
+                "instructions": "Turn left onto Albert Rd/R102\nDestination will be on the left"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "50 m"
+                },
+                "staticDuration": {
+                  "text": "1 min"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 8184,
+              "staticDuration": "1500s",
+              "polyline": {
+                "encodedPolyline": "nganEo|qoBH@dBc\\jBc]RuBp@eEd@iC?[LyAA}@gIwa@i@gDyAyMyEoi@{@oJ]yDYwB}@wKQsASGWJuDb@oCHQJqEZc@NaAd@i@Lc@?SGsA{@YIaBYsAOsAAI@oAbAaAx@a@J_@Ba@KYOUU[q@Oy@c@sA[k@e@YaAi@UIgAg@oi@}R{McFiDkAsPgGcMuEiO_GeFqBeNcG{DuAgA]s@Ik@SoCk@{Bo@mGwAuLwCwAQiHk@qBIu@Kk@OoDqAsB_AAB"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.926477399999996,
+                  "longitude": 18.4469583
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.8824736,
+                  "longitude": 18.4959703
+                }
+              },
+              "navigationInstruction": {
+                "instructions": "Bus towards 261 Century Rail"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "8.2 km"
+                },
+                "staticDuration": {
+                  "text": "25 mins"
+                }
+              },
+              "transitDetails": {
+                "stopDetails": {
+                  "arrivalStop": {
+                    "name": "Mansfield",
+                    "location": {
+                      "latLng": {
+                        "latitude": -33.8824736,
+                        "longitude": 18.4959703
+                      }
+                    }
+                  },
+                  "arrivalTime": "2025-10-16T16:11:00Z",
+                  "departureStop": {
+                    "name": "Davison",
+                    "location": {
+                      "latLng": {
+                        "latitude": -33.926477399999996,
+                        "longitude": 18.4469583
+                      }
+                    }
+                  },
+                  "departureTime": "2025-10-16T15:46:00Z"
+                },
+                "localizedValues": {
+                  "arrivalTime": {
+                    "time": {
+                      "text": "6:11 PM"
+                    },
+                    "timeZone": "Africa/Johannesburg"
+                  },
+                  "departureTime": {
+                    "time": {
+                      "text": "5:46 PM"
+                    },
+                    "timeZone": "Africa/Johannesburg"
+                  }
+                },
+                "headsign": "261 Century Rail",
+                "transitLine": {
+                  "agencies": [
+                    {
+                      "name": "MyCiTi",
+                      "uri": "https://myciti.org.za/"
+                    }
+                  ],
+                  "name": "Century City Rail - Omuramba - Salt River - Adderley",
+                  "uri": "https://myciti.org.za/en/routes/interactive-routes/century-city-rail-omuramba-salt-river-adderley/",
+                  "color": "#c3d82d",
+                  "nameShort": "261",
+                  "textColor": "#231f20",
+                  "vehicle": {
+                    "name": {
+                      "text": "Bus"
+                    },
+                    "type": "BUS",
+                    "iconUri": "//maps.gstatic.com/mapfiles/transit/iw2/6/bus2.png"
+                  }
+                },
+                "stopCount": 18
+              },
+              "travelMode": "TRANSIT"
+            },
+            {
+              "distanceMeters": 3084,
+              "staticDuration": "720s",
+              "polyline": {
+                "encodedPolyline": "ltxmEyn{oB@CcBeAkFuDyB{AyHuFeD}BxAiDnBuEfBeEZ}@XaAXsA^kDt@sJZqCXqExAsQnCZtCf@hKlAnEr@rCp@pCfB~MfKdHxFTSn@qAH?`At@LW"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.8824736,
+                  "longitude": 18.4959703
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.89149,
+                  "longitude": 18.50641
+                }
+              },
+              "navigationInstruction": {
+                "instructions": "Bus towards 262 SummerGreens"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "3.1 km"
+                },
+                "staticDuration": {
+                  "text": "12 mins"
+                }
+              },
+              "transitDetails": {
+                "stopDetails": {
+                  "arrivalStop": {
+                    "name": "Century City",
+                    "location": {
+                      "latLng": {
+                        "latitude": -33.89149,
+                        "longitude": 18.50641
+                      }
+                    }
+                  },
+                  "arrivalTime": "2025-10-16T16:27:00Z",
+                  "departureStop": {
+                    "name": "Mansfield",
+                    "location": {
+                      "latLng": {
+                        "latitude": -33.8824736,
+                        "longitude": 18.4959703
+                      }
+                    }
+                  },
+                  "departureTime": "2025-10-16T16:15:00Z"
+                },
+                "localizedValues": {
+                  "arrivalTime": {
+                    "time": {
+                      "text": "6:27 PM"
+                    },
+                    "timeZone": "Africa/Johannesburg"
+                  },
+                  "departureTime": {
+                    "time": {
+                      "text": "6:15 PM"
+                    },
+                    "timeZone": "Africa/Johannesburg"
+                  }
+                },
+                "headsign": "262 SummerGreens",
+                "transitLine": {
+                  "agencies": [
+                    {
+                      "name": "MyCiTi",
+                      "uri": "https://myciti.org.za/"
+                    }
+                  ],
+                  "name": "Summer Greens - Century City - Woodbridge Island",
+                  "uri": "https://myciti.org.za/en/routes/interactive-routes/summer-greens-century-city-woodbridge-island/",
+                  "color": "#0076bd",
+                  "nameShort": "262",
+                  "textColor": "#ffffff",
+                  "vehicle": {
+                    "name": {
+                      "text": "Bus"
+                    },
+                    "type": "BUS",
+                    "iconUri": "//maps.gstatic.com/mapfiles/transit/iw2/6/bus2.png"
+                  }
+                },
+                "stopCount": 6
+              },
+              "travelMode": "TRANSIT"
+            },
+            {
+              "distanceMeters": 50,
+              "staticDuration": "40s",
+              "polyline": {
+                "encodedPolyline": "|lzmEep}oBiAaA"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.8915052,
+                  "longitude": 18.5064344
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.8911428,
+                  "longitude": 18.5067625
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "DEPART",
+                "instructions": "Head northeast"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "50 m"
+                },
+                "staticDuration": {
+                  "text": "1 min"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 31,
+              "staticDuration": "26s",
+              "polyline": {
+                "encodedPolyline": "rjzmEgr}oBNYTW"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.8911428,
+                  "longitude": 18.5067625
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.8913274,
+                  "longitude": 18.507010599999997
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "TURN_RIGHT",
+                "instructions": "Turn right toward Century Way"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "31 m"
+                },
+                "staticDuration": {
+                  "text": "1 min"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 108,
+              "staticDuration": "87s",
+              "polyline": {
+                "encodedPolyline": "xkzmEys}oB{BgBc@Y"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.8913274,
+                  "longitude": 18.507010599999997
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.8905272,
+                  "longitude": 18.5076627
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "TURN_LEFT",
+                "instructions": "Turn left onto Century Way"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "0.1 km"
+                },
+                "staticDuration": {
+                  "text": "1 min"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 112,
+              "staticDuration": "91s",
+              "polyline": {
+                "encodedPolyline": "xfzmE{w}oBsBdE"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.8905272,
+                  "longitude": 18.5076627
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.8899529,
+                  "longitude": 18.5066679
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "TURN_LEFT",
+                "instructions": "Turn left onto Century Link"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "0.1 km"
+                },
+                "staticDuration": {
+                  "text": "2 mins"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 175,
+              "staticDuration": "145s",
+              "polyline": {
+                "encodedPolyline": "dczmEuq}oB_GyE"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.8899529,
+                  "longitude": 18.5066679
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.8886654,
+                  "longitude": 18.507763999999998
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "TURN_RIGHT",
+                "instructions": "Turn right onto Ratanga Rd\nDestination will be on the right"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "0.2 km"
+                },
+                "staticDuration": {
+                  "text": "2 mins"
+                }
+              },
+              "travelMode": "WALK"
+            }
+          ]
+        }
+      ],
+      "distanceMeters": 18299,
+      "duration": "4840s",
+      "polyline": {
+        "encodedPolyline": "vghnE}owoB|CvNsEvANfA?A}R{@gbA}FoAE}B?}DNmCRiANakA|U{N|CuA^oB~@aBnAiBvBkAvBg@pA[lA]dBa@tDM|Bo@fHOfIMtCiAhRuAhVQvB}AvXQlDE~B@nIC?iAsA?NzCA?iAxB@JiBIAH@dBc\\jBc]RuBp@eEd@iC?[LyAA}@gIwa@i@gDyAyMyEoi@{@oJ]yDYwB}@wKQsASGWJuDb@oCHQJqEZc@NaAd@i@Lc@?SGsA{@YIaBYsAOsAAI@oAbAaAx@a@J_@Ba@KYOUU[q@Oy@c@sA[k@e@YaAi@UIgAg@oi@}R{McFiDkAsPgGcMuEiO_GeFqBeNcG{DuAgA]s@Ik@SoCk@{Bo@mGwAuLwCwAQiHk@qBIu@Kk@OoDqAsB_AAB@CcBeAkFuDyB{AyHuFeD}BxAiDnBuEfBeEZ}@XaAXsA^kDt@sJZqCXqExAsQnCZtCf@hKlAnEr@rCp@pCfB~MfKdHxFTSn@qAH?`At@LWBCiAaANYTW{BgBc@YsBdE_GyE"
+      }
+    },
+    {
+      "legs": [
+        {
+          "steps": [
+            {
+              "distanceMeters": 249,
+              "staticDuration": "182s",
+              "polyline": {
+                "encodedPolyline": "vghnE}owoB|CvN"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.9623572,
+                  "longitude": 18.475669099999998
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.963147899999996,
+                  "longitude": 18.473147
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "DEPART",
+                "instructions": "Head west on College Rd toward Queen Rd"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "0.2 km"
+                },
+                "staticDuration": {
+                  "text": "3 mins"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 125,
+              "staticDuration": "98s",
+              "polyline": {
+                "encodedPolyline": "tlhnEe`woBsEvA"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.963147899999996,
+                  "longitude": 18.473147
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.9620867,
+                  "longitude": 18.4727074
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "TURN_RIGHT",
+                "instructions": "Turn right onto Station Rd\nDestination will be on the left"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "0.1 km"
+                },
+                "staticDuration": {
+                  "text": "2 mins"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 4198,
+              "staticDuration": "540s",
+              "polyline": {
+                "encodedPolyline": "pfhnEe{voB?A}R{@gbA}FoAE}B?}DNmCRiANakA|U{N|CuA^oB~@aBnAiBvBkAvBg@pA[lA]dBa@tDMtBB?"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.9621694,
+                  "longitude": 18.47235
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.92735,
+                  "longitude": 18.4643472
+                }
+              },
+              "navigationInstruction": {
+                "instructions": "Train towards Cape Town Station"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "4.2 km"
+                },
+                "staticDuration": {
+                  "text": "9 mins"
+                }
+              },
+              "transitDetails": {
+                "stopDetails": {
+                  "arrivalStop": {
+                    "name": "Salt River Station",
+                    "location": {
+                      "latLng": {
+                        "latitude": -33.92735,
+                        "longitude": 18.4643472
+                      }
+                    }
+                  },
+                  "arrivalTime": "2025-10-16T15:46:30Z",
+                  "departureStop": {
+                    "name": "Rondebosch Station",
+                    "location": {
+                      "latLng": {
+                        "latitude": -33.9621694,
+                        "longitude": 18.47235
+                      }
+                    }
+                  },
+                  "departureTime": "2025-10-16T15:37:30Z"
+                },
+                "localizedValues": {
+                  "arrivalTime": {
+                    "time": {
+                      "text": "5:46 PM"
+                    },
+                    "timeZone": "Africa/Johannesburg"
+                  },
+                  "departureTime": {
+                    "time": {
+                      "text": "5:37 PM"
+                    },
+                    "timeZone": "Africa/Johannesburg"
+                  }
+                },
+                "headsign": "Cape Town Station",
+                "transitLine": {
+                  "agencies": [
+                    {
+                      "name": "Prasa",
+                      "phoneNumber": "+27 11 013 6700",
+                      "uri": "https://linktr.ee/PRASA.WC"
+                    }
+                  ],
+                  "name": "Southern Line",
+                  "color": "#f20000",
+                  "textColor": "#ffffff",
+                  "vehicle": {
+                    "name": {
+                      "text": "Train"
+                    },
+                    "type": "HEAVY_RAIL",
+                    "iconUri": "//maps.gstatic.com/mapfiles/transit/iw2/6/rail2.png"
+                  }
+                },
+                "stopCount": 5
+              },
+              "travelMode": "TRANSIT"
+            },
+            {
+              "distanceMeters": 19,
+              "staticDuration": "15s",
+              "polyline": {
+                "encodedPolyline": "foanE{juoBJe@"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.9277192,
+                  "longitude": 18.464621599999997
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.9277786,
+                  "longitude": 18.4648142
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "DEPART",
+                "instructions": "Head east on Foundry Rd"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "19 m"
+                },
+                "staticDuration": {
+                  "text": "1 min"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 293,
+              "staticDuration": "248s",
+              "polyline": {
+                "encodedPolyline": "roanEaluoBWYNw@Bi@NFAJQ^EC@q@{BWgBTSoA"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.9277786,
+                  "longitude": 18.4648142
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.926476199999996,
+                  "longitude": 18.4658525
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "TURN_LEFT",
+                "instructions": "Turn left"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "0.3 km"
+                },
+                "staticDuration": {
+                  "text": "4 mins"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 19,
+              "staticDuration": "20s",
+              "polyline": {
+                "encodedPolyline": "nganEqruoBI@CMK@"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.926476199999996,
+                  "longitude": 18.4658525
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.9263536,
+                  "longitude": 18.465899699999998
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "TURN_LEFT",
+                "instructions": "Turn left toward Voortrekker Rd/R102"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "19 m"
+                },
+                "staticDuration": {
+                  "text": "1 min"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 10,
+              "staticDuration": "7s",
+              "polyline": {
+                "encodedPolyline": "tfanE{ruoBCS"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.9263536,
+                  "longitude": 18.465899699999998
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.9263306,
+                  "longitude": 18.4660021
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "TURN_RIGHT",
+                "instructions": "Turn right onto Voortrekker Rd/R102\nDestination will be on the left"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "10 m"
+                },
+                "staticDuration": {
+                  "text": "1 min"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 7298,
+              "staticDuration": "1440s",
+              "polyline": {
+                "encodedPolyline": "hfanEmsuoBFAyAyMyEoi@{@oJ]yDYwB}@wKQsASGWJuDb@oCHQJqEZc@NaAd@i@Lc@?SGsA{@YIaBYsAOsAAI@oAbAaAx@a@J_@Ba@KYOUU[q@Oy@c@sA[k@e@YaAi@UIgAg@oi@}R{McFiDkAsPgGcMuEiO_GeFqBeNcG{DuAgA]s@Ik@SoCk@{Bo@mGwAuLwCwAQiHk@qBIu@Kk@OoDqAsB_AcBeAkFuDyB{AyHuF{RaNAD"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.926293,
+                  "longitude": 18.465992
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.8754333,
+                  "longitude": 18.5013243
+                }
+              },
+              "navigationInstruction": {
+                "instructions": "Bus towards 260 Omuramba"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "7.3 km"
+                },
+                "staticDuration": {
+                  "text": "24 mins"
+                }
+              },
+              "transitDetails": {
+                "stopDetails": {
+                  "arrivalStop": {
+                    "name": "Zastron",
+                    "location": {
+                      "latLng": {
+                        "latitude": -33.8754333,
+                        "longitude": 18.5013243
+                      }
+                    }
+                  },
+                  "arrivalTime": "2025-10-16T16:22:00Z",
+                  "departureStop": {
+                    "name": "Salt River Rail North",
+                    "location": {
+                      "latLng": {
+                        "latitude": -33.926293,
+                        "longitude": 18.465992
+                      }
+                    }
+                  },
+                  "departureTime": "2025-10-16T15:58:00Z"
+                },
+                "localizedValues": {
+                  "arrivalTime": {
+                    "time": {
+                      "text": "6:22 PM"
+                    },
+                    "timeZone": "Africa/Johannesburg"
+                  },
+                  "departureTime": {
+                    "time": {
+                      "text": "5:58 PM"
+                    },
+                    "timeZone": "Africa/Johannesburg"
+                  }
+                },
+                "headsign": "260 Omuramba",
+                "transitLine": {
+                  "agencies": [
+                    {
+                      "name": "MyCiTi",
+                      "uri": "https://myciti.org.za/"
+                    }
+                  ],
+                  "name": "Century City Rail - Omuramba - Salt River - Adderley",
+                  "uri": "https://myciti.org.za/en/routes/interactive-routes/century-city-rail-omuramba-salt-river-adderley/",
+                  "color": "#c3d82d",
+                  "nameShort": "261",
+                  "textColor": "#231f20",
+                  "vehicle": {
+                    "name": {
+                      "text": "Bus"
+                    },
+                    "type": "BUS",
+                    "iconUri": "//maps.gstatic.com/mapfiles/transit/iw2/6/bus2.png"
+                  }
+                },
+                "stopCount": 15
+              },
+              "travelMode": "TRANSIT"
+            },
+            {
+              "distanceMeters": 93,
+              "staticDuration": "93s",
+              "polyline": {
+                "encodedPolyline": "hhwmE_p|oB`Dx@"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.875411299999996,
+                  "longitude": 18.501281499999997
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.8762167,
+                  "longitude": 18.5009893
+                }
+              },
+              "navigationInstruction": {},
+              "localizedValues": {
+                "distance": {
+                  "text": "93 m"
+                },
+                "staticDuration": {
+                  "text": "2 mins"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 2874,
+              "staticDuration": "480s",
+              "polyline": {
+                "encodedPolyline": "hmwmEan|oBEHlIvFlAsCnBuEfBeEZ}@XaAXsA^kDt@sJZqCXqExAsQnCZtCf@~IdA?DfCZNEnCf@rA\\|Av@vPpM|GjFnAoCtBdBp@v@KPwC{BDK"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.876208999999996,
+                  "longitude": 18.500974
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.89119,
+                  "longitude": 18.50657
+                }
+              },
+              "navigationInstruction": {
+                "instructions": "Bus towards T03 Century City"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "2.9 km"
+                },
+                "staticDuration": {
+                  "text": "8 mins"
+                }
+              },
+              "transitDetails": {
+                "stopDetails": {
+                  "arrivalStop": {
+                    "name": "Century City",
+                    "location": {
+                      "latLng": {
+                        "latitude": -33.89119,
+                        "longitude": 18.50657
+                      }
+                    }
+                  },
+                  "arrivalTime": "2025-10-16T16:41:00Z",
+                  "departureStop": {
+                    "name": "Zastron",
+                    "location": {
+                      "latLng": {
+                        "latitude": -33.876208999999996,
+                        "longitude": 18.500974
+                      }
+                    }
+                  },
+                  "departureTime": "2025-10-16T16:33:00Z"
+                },
+                "localizedValues": {
+                  "arrivalTime": {
+                    "time": {
+                      "text": "6:41 PM"
+                    },
+                    "timeZone": "Africa/Johannesburg"
+                  },
+                  "departureTime": {
+                    "time": {
+                      "text": "6:33 PM"
+                    },
+                    "timeZone": "Africa/Johannesburg"
+                  }
+                },
+                "headsign": "T03 Century City",
+                "transitLine": {
+                  "agencies": [
+                    {
+                      "name": "MyCiTi",
+                      "uri": "https://myciti.org.za/"
+                    }
+                  ],
+                  "name": "Atlantis - Melkbosstrand - Table View - Century City",
+                  "uri": "https://myciti.org.za/en/routes/interactive-routes/atlantis-melkbosstrand-table-view-century-city/",
+                  "color": "#da1931",
+                  "nameShort": "T03",
+                  "textColor": "#ffffff",
+                  "vehicle": {
+                    "name": {
+                      "text": "Bus"
+                    },
+                    "type": "BUS",
+                    "iconUri": "//maps.gstatic.com/mapfiles/transit/iw2/6/bus2.png"
+                  }
+                },
+                "stopCount": 5
+              },
+              "travelMode": "TRANSIT"
+            },
+            {
+              "distanceMeters": 77,
+              "staticDuration": "61s",
+              "polyline": {
+                "encodedPolyline": "tjzmEsp}oBQMC@o@pAUR"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.8911537,
+                  "longitude": 18.5065046
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.8906862,
+                  "longitude": 18.506048399999997
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "DEPART",
+                "instructions": "Head northeast toward Ratanga Rd"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "77 m"
+                },
+                "staticDuration": {
+                  "text": "1 min"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 275,
+              "staticDuration": "228s",
+              "polyline": {
+                "encodedPolyline": "xgzmEym}oBsKuI"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.8906862,
+                  "longitude": 18.506048399999997
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.8886654,
+                  "longitude": 18.507763999999998
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "TURN_RIGHT",
+                "instructions": "Turn right onto Ratanga Rd\nDestination will be on the right"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "0.3 km"
+                },
+                "staticDuration": {
+                  "text": "4 mins"
+                }
+              },
+              "travelMode": "WALK"
+            }
+          ]
+        }
+      ],
+      "distanceMeters": 15530,
+      "duration": "4414s",
+      "polyline": {
+        "encodedPolyline": "vghnE}owoB|CvNsEvANfA?A}R{@gbA}FoAE}B?}DNmCRiANakA|U{N|CuA^oB~@aBnAiBvBkAvBg@pA[lA]dBa@tDMtBB?hAu@Je@WYNw@Bi@NFAJQ^EC@q@{BWgBTSoAI@CMK@CSG@FAyAyMyEoi@{@oJ]yDYwB}@wKQsASGWJuDb@oCHQJqEZc@NaAd@i@Lc@?SGsA{@YIaBYsAOsAAI@oAbAaAx@a@J_@Ba@KYOUU[q@Oy@c@sA[k@e@YaAi@UIgAg@oi@}R{McFiDkAsPgGcMuEiO_GeFqBeNcG{DuAgA]s@Ik@SoCk@{Bo@mGwAuLwCwAQiHk@qBIu@Kk@OoDqAsB_AcBeAkFuDyB{AyHuF{RaNADCF`Dx@ABEHlIvFlAsCnBuEfBeEZ}@XaAXsA^kDt@sJZqCXqExAsQnCZtCf@~IdA?DfCZNEnCf@rA\\|Av@vPpM|GjFnAoCtBdBp@v@KPwC{BDKGLQMC@o@pAURsKuI"
+      }
+    },
+    {
+      "legs": [
+        {
+          "steps": [
+            {
+              "distanceMeters": 249,
+              "staticDuration": "182s",
+              "polyline": {
+                "encodedPolyline": "vghnE}owoB|CvN"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.9623572,
+                  "longitude": 18.475669099999998
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.963147899999996,
+                  "longitude": 18.473147
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "DEPART",
+                "instructions": "Head west on College Rd toward Queen Rd"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "0.2 km"
+                },
+                "staticDuration": {
+                  "text": "3 mins"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 125,
+              "staticDuration": "98s",
+              "polyline": {
+                "encodedPolyline": "tlhnEe`woBsEvA"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.963147899999996,
+                  "longitude": 18.473147
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.9620867,
+                  "longitude": 18.4727074
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "TURN_RIGHT",
+                "instructions": "Turn right onto Station Rd\nDestination will be on the left"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "0.1 km"
+                },
+                "staticDuration": {
+                  "text": "2 mins"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 5933,
+              "staticDuration": "1020s",
+              "polyline": {
+                "encodedPolyline": "pfhnEe{voB?A}R{@gbA}FoAE}B?}DNmCRiANakA|U{N|CuA^oB~@aBnAiBvBkAvBg@pA[lA]dBa@tDM|Bo@fHOfIMtCiAhRuAhVQvB}AvXQlDE~B@nIC?"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.9621694,
+                  "longitude": 18.47235
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.925452799999995,
+                  "longitude": 18.4457083
+                }
+              },
+              "navigationInstruction": {
+                "instructions": "Train towards Cape Town Station"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "5.9 km"
+                },
+                "staticDuration": {
+                  "text": "17 mins"
+                }
+              },
+              "transitDetails": {
+                "stopDetails": {
+                  "arrivalStop": {
+                    "name": "Woodstock Station",
+                    "location": {
+                      "latLng": {
+                        "latitude": -33.925452799999995,
+                        "longitude": 18.4457083
+                      }
+                    }
+                  },
+                  "arrivalTime": "2025-10-16T15:54:30Z",
+                  "departureStop": {
+                    "name": "Rondebosch Station",
+                    "location": {
+                      "latLng": {
+                        "latitude": -33.9621694,
+                        "longitude": 18.47235
+                      }
+                    }
+                  },
+                  "departureTime": "2025-10-16T15:37:30Z"
+                },
+                "localizedValues": {
+                  "arrivalTime": {
+                    "time": {
+                      "text": "5:54 PM"
+                    },
+                    "timeZone": "Africa/Johannesburg"
+                  },
+                  "departureTime": {
+                    "time": {
+                      "text": "5:37 PM"
+                    },
+                    "timeZone": "Africa/Johannesburg"
+                  }
+                },
+                "headsign": "Cape Town Station",
+                "transitLine": {
+                  "agencies": [
+                    {
+                      "name": "Prasa",
+                      "phoneNumber": "+27 11 013 6700",
+                      "uri": "https://linktr.ee/PRASA.WC"
+                    }
+                  ],
+                  "name": "Southern Line",
+                  "color": "#f20000",
+                  "textColor": "#ffffff",
+                  "vehicle": {
+                    "name": {
+                      "text": "Train"
+                    },
+                    "type": "HEAVY_RAIL",
+                    "iconUri": "//maps.gstatic.com/mapfiles/transit/iw2/6/rail2.png"
+                  }
+                },
+                "stopCount": 6
+              },
+              "travelMode": "TRANSIT"
+            },
+            {
+              "distanceMeters": 11,
+              "staticDuration": "9s",
+              "polyline": {
+                "encodedPolyline": "v~`nEiwqoBCKG?"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.9250751,
+                  "longitude": 18.4461331
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.9250182,
+                  "longitude": 18.4461916
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "DEPART",
+                "instructions": "Head northeast toward Porter St"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "11 m"
+                },
+                "staticDuration": {
+                  "text": "1 min"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 130,
+              "staticDuration": "116s",
+              "polyline": {
+                "encodedPolyline": "j~`nEuwqoBAG_BBoAFCV]@"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.9250182,
+                  "longitude": 18.4461916
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.9239574,
+                  "longitude": 18.446037399999998
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "TURN_RIGHT",
+                "instructions": "Turn right onto Davidson St\nTake the stairs"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "0.1 km"
+                },
+                "staticDuration": {
+                  "text": "2 mins"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 200,
+              "staticDuration": "180s",
+              "polyline": {
+                "encodedPolyline": "vw`nEwvqoBiEB@fADC?eADI?IIM"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.9239574,
+                  "longitude": 18.446037399999998
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.922970899999996,
+                  "longitude": 18.4461959
+                }
+              },
+              "navigationInstruction": {},
+              "localizedValues": {
+                "distance": {
+                  "text": "0.2 km"
+                },
+                "staticDuration": {
+                  "text": "3 mins"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 11,
+              "staticDuration": "8s",
+              "polyline": {
+                "encodedPolyline": "pq`nEwwqoBKP"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.922970899999996,
+                  "longitude": 18.4461959
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.922913,
+                  "longitude": 18.4461059
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "TURN_LEFT",
+                "instructions": "Turn left"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "11 m"
+                },
+                "staticDuration": {
+                  "text": "1 min"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 45,
+              "staticDuration": "35s",
+              "polyline": {
+                "encodedPolyline": "dq`nEewqoB?_B"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.922913,
+                  "longitude": 18.4461059
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.9229108,
+                  "longitude": 18.4465899
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "TURN_SHARP_RIGHT",
+                "instructions": "Sharp right"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "45 m"
+                },
+                "staticDuration": {
+                  "text": "1 min"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 9633,
+              "staticDuration": "780s",
+              "polyline": {
+                "encodedPolyline": "fq`nEezqoBA?AyFAiAaA_O_@mCgA{EG][iEMqUKqMCqGIa@_@e@uCyCs@o@w@kAWi@aEyK}@kCu@iB]m@}DoEyAyAwDaD{BqB{DcDoL{JqNwL_CoBcDkC{AyA[a@sDuCqA_AsGsFqAo@mGmCaAg@_@WyDmEyAoAc@Yq@US@QDOJMNu@nCA\\D~@e@rBWrABZMf@Wl@kSoOuFaEuGmFgAu@eF_E_LqIkBkBiN}Q}@{@y@q@eAg@kA[iH}AgBQeBCmCBgEVsCP}E`@_E\\_ADIB}AAsAKqAYmDiAkB{@eAs@kAcAqKaM{BkBw@e@ISgCcAaCi@kBYkBI}JBiBKmBYaBe@yAm@eBcAoL_JeD}CkCsBeBgA@C"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.9229218,
+                  "longitude": 18.44659
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.8613435,
+                  "longitude": 18.500363099999998
+                }
+              },
+              "navigationInstruction": {
+                "instructions": "Bus towards T02X Atlantis"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "9.6 km"
+                },
+                "staticDuration": {
+                  "text": "13 mins"
+                }
+              },
+              "transitDetails": {
+                "stopDetails": {
+                  "arrivalStop": {
+                    "name": "Racecourse",
+                    "location": {
+                      "latLng": {
+                        "latitude": -33.8613435,
+                        "longitude": 18.500363099999998
+                      }
+                    }
+                  },
+                  "arrivalTime": "2025-10-16T16:20:00Z",
+                  "departureStop": {
+                    "name": "Woodstock",
+                    "location": {
+                      "latLng": {
+                        "latitude": -33.9229218,
+                        "longitude": 18.44659
+                      }
+                    }
+                  },
+                  "departureTime": "2025-10-16T16:07:00Z"
+                },
+                "localizedValues": {
+                  "arrivalTime": {
+                    "time": {
+                      "text": "6:20 PM"
+                    },
+                    "timeZone": "Africa/Johannesburg"
+                  },
+                  "departureTime": {
+                    "time": {
+                      "text": "6:07 PM"
+                    },
+                    "timeZone": "Africa/Johannesburg"
+                  }
+                },
+                "headsign": "T02X Atlantis",
+                "transitLine": {
+                  "agencies": [
+                    {
+                      "name": "MyCiTi",
+                      "uri": "https://myciti.org.za/"
+                    }
+                  ],
+                  "name": "Atlantis - Table View - Civic Centre",
+                  "uri": "https://myciti.org.za/en/routes/interactive-routes/atlantis-civic-centre-express/",
+                  "color": "#da1931",
+                  "nameShort": "T02X",
+                  "textColor": "#ffffff",
+                  "vehicle": {
+                    "name": {
+                      "text": "Bus"
+                    },
+                    "type": "BUS",
+                    "iconUri": "//maps.gstatic.com/mapfiles/transit/iw2/6/bus2.png"
+                  }
+                },
+                "stopCount": 3
+              },
+              "travelMode": "TRANSIT"
+            },
+            {
+              "distanceMeters": 52,
+              "staticDuration": "41s",
+              "polyline": {
+                "encodedPolyline": "hptmEcj|oBnAv@"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.861331899999996,
+                  "longitude": 18.5003395
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.8617318,
+                  "longitude": 18.5000551
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "DEPART",
+                "instructions": "Head southwest toward Racecourse Rd"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "52 m"
+                },
+                "staticDuration": {
+                  "text": "1 min"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 11,
+              "staticDuration": "14s",
+              "polyline": {
+                "encodedPolyline": "xrtmEkh|oBJO"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.8617318,
+                  "longitude": 18.5000551
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.8617916,
+                  "longitude": 18.500143200000004
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "TURN_LEFT",
+                "instructions": "Turn left onto Racecourse Rd"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "11 m"
+                },
+                "staticDuration": {
+                  "text": "1 min"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 32,
+              "staticDuration": "30s",
+              "polyline": {
+                "encodedPolyline": "dstmE{h|oBo@e@"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.8617916,
+                  "longitude": 18.500143200000004
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.8615515,
+                  "longitude": 18.500325699999998
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "TURN_LEFT",
+                "instructions": "Turn left onto W Coast Rd/Otto du Plessis Dr/R27"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "32 m"
+                },
+                "staticDuration": {
+                  "text": "1 min"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 6226,
+              "staticDuration": "1140s",
+              "polyline": {
+                "encodedPolyline": "tqtmEaj|oBx@l@FKj@oD\\eAbFeLhHwP@MACxAgDtCcHb@e@~AsD`BkDdFyLz@sBJ?DJAHaBxDe@z@sEbKmAdC@TwAxCnBrAdCpB`XhRrZfTnD`C|EdDlAsCnBuEfBeEZ}@XaAXsA^kDt@sJZqCXqExAsQnCZtCf@~IdA?DfCZNEnCf@rA\\|Av@vPpM|GjFnAoCtBdBp@v@KPwC{BDK"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.8615523,
+                  "longitude": 18.500327199999997
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.89119,
+                  "longitude": 18.50657
+                }
+              },
+              "navigationInstruction": {
+                "instructions": "Bus towards T03 Century City"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "6.2 km"
+                },
+                "staticDuration": {
+                  "text": "19 mins"
+                }
+              },
+              "transitDetails": {
+                "stopDetails": {
+                  "arrivalStop": {
+                    "name": "Century City",
+                    "location": {
+                      "latLng": {
+                        "latitude": -33.89119,
+                        "longitude": 18.50657
+                      }
+                    }
+                  },
+                  "arrivalTime": "2025-10-16T16:48:00Z",
+                  "departureStop": {
+                    "name": "Racecourse",
+                    "location": {
+                      "latLng": {
+                        "latitude": -33.8615523,
+                        "longitude": 18.500327199999997
+                      }
+                    }
+                  },
+                  "departureTime": "2025-10-16T16:29:00Z"
+                },
+                "localizedValues": {
+                  "arrivalTime": {
+                    "time": {
+                      "text": "6:48 PM"
+                    },
+                    "timeZone": "Africa/Johannesburg"
+                  },
+                  "departureTime": {
+                    "time": {
+                      "text": "6:29 PM"
+                    },
+                    "timeZone": "Africa/Johannesburg"
+                  }
+                },
+                "headsign": "T03 Century City",
+                "transitLine": {
+                  "agencies": [
+                    {
+                      "name": "MyCiTi",
+                      "uri": "https://myciti.org.za/"
+                    }
+                  ],
+                  "name": "Atlantis - Melkbosstrand - Table View - Century City",
+                  "uri": "https://myciti.org.za/en/routes/interactive-routes/atlantis-melkbosstrand-table-view-century-city/",
+                  "color": "#da1931",
+                  "nameShort": "T03",
+                  "textColor": "#ffffff",
+                  "vehicle": {
+                    "name": {
+                      "text": "Bus"
+                    },
+                    "type": "BUS",
+                    "iconUri": "//maps.gstatic.com/mapfiles/transit/iw2/6/bus2.png"
+                  }
+                },
+                "stopCount": 10
+              },
+              "travelMode": "TRANSIT"
+            },
+            {
+              "distanceMeters": 77,
+              "staticDuration": "61s",
+              "polyline": {
+                "encodedPolyline": "tjzmEsp}oBQMC@o@pAUR"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.8911537,
+                  "longitude": 18.5065046
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.8906862,
+                  "longitude": 18.506048399999997
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "DEPART",
+                "instructions": "Head northeast toward Ratanga Rd"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "77 m"
+                },
+                "staticDuration": {
+                  "text": "1 min"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 275,
+              "staticDuration": "228s",
+              "polyline": {
+                "encodedPolyline": "xgzmEym}oBsKuI"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.8906862,
+                  "longitude": 18.506048399999997
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.8886654,
+                  "longitude": 18.507763999999998
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "TURN_RIGHT",
+                "instructions": "Turn right onto Ratanga Rd\nDestination will be on the right"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "0.3 km"
+                },
+                "staticDuration": {
+                  "text": "4 mins"
+                }
+              },
+              "travelMode": "WALK"
+            }
+          ]
+        }
+      ],
+      "distanceMeters": 23010,
+      "duration": "4834s",
+      "polyline": {
+        "encodedPolyline": "vghnE}owoB|CvNsEvANfA?A}R{@gbA}FoAE}B?}DNmCRiANakA|U{N|CuA^oB~@aBnAiBvBkAvBg@pA[lA]dBa@tDM|Bo@fHOfIMtCiAhRuAhVQvB}AvXQlDE~B@nIC?iAsACKG?AG_BBoAFCV]@iEB@fADC?eADI?IIMKP?_B@?A?AyFAiAaA_O_@mCgA{EG][iEMqUKqMCqGIa@_@e@uCyCs@o@w@kAWi@aEyK}@kCu@iB]m@}DoEyAyAwDaD{BqB{DcDoL{JqNwL_CoBcDkC{AyA[a@sDuCqA_AsGsFqAo@mGmCaAg@_@WyDmEyAoAc@Yq@US@QDOJMNu@nCA\\D~@e@rBWrABZMf@Wl@kSoOuFaEuGmFgAu@eF_E_LqIkBkBiN}Q}@{@y@q@eAg@kA[iH}AgBQeBCmCBgEVsCP}E`@_E\\_ADIB}AAsAKqAYmDiAkB{@eAs@kAcAqKaM{BkBw@e@ISgCcAaCi@kBYkBI}JBiBKmBYaBe@yAm@eBcAoL_JeD}CkCsBeBgA@CABnAv@JOo@e@x@l@FKj@oD\\eAbFeLhHwP@MACxAgDtCcHb@e@~AsD`BkDdFyLz@sBJ?DJAHaBxDe@z@sEbKmAdC@TwAxCnBrAdCpB`XhRrZfTnD`C|EdDlAsCnBuEfBeEZ}@XaAXsA^kDt@sJZqCXqExAsQnCZtCf@~IdA?DfCZNEnCf@rA\\|Av@vPpM|GjFnAoCtBdBp@v@KPwC{BDKGLQMC@o@pAURsKuI"
+      }
+    },
+    {
+      "legs": [
+        {
+          "steps": [
+            {
+              "distanceMeters": 249,
+              "staticDuration": "182s",
+              "polyline": {
+                "encodedPolyline": "vghnE}owoB|CvN"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.9623572,
+                  "longitude": 18.475669099999998
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.963147899999996,
+                  "longitude": 18.473147
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "DEPART",
+                "instructions": "Head west on College Rd toward Queen Rd"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "0.2 km"
+                },
+                "staticDuration": {
+                  "text": "3 mins"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 125,
+              "staticDuration": "98s",
+              "polyline": {
+                "encodedPolyline": "tlhnEe`woBsEvA"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.963147899999996,
+                  "longitude": 18.473147
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.9620867,
+                  "longitude": 18.4727074
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "TURN_RIGHT",
+                "instructions": "Turn right onto Station Rd\nDestination will be on the left"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "0.1 km"
+                },
+                "staticDuration": {
+                  "text": "2 mins"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 4198,
+              "staticDuration": "540s",
+              "polyline": {
+                "encodedPolyline": "pfhnEe{voB?A}R{@gbA}FoAE}B?}DNmCRiANakA|U{N|CuA^oB~@aBnAiBvBkAvBg@pA[lA]dBa@tDMtBB?"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.9621694,
+                  "longitude": 18.47235
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.92735,
+                  "longitude": 18.4643472
+                }
+              },
+              "navigationInstruction": {
+                "instructions": "Train towards Cape Town Station"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "4.2 km"
+                },
+                "staticDuration": {
+                  "text": "9 mins"
+                }
+              },
+              "transitDetails": {
+                "stopDetails": {
+                  "arrivalStop": {
+                    "name": "Salt River Station",
+                    "location": {
+                      "latLng": {
+                        "latitude": -33.92735,
+                        "longitude": 18.4643472
+                      }
+                    }
+                  },
+                  "arrivalTime": "2025-10-16T16:06:30Z",
+                  "departureStop": {
+                    "name": "Rondebosch Station",
+                    "location": {
+                      "latLng": {
+                        "latitude": -33.9621694,
+                        "longitude": 18.47235
+                      }
+                    }
+                  },
+                  "departureTime": "2025-10-16T15:57:30Z"
+                },
+                "localizedValues": {
+                  "arrivalTime": {
+                    "time": {
+                      "text": "6:06 PM"
+                    },
+                    "timeZone": "Africa/Johannesburg"
+                  },
+                  "departureTime": {
+                    "time": {
+                      "text": "5:57 PM"
+                    },
+                    "timeZone": "Africa/Johannesburg"
+                  }
+                },
+                "headsign": "Cape Town Station",
+                "transitLine": {
+                  "agencies": [
+                    {
+                      "name": "Prasa",
+                      "phoneNumber": "+27 11 013 6700",
+                      "uri": "https://linktr.ee/PRASA.WC"
+                    }
+                  ],
+                  "name": "Southern Line",
+                  "color": "#f20000",
+                  "textColor": "#ffffff",
+                  "vehicle": {
+                    "name": {
+                      "text": "Train"
+                    },
+                    "type": "HEAVY_RAIL",
+                    "iconUri": "//maps.gstatic.com/mapfiles/transit/iw2/6/rail2.png"
+                  }
+                },
+                "stopCount": 5
+              },
+              "travelMode": "TRANSIT"
+            },
+            {
+              "distanceMeters": 19,
+              "staticDuration": "15s",
+              "polyline": {
+                "encodedPolyline": "foanE{juoBJe@"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.9277192,
+                  "longitude": 18.464621599999997
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.9277786,
+                  "longitude": 18.4648142
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "DEPART",
+                "instructions": "Head east on Foundry Rd"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "19 m"
+                },
+                "staticDuration": {
+                  "text": "1 min"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 293,
+              "staticDuration": "248s",
+              "polyline": {
+                "encodedPolyline": "roanEaluoBWYNw@Bi@NFAJQ^EC@q@{BWgBTSoA"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.9277786,
+                  "longitude": 18.4648142
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.926476199999996,
+                  "longitude": 18.4658525
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "TURN_LEFT",
+                "instructions": "Turn left"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "0.3 km"
+                },
+                "staticDuration": {
+                  "text": "4 mins"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 19,
+              "staticDuration": "20s",
+              "polyline": {
+                "encodedPolyline": "nganEqruoBI@CMK@"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.926476199999996,
+                  "longitude": 18.4658525
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.9263536,
+                  "longitude": 18.465899699999998
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "TURN_LEFT",
+                "instructions": "Turn left toward Voortrekker Rd/R102"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "19 m"
+                },
+                "staticDuration": {
+                  "text": "1 min"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 10,
+              "staticDuration": "7s",
+              "polyline": {
+                "encodedPolyline": "tfanE{ruoBCS"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.9263536,
+                  "longitude": 18.465899699999998
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.9263306,
+                  "longitude": 18.4660021
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "TURN_RIGHT",
+                "instructions": "Turn right onto Voortrekker Rd/R102\nDestination will be on the left"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "10 m"
+                },
+                "staticDuration": {
+                  "text": "1 min"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 7298,
+              "staticDuration": "1440s",
+              "polyline": {
+                "encodedPolyline": "hfanEmsuoBFAyAyMyEoi@{@oJ]yDYwB}@wKQsASGWJuDb@oCHQJqEZc@NaAd@i@Lc@?SGsA{@YIaBYsAOsAAI@oAbAaAx@a@J_@Ba@KYOUU[q@Oy@c@sA[k@e@YaAi@UIgAg@oi@}R{McFiDkAsPgGcMuEiO_GeFqBeNcG{DuAgA]s@Ik@SoCk@{Bo@mGwAuLwCwAQiHk@qBIu@Kk@OoDqAsB_AcBeAkFuDyB{AyHuF{RaNAD"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.926293,
+                  "longitude": 18.465992
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.8754333,
+                  "longitude": 18.5013243
+                }
+              },
+              "navigationInstruction": {
+                "instructions": "Bus towards 260 Omuramba"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "7.3 km"
+                },
+                "staticDuration": {
+                  "text": "24 mins"
+                }
+              },
+              "transitDetails": {
+                "stopDetails": {
+                  "arrivalStop": {
+                    "name": "Zastron",
+                    "location": {
+                      "latLng": {
+                        "latitude": -33.8754333,
+                        "longitude": 18.5013243
+                      }
+                    }
+                  },
+                  "arrivalTime": "2025-10-16T16:43:00Z",
+                  "departureStop": {
+                    "name": "Salt River Rail North",
+                    "location": {
+                      "latLng": {
+                        "latitude": -33.926293,
+                        "longitude": 18.465992
+                      }
+                    }
+                  },
+                  "departureTime": "2025-10-16T16:19:00Z"
+                },
+                "localizedValues": {
+                  "arrivalTime": {
+                    "time": {
+                      "text": "6:43 PM"
+                    },
+                    "timeZone": "Africa/Johannesburg"
+                  },
+                  "departureTime": {
+                    "time": {
+                      "text": "6:19 PM"
+                    },
+                    "timeZone": "Africa/Johannesburg"
+                  }
+                },
+                "headsign": "260 Omuramba",
+                "transitLine": {
+                  "agencies": [
+                    {
+                      "name": "MyCiTi",
+                      "uri": "https://myciti.org.za/"
+                    }
+                  ],
+                  "name": "Century City Rail - Omuramba - Salt River - Adderley",
+                  "uri": "https://myciti.org.za/en/routes/interactive-routes/century-city-rail-omuramba-salt-river-adderley/",
+                  "color": "#c3d82d",
+                  "nameShort": "261",
+                  "textColor": "#231f20",
+                  "vehicle": {
+                    "name": {
+                      "text": "Bus"
+                    },
+                    "type": "BUS",
+                    "iconUri": "//maps.gstatic.com/mapfiles/transit/iw2/6/bus2.png"
+                  }
+                },
+                "stopCount": 15
+              },
+              "travelMode": "TRANSIT"
+            },
+            {
+              "distanceMeters": 93,
+              "staticDuration": "93s",
+              "polyline": {
+                "encodedPolyline": "hhwmE_p|oB`Dx@"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.875411299999996,
+                  "longitude": 18.501281499999997
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.8762167,
+                  "longitude": 18.5009893
+                }
+              },
+              "navigationInstruction": {},
+              "localizedValues": {
+                "distance": {
+                  "text": "93 m"
+                },
+                "staticDuration": {
+                  "text": "2 mins"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 2874,
+              "staticDuration": "480s",
+              "polyline": {
+                "encodedPolyline": "hmwmEan|oBEHlIvFlAsCnBuEfBeEZ}@XaAXsA^kDt@sJZqCXqExAsQnCZtCf@~IdA?DfCZNEnCf@rA\\|Av@vPpM|GjFnAoCtBdBp@v@KPwC{BDK"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.876208999999996,
+                  "longitude": 18.500974
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.89119,
+                  "longitude": 18.50657
+                }
+              },
+              "navigationInstruction": {
+                "instructions": "Bus towards T03 Century City"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "2.9 km"
+                },
+                "staticDuration": {
+                  "text": "8 mins"
+                }
+              },
+              "transitDetails": {
+                "stopDetails": {
+                  "arrivalStop": {
+                    "name": "Century City",
+                    "location": {
+                      "latLng": {
+                        "latitude": -33.89119,
+                        "longitude": 18.50657
+                      }
+                    }
+                  },
+                  "arrivalTime": "2025-10-16T17:02:00Z",
+                  "departureStop": {
+                    "name": "Zastron",
+                    "location": {
+                      "latLng": {
+                        "latitude": -33.876208999999996,
+                        "longitude": 18.500974
+                      }
+                    }
+                  },
+                  "departureTime": "2025-10-16T16:54:00Z"
+                },
+                "localizedValues": {
+                  "arrivalTime": {
+                    "time": {
+                      "text": "7:02 PM"
+                    },
+                    "timeZone": "Africa/Johannesburg"
+                  },
+                  "departureTime": {
+                    "time": {
+                      "text": "6:54 PM"
+                    },
+                    "timeZone": "Africa/Johannesburg"
+                  }
+                },
+                "headsign": "T03 Century City",
+                "transitLine": {
+                  "agencies": [
+                    {
+                      "name": "MyCiTi",
+                      "uri": "https://myciti.org.za/"
+                    }
+                  ],
+                  "name": "Atlantis - Melkbosstrand - Table View - Century City",
+                  "uri": "https://myciti.org.za/en/routes/interactive-routes/atlantis-melkbosstrand-table-view-century-city/",
+                  "color": "#da1931",
+                  "nameShort": "T03",
+                  "textColor": "#ffffff",
+                  "vehicle": {
+                    "name": {
+                      "text": "Bus"
+                    },
+                    "type": "BUS",
+                    "iconUri": "//maps.gstatic.com/mapfiles/transit/iw2/6/bus2.png"
+                  }
+                },
+                "stopCount": 5
+              },
+              "travelMode": "TRANSIT"
+            },
+            {
+              "distanceMeters": 77,
+              "staticDuration": "61s",
+              "polyline": {
+                "encodedPolyline": "tjzmEsp}oBQMC@o@pAUR"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.8911537,
+                  "longitude": 18.5065046
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.8906862,
+                  "longitude": 18.506048399999997
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "DEPART",
+                "instructions": "Head northeast toward Ratanga Rd"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "77 m"
+                },
+                "staticDuration": {
+                  "text": "1 min"
+                }
+              },
+              "travelMode": "WALK"
+            },
+            {
+              "distanceMeters": 275,
+              "staticDuration": "228s",
+              "polyline": {
+                "encodedPolyline": "xgzmEym}oBsKuI"
+              },
+              "startLocation": {
+                "latLng": {
+                  "latitude": -33.8906862,
+                  "longitude": 18.506048399999997
+                }
+              },
+              "endLocation": {
+                "latLng": {
+                  "latitude": -33.8886654,
+                  "longitude": 18.507763999999998
+                }
+              },
+              "navigationInstruction": {
+                "maneuver": "TURN_RIGHT",
+                "instructions": "Turn right onto Ratanga Rd\nDestination will be on the right"
+              },
+              "localizedValues": {
+                "distance": {
+                  "text": "0.3 km"
+                },
+                "staticDuration": {
+                  "text": "4 mins"
+                }
+              },
+              "travelMode": "WALK"
+            }
+          ]
+        }
+      ],
+      "distanceMeters": 15530,
+      "duration": "4474s",
+      "polyline": {
+        "encodedPolyline": "vghnE}owoB|CvNsEvANfA?A}R{@gbA}FoAE}B?}DNmCRiANakA|U{N|CuA^oB~@aBnAiBvBkAvBg@pA[lA]dBa@tDMtBB?hAu@Je@WYNw@Bi@NFAJQ^EC@q@{BWgBTSoAI@CMK@CSG@FAyAyMyEoi@{@oJ]yDYwB}@wKQsASGWJuDb@oCHQJqEZc@NaAd@i@Lc@?SGsA{@YIaBYsAOsAAI@oAbAaAx@a@J_@Ba@KYOUU[q@Oy@c@sA[k@e@YaAi@UIgAg@oi@}R{McFiDkAsPgGcMuEiO_GeFqBeNcG{DuAgA]s@Ik@SoCk@{Bo@mGwAuLwCwAQiHk@qBIu@Kk@OoDqAsB_AcBeAkFuDyB{AyHuF{RaNADCF`Dx@ABEHlIvFlAsCnBuEfBeEZ}@XaAXsA^kDt@sJZqCXqExAsQnCZtCf@~IdA?DfCZNEnCf@rA\\|Av@vPpM|GjFnAoCtBdBp@v@KPwC{BDKGLQMC@o@pAURsKuI"
+      }
+    }
+  ]
+}
