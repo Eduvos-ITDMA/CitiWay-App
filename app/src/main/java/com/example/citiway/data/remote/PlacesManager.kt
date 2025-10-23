@@ -182,7 +182,7 @@ class PlacesManager(
             }
         }
     }
-
+     // Todo: wont on fixing location tap bug
     // When user taps on a search suggestion, this function fetches detailed place information and
     // updates the state. It also resets the AutocompleteSessionToken
     private fun selectPlace(prediction: AutocompletePrediction) {
