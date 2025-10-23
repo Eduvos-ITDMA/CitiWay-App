@@ -30,6 +30,7 @@ import com.example.citiway.features.shared.JourneyState
 import com.example.citiway.features.shared.MapActions
 import com.example.citiway.features.shared.MapState
 import com.example.citiway.features.shared.Stop
+import com.example.citiway.features.shared.StopType
 import com.example.citiway.features.start_location_selection.StartLocationSelectionContent
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.rememberCameraPositionState
@@ -198,58 +199,51 @@ fun ProgressTrackerScreenPreview() {
             stops = listOf(
                 Stop(
                     name = "Mowbray Station",
-                    nextDeparture = Duration.ofMinutes(5),
-                    nextDepartureMin = 5,
-                    arrivesIn = Duration.ofMinutes(10),
-                    arrivesInMin = 10,
-                    fromMode = "WALK",
-                    toMode = "HEAVY_RAIL",
+                    stopType = StopType.DEPARTURE,
+                    latLng = LatLng(-33.9455, 18.4756),
+                    nextEventIn = Duration.ofMinutes(5),
+                    nextEventInMin = 5,
                     routeName = "Southern Line",
-                    latLng = LatLng(-33.9455, 18.4756)
+                    travelMode = "HEAVY_RAIL",
                 ),
                 Stop(
                     name = "Salt River Station",
-                    nextDeparture = Duration.ofMinutes(10),
-                    nextDepartureMin = 10,
-                    arrivesIn = Duration.ofMinutes(20),
-                    arrivesInMin = 20,
-                    fromMode = "HEAVY_RAIL",
-                    toMode = "BUS",
-                    routeName = "Southern Line",
-                    latLng = LatLng(-33.9295, 18.4528)
+                    stopType = StopType.ARRIVAL,
+                    latLng = LatLng(-33.9295, 18.4528),
+                    nextEventIn = Duration.ofMinutes(5),
+                    nextEventInMin = 5,
                 ),
                 Stop(
                     name = "Salt River Rail North",
-                    nextDeparture = Duration.ofMinutes(22),
-                    nextDepartureMin = 22,
-                    arrivesIn = Duration.ofMinutes(44),
-                    arrivesInMin = 44,
-                    fromMode = "BUS",
-                    toMode = "BUS",
+                    stopType = StopType.DEPARTURE,
+                    latLng = LatLng(-33.9275, 18.4533),
+                    nextEventIn = Duration.ofMinutes(5),
+                    nextEventInMin = 5,
                     routeName = "260 Omuramba",
-                    latLng = LatLng(-33.9275, 18.4533)
+                    travelMode = "BUS",
                 ),
                 Stop(
                     name = "Quest",
-                    nextDeparture = Duration.ofMinutes(44),
-                    nextDepartureMin = 44,
-                    arrivesIn = Duration.ofMinutes(57),
-                    arrivesInMin = 57,
-                    fromMode = "BUS",
-                    toMode = "BUS",
-                    routeName = "262 SummerGreens",
-                    latLng = LatLng(-33.8953, 18.5147)
+                    stopType = StopType.ARRIVAL,
+                    latLng = LatLng(-33.8953, 18.5147),
+                    nextEventIn = Duration.ofMinutes(5),
+                    nextEventInMin = 5,
                 ),
                 Stop(
                     name = "Oasis",
-                    nextDeparture = Duration.ofMinutes(67),
-                    nextDepartureMin = 67,
-                    arrivesIn = Duration.ofMinutes(76),
-                    arrivesInMin = 76,
-                    fromMode = "BUS",
-                    toMode = "WALK",
+                    stopType = StopType.DEPARTURE,
+                    latLng = LatLng(-33.8935, 18.5085),
+                    nextEventIn = Duration.ofMinutes(5),
+                    nextEventInMin = 5,
                     routeName = "262 SummerGreens",
-                    latLng = LatLng(-33.8935, 18.5085)
+                    travelMode = "BUS",
+                ),
+                Stop(
+                    name = "Final stop",
+                    stopType = StopType.ARRIVAL,
+                    latLng = LatLng(-33.8935, 18.5085),
+                    nextEventIn = Duration.ofMinutes(5),
+                    nextEventInMin = 5,
                 )
             ),
             instructions = listOf(
@@ -274,6 +268,11 @@ fun ProgressTrackerScreenPreview() {
                     travelMode = "BUS"
                 ),
                 Instruction(
+                    text = "Walk 42m",
+                    durationMinutes = 1,
+                    travelMode = "WALK"
+                ),
+                Instruction(
                     text = "Take MyCiTi bus for 5 stops",
                     durationMinutes = 13,
                     travelMode = "BUS"
@@ -284,8 +283,6 @@ fun ProgressTrackerScreenPreview() {
                     travelMode = "WALK"
                 )
             ),
-            // The arrival time in the screenshot is "4:06 PM". We'll represent this as an Instant.
-            // This is a placeholder for a specific date, adjust if necessary.
             arrivalTime = Instant.parse("2025-10-21T16:06:00Z"),
             distanceMeters = 5000
         ),

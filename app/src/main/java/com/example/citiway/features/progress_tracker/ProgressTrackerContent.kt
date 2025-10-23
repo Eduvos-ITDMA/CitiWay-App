@@ -6,6 +6,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -40,6 +41,7 @@ import com.example.citiway.core.utils.convertIsoToHhmm
 import com.example.citiway.features.shared.Instruction
 import com.example.citiway.features.shared.JourneyState
 import com.example.citiway.features.shared.Stop
+import com.example.citiway.features.shared.StopType
 
 @Composable
 fun ProgressTrackerContent(
@@ -169,7 +171,8 @@ fun ProgressTrackerContent(
                     // End Location
                     JourneyStep(
                         isStart = false,
-                        title = "Eduvos Cape Town - Mowbray",
+                        title = journeyState.destination?.primaryText
+                            ?: "Error: Unknown Location",
                         hasEditIcon = true,
                         onCoordinatesChanged = { offset ->
                             stepCoordinates = stepCoordinates.toMutableList().apply {
@@ -350,7 +353,7 @@ fun JourneyStep(
 
 @Composable
 fun InstructionStep(instruction: Instruction) {
-    VerticalSpace(12)
+    VerticalSpace(16)
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -394,7 +397,7 @@ fun InstructionStep(instruction: Instruction) {
             }
         }
     }
-    VerticalSpace(18)
+    VerticalSpace(16)
 }
 
 @Composable
@@ -402,13 +405,6 @@ fun TransitStopCard(
     stop: Stop,
     onCoordinatesChanged: (Offset) -> Unit
 ) {
-    var routeName = stop.routeName
-    var routeColor = MaterialTheme.colorScheme.secondary
-    if (stop.toMode == "WALK") {
-        routeColor = MaterialTheme.colorScheme.onSurfaceVariant
-        routeName = "Disembark"
-    }
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -419,7 +415,7 @@ fun TransitStopCard(
         Box(
             modifier = Modifier
                 .width(40.dp)
-                .height(120.dp)
+                .fillMaxHeight()
                 .onGloballyPositioned { coordinates ->
                     // Use positionInRoot() to get absolute position
                     val center = Offset(
@@ -430,6 +426,13 @@ fun TransitStopCard(
                 },
             contentAlignment = Alignment.Center
         ) {
+//            Icon(
+//                painter = painterResource(iconRes),
+//                contentDescription = "Node marker",
+//                modifier = Modifier
+//                    .size(24.dp),
+//                tint = MaterialTheme.colorScheme.primary
+//            )
             Box(
                 modifier = Modifier
                     .padding(top = 8.dp)
@@ -441,9 +444,34 @@ fun TransitStopCard(
             )
         }
 
-        HorizontalSpace(12)
+        val iconRes = when (stop.stopType) {
+            StopType.DEPARTURE -> R.drawable.ic_right_chevron
+            StopType.ARRIVAL -> R.drawable.ic_left_chevron
+        }
 
-        Column(modifier = Modifier.weight(1f)) {
+        Icon(
+            painter = painterResource(iconRes),
+            contentDescription = "",
+            modifier = Modifier
+                .width(20.dp)
+                .fillMaxHeight()
+                .align(Alignment.CenterVertically)
+                .padding(end = 8.dp, top = 8.dp, start = 0.dp, bottom = 0.dp),
+            tint = MaterialTheme.colorScheme.secondary
+        )
+
+        Column(verticalArrangement = Arrangement.Center, modifier = Modifier.weight(1f)) {
+            Text(
+                text = when (stop.stopType) {
+                    StopType.DEPARTURE -> "Board"
+                    StopType.ARRIVAL -> "Disembark"
+                },
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier
+                    .padding(end = 10.dp, bottom = 2.dp)
+                    .align(Alignment.End)
+            )
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(
@@ -468,7 +496,6 @@ fun TransitStopCard(
 
                         VerticalSpace(2)
 
-                        var duration = stop.nextDepartureMin
                         // "Next bus in 11min" with orange color for time
                         val annotatedString = buildAnnotatedString {
                             withStyle(
@@ -477,18 +504,21 @@ fun TransitStopCard(
                                     fontWeight = FontWeight.Bold
                                 )
                             ) {
-                                when (stop.toMode) {
-                                    "WALK" -> {
+                                when (stop.stopType) {
+                                    StopType.ARRIVAL -> {
                                         append("Arrives in ")
-                                        duration = stop.arrivesInMin
                                     }
 
-                                    "HEAVY_RAIL" -> {
-                                        append("Next train in ")
-                                    }
+                                    StopType.DEPARTURE -> {
+                                        when (stop.travelMode) {
+                                            "HEAVY_RAIL" -> {
+                                                append("Next train in ")
+                                            }
 
-                                    "BUS" -> {
-                                        append("Next bus in ")
+                                            "BUS" -> {
+                                                append("Next bus in ")
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -498,7 +528,7 @@ fun TransitStopCard(
                                     fontWeight = FontWeight.ExtraBold
                                 )
                             ) {
-                                append("$duration min")
+                                append("${stop.nextEventInMin} min")
                             }
                         }
 
@@ -509,70 +539,36 @@ fun TransitStopCard(
                     }
 
                     // Route info section with vertical divider (The card)
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
-                            .border(
-                                width = 1.dp,
-                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f),
-                                shape = RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp)
-                            )
-                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f))
-                            .padding(8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
+                    if (stop.routeName != null) {
                         Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
+                                .border(
+                                    width = 1.dp,
+                                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f),
+                                    shape = RoundedCornerShape(
+                                        bottomStart = 12.dp,
+                                        bottomEnd = 12.dp
+                                    )
+                                )
+                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f))
+                                .padding(12.dp, 8.dp),
                             verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.weight(1f)
+                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Icon(
-                                painter = painterResource(modeIcon(stop.fromMode)),
-                                contentDescription = stop.fromMode,
-                                tint = MaterialTheme.colorScheme.onBackground,
-                                modifier = Modifier.size(24.dp)
-                            )
-
-                            HorizontalSpace(8)
-
-                            Icon(
-                                painter = painterResource(R.drawable.double_arrow_right), // Downloaded icon from site fonts.google, can be customised.
-                                contentDescription = "To",
-                                tint = MaterialTheme.colorScheme.secondary,
-                                modifier = Modifier.size(28.dp)
-                            )
-
-                            HorizontalSpace(8)
-
-                            Icon(
-                                painter = painterResource(modeIcon(stop.toMode)),
-                                contentDescription = stop.toMode,
-                                tint = MaterialTheme.colorScheme.onBackground,
-                                modifier = Modifier.size(24.dp)
-                            )
-
-                            HorizontalSpace(12)
-
-                            // Vertical divider
-                            Box(
-                                modifier = Modifier
-                                    .width(2.dp)
-                                    .height(28.dp)
-                                    .background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f))
+                            Text(
+                                text = stop.routeName,
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary,
+                                textAlign = TextAlign.End
                             )
                         }
-
-                        Text(
-                            text = routeName,
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = routeColor,
-                            textAlign = TextAlign.End
-                        )
                     }
                 }
             }
+            VerticalSpace(16)
         }
     }
 }
