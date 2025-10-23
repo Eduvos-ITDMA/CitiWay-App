@@ -14,6 +14,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.jupiter.api.Assertions.*
 import java.io.InputStreamReader
+import java.time.Duration
 
 class JourneyViewModelTest {
     private lateinit var mockNavController: NavController
@@ -47,9 +48,7 @@ class JourneyViewModelTest {
 
         // ASSERT
         assertEquals("Walk 374m", journey.instructions[0].text)
-        assertEquals(
-            4, journey.instructions[0].durationMinutes
-        ) // (182s + 98s) / 60 = 4.66, rounded up
+        assertEquals(4, journey.instructions[0].durationMinutes)
         assertEquals("WALK", journey.instructions[0].travelMode)
 
         // Second instruction: The first TRANSIT step
@@ -59,9 +58,7 @@ class JourneyViewModelTest {
 
         // Third instruction: A combination of the next four WALK steps
         assertEquals("Walk 341m", journey.instructions[2].text)
-        assertEquals(
-            4, journey.instructions[2].durationMinutes
-        ) // (15s + 248s + 20s + 7s) / 60 = 4.83, rounded up
+        assertEquals(4, journey.instructions[2].durationMinutes)
         assertEquals("WALK", journey.instructions[2].travelMode)
 
         // Fourth instruction: The final TRANSIT step
@@ -74,11 +71,26 @@ class JourneyViewModelTest {
         assertEquals("WALK", journey.instructions[6].travelMode)
 
         // Assertions for the stops
-        assertEquals(3, journey.stops.size)
-        assertEquals("Salt River Station", journey.stops[0].name)
-        assertEquals("WALK", journey.stops[0].fromMode)
-        assertEquals("HEAVY_RAIL", journey.stops[0].toMode)
+        assertEquals(6, journey.stops.size)
+        assertEquals("Rondebosch Station", journey.stops[0].name)
+        assertEquals(StopType.DEPARTURE, journey.stops[0].stopType)
         assertEquals("Southern Line", journey.stops[0].routeName)
+        assertEquals("HEAVY_RAIL", journey.stops[0].travelMode)
+
+        assertEquals("Salt River Station", journey.stops[1].name)
+        assertEquals(StopType.ARRIVAL, journey.stops[1].stopType)
+        assertEquals(null, journey.stops[1].routeName)
+        assertEquals(null, journey.stops[1].travelMode)
+
+        assertEquals("Zastron", journey.stops[4].name)
+        assertEquals(StopType.DEPARTURE, journey.stops[4].stopType)
+        assertEquals("Dunoon - Omuramba - Century City", journey.stops[4].routeName)
+        assertEquals("BUS", journey.stops[4].travelMode)
+
+        assertEquals("Sanddrift", journey.stops[5].name)
+        assertEquals(StopType.ARRIVAL, journey.stops[5].stopType)
+        assertEquals(null, journey.stops[5].routeName)
+        assertEquals(null, journey.stops[5].travelMode)
     }
 
     private fun loadRouteFromJson(fileName: String): Route {

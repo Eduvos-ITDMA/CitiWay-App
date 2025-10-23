@@ -68,13 +68,10 @@ class JourneyViewModel(
                 if (_state.value.journey != null) {
                     _state.update { currentState ->
                         val stops = currentState.journey?.stops?.map { stop ->
-                            val newNextDeparture = stop.nextDeparture?.minusSeconds(1)
-                            val newArrivesIn = stop.arrivesIn?.minusSeconds(1)
+                            val nextEventIn = stop.nextEventIn?.minusSeconds(1)
                             stop.copy(
-                                nextDeparture = newNextDeparture,
-                                arrivesIn = newArrivesIn,
-                                nextDepartureMin = newNextDeparture?.toMinutes()?.toInt() ?: 0,
-                                arrivesInMin = newArrivesIn?.toMinutes()?.toInt() ?: 0
+                                nextEventIn = nextEventIn,
+                                nextEventInMin = nextEventIn?.toMinutes()?.toInt() ?: 0,
                             )
                         }
                         val newState = currentState.journey?.copy(stops = stops ?: emptyList())
@@ -350,63 +347,73 @@ class JourneyViewModel(
                 }
 
                 "TRANSIT" -> {
+                    // ======== Add walk instruction ========
                     val minutes = duration / 60
                     if (fromMode == "WALK") {
                         instructions.add(Instruction("Walk ${distance}m", minutes, "WALK"))
                     }
 
-                    val vehicle = getVehicle(step)
-                    val stopCount = step.transitDetails?.stopCount ?: 1
-                    var instructionText = "Take transport"
-                    var toMode = ""
-                    when (vehicle?.type ?: "") {
-                        "HEAVY_RAIL" -> {
-                            instructionText = "Take train for $stopCount stations"
-                            toMode = "HEAVY_RAIL"
-                        }
+                    val stopDetails = step.transitDetails?.stopDetails
+                    val vehicleType = getVehicle(step)?.type ?: ""
 
-                        "BUS" -> {
-                            instructionText = "Take MyCiTi bus for $stopCount stops"
-                            toMode = "BUS"
-                        }
-                    }
-
-                    if (stopCount <= 1) instructionText = instructionText.dropLast(1)
-
-                    val instruction =
-                        Instruction(
-                            instructionText,
-                            step.staticDuration.toSecondsInt() / 60,
-                            vehicle?.type ?: ""
-                        )
-
-                    val stopName =
-                        step.transitDetails?.stopDetails?.arrivalStop?.name ?: "Transport stop"
-                    val nextDeparture = Duration.between(
+                    // ========  Get departure stop data ========
+                    var stopName = stopDetails?.departureStop?.name ?: "Transport stop"
+                    var latLng = stopDetails?.departureStop?.location?.latLng
+                    var nextEventIn = Duration.between(
                         Instant.now(),
-                        Instant.parse(step.transitDetails?.stopDetails?.departureTime)
+                        Instant.parse(stopDetails?.departureTime)
                     )
-                    val arrivesIn = Duration.between(
-                        Instant.now(), Instant.parse(step.transitDetails?.stopDetails?.arrivalTime)
-                    )
+                    var nextEventInMin = nextEventIn.toMinutes().toInt()
                     val routeName = step.transitDetails?.transitLine?.name ?: ""
-                    val latLng = step.transitDetails?.stopDetails?.departureStop?.location?.latLng
 
-                    // Add instruction
-                    instructions.add(instruction)
-
-                    // Add stop
+                    // Add departure stop
                     stops.add(
                         Stop(
                             stopName,
-                            fromMode,
-                            toMode,
-                            nextDeparture,
-                            nextDeparture.toMinutes().toInt(),
-                            arrivesIn,
-                            arrivesIn.toMinutes().toInt(),
+                            StopType.DEPARTURE,
+                            latLng,
+                            nextEventIn,
+                            nextEventInMin,
                             routeName,
-                            latLng
+                            vehicleType,
+                        )
+                    )
+
+                    // ======== Get intermediary instruction data ========
+                    val stopCount = step.transitDetails?.stopCount ?: 1
+                    var instructionText = when (vehicleType) {
+                        "HEAVY_RAIL" -> "Take train for $stopCount stations"
+                        "BUS" -> "Take MyCiTi bus for $stopCount stops"
+                        else -> "Take transport"
+                    }
+                    if (stopCount <= 1) instructionText = instructionText.dropLast(1)
+
+                    // Add intermediary instruction
+                    instructions.add(
+                        Instruction(
+                            instructionText,
+                            step.staticDuration.toSecondsInt() / 60,
+                            vehicleType,
+                        )
+                    )
+
+                    // ======== Get arrival stop data ========
+                    stopName = stopDetails?.arrivalStop?.name ?: "Transport stop"
+                    latLng = stopDetails?.arrivalStop?.location?.latLng
+                    nextEventIn = Duration.between(
+                        Instant.now(),
+                        Instant.parse(stopDetails?.arrivalTime)
+                    )
+                    nextEventInMin = nextEventIn.toMinutes().toInt()
+
+                    // Add arrival stop
+                    stops.add(
+                        Stop(
+                            stopName,
+                            StopType.ARRIVAL,
+                            latLng,
+                            nextEventIn,
+                            nextEventInMin
                         )
                     )
 
@@ -477,18 +484,18 @@ data class Journey(
 
 data class Stop(
     val name: String,
-    val fromMode: String,
-    val toMode: String?,
-    val nextDeparture: Duration?,
-    val nextDepartureMin: Int,
-    val arrivesIn: Duration?,
-    val arrivesInMin: Int,
-    val routeName: String,
-    val latLng: LatLng?
+    val stopType: StopType,
+    val latLng: LatLng?,
+    val nextEventIn: Duration? = null,
+    val nextEventInMin: Int? = null,
+    val routeName: String? = null,
+    val travelMode: String? = null,
 )
 
 data class Instruction(
-    var text: String, val durationMinutes: Int, val travelMode: String = "WALK"
+    var text: String,
+    val durationMinutes: Int,
+    val travelMode: String = "WALK",
 )
 
 /**
@@ -510,4 +517,8 @@ enum class TimeType(val label: String) {
 
 enum class LocationType {
     START, END
+}
+
+enum class StopType {
+    DEPARTURE, ARRIVAL
 }
