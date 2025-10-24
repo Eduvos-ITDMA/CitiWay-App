@@ -17,6 +17,9 @@ import com.example.citiway.data.remote.SelectedLocation
 import com.example.citiway.data.remote.Step
 import com.example.citiway.data.remote.Vehicle
 import com.google.android.gms.maps.model.LatLng
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -33,12 +36,14 @@ import kotlin.math.ceil
 
 class JourneyViewModel(
     private val navController: NavController,
-    private val routesManager: RoutesManager = App.appModule.routesManager
+    private val routesManager: RoutesManager = App.appModule.routesManager,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.Main
 ) : ViewModel() {
     private val _state = MutableStateFlow(JourneyState())
     val state: StateFlow<JourneyState> = _state
 
-    private var recalculateRoutes = false
+    private val scope = CoroutineScope(viewModelScope.coroutineContext)
+    var recalculateRoutes = false
 
     // Timer that emits every second, used to update relative times in the UI
     private val ticker = flow {
@@ -49,7 +54,7 @@ class JourneyViewModel(
     }
 
     init {
-        viewModelScope.launch {
+        viewModelScope.launch() {
             // Recalculate the nextDeparture duration from the original departure time
             // This triggers a recomposition in the UI when the minute ticks down
             ticker.collect {
@@ -202,7 +207,7 @@ class JourneyViewModel(
         val destination: LatLng? = state.value.destination?.latLng
         if (start != null && destination != null) {
 
-            viewModelScope.launch {
+            scope.launch(dispatcher) {
                 val filter = state.value.filter
 
                 val routes = routesManager.getTransitRoutes(
@@ -289,7 +294,7 @@ class JourneyViewModel(
                         steps.forEach { step ->
                             if (step.travelMode == "TRANSIT") {
                                 when (getVehicle(step)?.type?.uppercase()) {
-                                    "BUS" -> fare += 200f
+                                    "BUS" -> fare += 20f
                                     "HEAVY_RAIL", "RAIL" -> fare += 10f
                                     else -> fare = 0f
                                 }
