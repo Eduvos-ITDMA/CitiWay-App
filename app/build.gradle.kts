@@ -54,6 +54,15 @@ kotlin {
 }
 
 dependencies {
+    // For Room testing
+    testImplementation("androidx.room:room-testing:2.6.1")
+// For JUnit tests
+    testImplementation("junit:junit:4.13.2")
+// For coroutines test support
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0")
+// For AndroidX test utilities
+    testImplementation("androidx.test:core:1.5.0")
+
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)

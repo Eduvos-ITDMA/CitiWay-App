@@ -244,6 +244,11 @@ class PlacesManager(
         // Reset session token after fetching place details
         autocompleteSessionToken = AutocompleteSessionToken.newInstance()
 
+        // ✅ ADD THESE 4 LINES HERE:
+        _state.update { currentState ->
+            currentState.copy(userLocation = latLng)
+        }
+
         return SelectedLocation(
             latLng = latLng,
             placeId = place.id ?: placeId,
