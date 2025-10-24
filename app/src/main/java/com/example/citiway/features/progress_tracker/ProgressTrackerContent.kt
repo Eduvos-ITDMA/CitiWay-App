@@ -1,7 +1,6 @@
 package com.example.citiway.features.progress_tracker
 
 import android.icu.text.DecimalFormat
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -151,7 +150,6 @@ fun ProgressTrackerContent(
                             ?: "Error: Unknown Location",
                         hasEditIcon = true,
                     ) { offset ->
-                        Log.d("Journey stop 1", offset.toString())
                         updateCoordinate(0, offset)
                     }
                     VerticalSpace(12)
@@ -180,7 +178,6 @@ fun ProgressTrackerContent(
                             ?: "Error: Unknown Location",
                         hasEditIcon = true,
                     ) { offset ->
-                        Log.d("Journey stop last", offset.toString())
                         updateCoordinate(journey.stops.size, offset)
                     }
                 }
@@ -428,13 +425,6 @@ fun TransitStopCard(
                 },
             contentAlignment = Alignment.Center
         ) {
-//            Icon(
-//                painter = painterResource(iconRes),
-//                contentDescription = "Node marker",
-//                modifier = Modifier
-//                    .size(24.dp),
-//                tint = MaterialTheme.colorScheme.primary
-//            )
             Box(
                 modifier = Modifier
                     .padding(top = 8.dp)
