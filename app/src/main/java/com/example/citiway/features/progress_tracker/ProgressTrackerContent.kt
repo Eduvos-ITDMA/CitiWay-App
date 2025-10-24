@@ -1,6 +1,7 @@
 package com.example.citiway.features.progress_tracker
 
 import android.icu.text.DecimalFormat
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -49,13 +50,20 @@ fun ProgressTrackerContent(
     paddingValues: PaddingValues,
     navController: NavController
 ) {
-
     // Track coordinates for progress line
-    var stepCoordinates by remember { mutableStateOf<List<Offset>>(emptyList()) }
-    var boxOffset by remember { mutableStateOf(Offset.Zero) } //  Tracks the Box position, stops the bug when i scroll
+    val journey = journeyState.journey
+    var stepCoordinates by remember {
+        mutableStateOf(Array<Offset?>(journey?.stops?.size?.plus(1) ?: 0) { null })
+    }
+    var boxOffset by remember { mutableStateOf(Offset.Zero) }
     val connectorColour = MaterialTheme.colorScheme.secondary
 
-    val journey = journeyState.journey
+    fun updateCoordinate(index: Int, offset: Offset) {
+        val localOffset = offset - boxOffset
+        stepCoordinates[index] = localOffset
+        // Trigger recomposition when stepCoordinatesState changes
+        stepCoordinates = stepCoordinates.clone()
+    }
 
     Column(
         modifier = Modifier
@@ -104,31 +112,24 @@ fun ProgressTrackerContent(
                 Canvas(
                     modifier = Modifier
                         .fillMaxSize()
-                        .align(Alignment.TopStart) // CentreStart broke it,  goes to first circle.
+                        .align(Alignment.TopStart)
                 ) {
-                    // Draw connecting lines between steps
-                    for (i in 0 until stepCoordinates.size - 1) {
+                    // Draw connecting lines between stops
+                    for (i in stepCoordinates.dropLast(1).indices) {
                         val start = stepCoordinates[i]
                         val end = stepCoordinates[i + 1]
 
-                        // Only draw if coordinates are valid
-                        if (start != Offset.Zero && end != Offset.Zero) {
-                            val adjustedStart = Offset(
-                                x = start.x - boxOffset.x,
-                                y = start.y - boxOffset.y
-                            )
-                            val adjustedEnd = Offset(
-                                x = end.x - boxOffset.x,
-                                y = end.y - boxOffset.y
-                            )
+                        val pathEffect = if (!journey.stops[i].reached) {
+                            PathEffect.dashPathEffect(floatArrayOf(15f, 15f))
+                        } else null
 
-                            // Dashed line between steps
+                        if (start != Offset.Zero && start != null && end != Offset.Zero && end != null) {
                             drawLine(
                                 color = connectorColour,
-                                start = adjustedStart,
-                                end = adjustedEnd,
+                                start = start,
+                                end = end,
                                 strokeWidth = 4.dp.toPx(),
-                                pathEffect = PathEffect.dashPathEffect(floatArrayOf(15f, 15f))
+                                pathEffect = pathEffect
                             )
                         }
                     }
@@ -140,47 +141,48 @@ fun ProgressTrackerContent(
                 // ======================================================================
 
                 Column(modifier = Modifier.fillMaxWidth()) {
+
+                    // ======================================================
                     // Start Location
+                    // ======================================================
                     JourneyStep(
                         isStart = true,
                         title = journeyState.startLocation?.primaryText
                             ?: "Error: Unknown Location",
                         hasEditIcon = true,
-                        onCoordinatesChanged = { offset -> // Still need to figure out what's going on here
-                            stepCoordinates = stepCoordinates.toMutableList().apply {
-                                if (isEmpty()) add(offset) else set(0, offset)
-                            }
-                        }
-                    )
+                    ) { offset ->
+                        Log.d("Journey stop 1", offset.toString())
+                        updateCoordinate(0, offset)
+                    }
                     VerticalSpace(12)
                     InstructionStep(journey.instructions.first())
 
+                    // ======================================================
                     // Create card for each stop with instruction below it
+                    // ======================================================
                     journey.stops.forEachIndexed { index, stop ->
+                        // Stop
                         TransitStopCard(stop) { offset ->
-                            stepCoordinates = stepCoordinates.toMutableList().apply {
-                                while (size < 2) add(Offset.Zero)
-                                set(1, offset)
-                            }
+                            updateCoordinate(index + 1, offset)
                         }
 
+                        // Instruction
                         val instruction = journey.instructions[index + 1]
                         InstructionStep(instruction)
                     }
 
+                    // ======================================================
                     // End Location
+                    // ======================================================
                     JourneyStep(
                         isStart = false,
                         title = journeyState.destination?.primaryText
                             ?: "Error: Unknown Location",
                         hasEditIcon = true,
-                        onCoordinatesChanged = { offset ->
-                            stepCoordinates = stepCoordinates.toMutableList().apply {
-                                while (size < 5) add(Offset.Zero)
-                                set(4, offset)
-                            }
-                        }
-                    )
+                    ) { offset ->
+                        Log.d("Journey stop last", offset.toString())
+                        updateCoordinate(journey.stops.size, offset)
+                    }
                 }
             }
 
@@ -411,7 +413,7 @@ fun TransitStopCard(
             .height(IntrinsicSize.Min),
         verticalAlignment = Alignment.Top
     ) {
-        // Circle indicator
+        // Node marker
         Box(
             modifier = Modifier
                 .width(40.dp)

@@ -53,6 +53,7 @@ class JourneyViewModel(
             // Recalculate the nextDeparture duration from the original departure time
             // This triggers a recomposition in the UI when the minute ticks down
             ticker.collect {
+                // For times on Journey Selection Screen
                 if (_state.value.journeyOptions.isNullOrEmpty()) {
                     _state.update { currentState ->
                         val updatedOptions = currentState.journeyOptions?.map { details ->
@@ -65,13 +66,19 @@ class JourneyViewModel(
                     }
                 }
 
+                // For times on Progress Tracker Screen
                 if (_state.value.journey != null) {
                     _state.update { currentState ->
-                        val stops = currentState.journey?.stops?.map { stop ->
+                        val stops = currentState.journey?.stops?.mapNotNull { stop ->
+                            // Only update times for departures/arrivals that have not passed yet
+                            if (stop.nextEventInMin == 0) return@mapNotNull null
+
                             val nextEventIn = stop.nextEventIn?.minusSeconds(1)
+                            val nextEventInMin = nextEventIn?.toMinutes()?.toInt() ?: 0
                             stop.copy(
                                 nextEventIn = nextEventIn,
-                                nextEventInMin = nextEventIn?.toMinutes()?.toInt() ?: 0,
+                                nextEventInMin = nextEventInMin,
+                                reached = nextEventInMin == 0
                             )
                         }
                         val newState = currentState.journey?.copy(stops = stops ?: emptyList())
@@ -364,7 +371,11 @@ class JourneyViewModel(
                         Instant.parse(stopDetails?.departureTime)
                     )
                     var nextEventInMin = nextEventIn.toMinutes().toInt()
-                    val routeName = step.transitDetails?.transitLine?.name ?: ""
+                    val routeName = if (vehicleType == "BUS") {
+                        step.transitDetails?.transitLine?.nameShort ?: ""
+                    } else {
+                        step.transitDetails?.transitLine?.name ?: ""
+                    }
 
                     // Add departure stop
                     stops.add(
@@ -490,6 +501,7 @@ data class Stop(
     val nextEventInMin: Int? = null,
     val routeName: String? = null,
     val travelMode: String? = null,
+    var reached: Boolean = false,
 )
 
 data class Instruction(

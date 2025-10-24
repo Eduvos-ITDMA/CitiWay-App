@@ -84,7 +84,7 @@ class JourneyViewModelTest {
 
         assertEquals("Zastron", journey.stops[4].name)
         assertEquals(StopType.DEPARTURE, journey.stops[4].stopType)
-        assertEquals("Dunoon - Omuramba - Century City", journey.stops[4].routeName)
+        assertEquals("T04", journey.stops[4].routeName)
         assertEquals("BUS", journey.stops[4].travelMode)
 
         assertEquals("Sanddrift", journey.stops[5].name)
