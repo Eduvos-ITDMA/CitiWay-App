@@ -36,6 +36,11 @@ fun StartLocationSelectionRoute(
     val placesState by placesManager.state.collectAsStateWithLifecycle()
     val placesActions = placesManager.actions
 
+    // ✅ ADD THIS HERE - Clear locations when entering this screen
+    LaunchedEffect(Unit) {
+        placesActions.onClearLocations()
+    }
+
     val context = LocalActivity.current as ComponentActivity
 
     // Getting activity-scoped DrawerViewModel

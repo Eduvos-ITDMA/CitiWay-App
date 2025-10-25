@@ -50,7 +50,8 @@ class PlacesActions(
     val onClearSearch: () -> Unit,
     val onSetSelectedLocation: (SelectedLocation) -> Unit,
     val onUseUserLocation: () -> Unit,
-    val getPlaceFromLatLng: suspend (LatLng) -> SelectedLocation
+    val getPlaceFromLatLng: suspend (LatLng) -> SelectedLocation,
+    val onClearLocations: () -> Unit
 )
 
 class PlacesManager(
@@ -70,7 +71,8 @@ class PlacesManager(
         onClearSearch = ::clearSearch,
         onSetSelectedLocation = ::setSelectedLocation,
         onUseUserLocation = ::useUserLocation,
-        getPlaceFromLatLng = ::getPlaceFromLatLng
+        getPlaceFromLatLng = ::getPlaceFromLatLng,
+        onClearLocations = ::clearLocations
     )
 
     /*
@@ -244,7 +246,9 @@ class PlacesManager(
         // Reset session token after fetching place details
         autocompleteSessionToken = AutocompleteSessionToken.newInstance()
 
-        // ✅ ADD THESE 4 LINES HERE:
+        // Update userLocation state when a location is selected via map tap or reverse geocoding
+        // This ensures the blue marker appears at the tapped location by syncing userLocation
+        // with the coordinates being converted to a SelectedLocation
         _state.update { currentState ->
             currentState.copy(userLocation = latLng)
         }
@@ -254,6 +258,25 @@ class PlacesManager(
             placeId = place.id ?: placeId,
             primaryText = place.displayName ?: place.formattedAddress ?: "Map Click Location"
         )
+    }
+
+    /**
+     * Clears all location-related state including selected location, user location,
+     * search text, and predictions.
+     *
+     * Used when navigating between location selection screens to prevent stale data
+     * from persisting (e.g., destination screen markers appearing on start location screen).
+     * Should be called when entering a fresh location selection flow.
+     */
+    private fun clearLocations() {
+        _state.update { currentState ->
+            currentState.copy(
+                selectedLocation = null,
+                userLocation = null,
+                searchText = "",
+                predictions = emptyList()
+            )
+        }
     }
 
     /**

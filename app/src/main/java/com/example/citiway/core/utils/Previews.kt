@@ -56,9 +56,12 @@ val mockPlacesActions = PlacesActions(
         SelectedLocation(
             latLng = latLng,
             placeId = "mock_id",
-            primaryText = "Mock Address"
+            primaryText = "Mock Address",
+
         )
-    }
+    },
+    onClearLocations = {}
+
 )
 
 private val mockJourneySelectionActions = JourneySelectionScreenActions(
