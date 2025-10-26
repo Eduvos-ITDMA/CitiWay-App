@@ -8,7 +8,6 @@ import com.example.citiway.core.ui.theme.CitiWayTheme
 import com.example.citiway.data.remote.PlacesActions
 import com.example.citiway.data.remote.PlacesState
 import com.example.citiway.data.remote.SelectedLocation
-import com.example.citiway.features.SplashScreen
 import com.example.citiway.features.destination_selection.DestinationSelectionContent
 import com.example.citiway.features.favourites.FavouritesContent
 import com.example.citiway.features.help.HelpContent
@@ -101,15 +100,6 @@ fun HomeScreenPreview() {
             placesActions = mockPlacesActions,
             paddingValues = PaddingValues(),
         )
-    }
-}
-
-// Splash Screen Preview
-@Preview(showBackground = true, name = "Splash Screen")
-@Composable
-fun SplashScreenPreview() {
-    CitiWayTheme {
-        SplashScreen(navController = rememberNavController()) // Assuming SplashScreen is simple UI
     }
 }
 
