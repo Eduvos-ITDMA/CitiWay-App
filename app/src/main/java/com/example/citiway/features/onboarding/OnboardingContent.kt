@@ -31,6 +31,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
+import android.util.Patterns
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -305,11 +306,22 @@ fun OnboardingContent(
             Button(
                 onClick = {
                     if (name.isNotBlank() && email.isNotBlank()) {
+                        // Validate email
+                        if (!isValidEmail(email.trim())) {
+                            errorMessage = "Please enter a valid email address"
+                            return@Button
+                        }
+
                         isLoading = true
                         errorMessage = null
 
-                        // Extract first name (split by space, take first part)
+                        // Extract first name and limit to 10 characters
                         val firstName = name.trim().split(" ").firstOrNull() ?: name.trim()
+                        val clippedName = if (firstName.length > 10) {
+                            firstName.substring(0, 10)
+                        } else {
+                            firstName
+                        }
 
                         viewModel.saveUser(
                             name = firstName,
@@ -382,4 +394,8 @@ fun OnboardingContent(
             Spacer(modifier = Modifier.height(32.dp))
         }
     }
+}
+
+private fun isValidEmail(email: String): Boolean {
+    return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
 }

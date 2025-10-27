@@ -7,7 +7,6 @@ import com.example.citiway.core.navigation.routes.Screen
 import com.example.citiway.data.remote.PlacesActions
 import com.example.citiway.data.remote.PlacesManager
 import com.example.citiway.data.remote.PlacesState
-import com.example.citiway.features.SplashScreen
 import com.example.citiway.features.help.HelpRoute
 import com.example.citiway.features.onboarding.OnboardingRoute
 import com.example.citiway.features.progress_tracker.ProgressTrackerRoute
@@ -15,8 +14,6 @@ import com.example.citiway.features.progress_tracker.ProgressTrackerRoute
 fun NavGraphBuilder.topLevelDestinations(
     navController: NavController,
 ) {
-    // Splash screen
-    composable(Screen.Splash.route) { SplashScreen(navController) }
 
     composable(route = Screen.Onboarding.route) {
         OnboardingRoute(navController)
