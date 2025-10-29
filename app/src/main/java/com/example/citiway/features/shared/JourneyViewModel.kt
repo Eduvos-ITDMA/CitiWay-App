@@ -294,9 +294,8 @@ class JourneyViewModel(
                         var fare = 0.0f
                         steps.forEach { step ->
                             if (step.travelMode == "TRANSIT") {
-                                var MyCitiFare =
                                 when (getVehicle(step)?.type?.uppercase()) {
-                                    "BUS" ->
+                                    "BUS" -> 0f
                                     "HEAVY_RAIL", "RAIL" -> fare += 10f
                                     else -> fare = 0f
                                 }

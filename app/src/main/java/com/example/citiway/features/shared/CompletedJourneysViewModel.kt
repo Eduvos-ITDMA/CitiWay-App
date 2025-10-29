@@ -2,6 +2,7 @@ package com.example.citiway.features.shared
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.citiway.App
 import com.example.citiway.data.local.entities.Trip
 import com.example.citiway.data.repository.CitiWayRepository
 import com.example.citiway.data.local.CompletedJourney
@@ -36,7 +37,7 @@ data class CompletedJourneysState(
 )
 
 class CompletedJourneysViewModel(
-    private val repository: CitiWayRepository,
+    private val repository: CitiWayRepository = App.appModule.repository,
     private val currentUserId: Int = 1
 ) : ViewModel() {
 

@@ -110,8 +110,8 @@ class CitiWayRepository(private val database: CitiWayDatabase) {
     // ========== FARE OPERATIONS ==========
     suspend fun insertMyCitiFares(fares: List<MyCitiFare>) =
         myCitiFareDao.insertMyCitiFares(fares)
-    suspend fun getMyCitiFare(distanceBand: String): MyCitiFare? =
-        myCitiFareDao.getFareByDistanceBand(distanceBand)
+    suspend fun getMyCitiFare(distanceMeters: Int): MyCitiFare? =
+        myCitiFareDao.getFareByDistance(distanceMeters)
 
 
 

@@ -53,14 +53,14 @@ class DatabaseSeeder(private val repository: CitiWayRepository) {
 
         // 3. Create MyCiti fare structure
         val myCitiFare1 = repository.insertMyCitiFares(listOf(
-            MyCitiFare(distance_band = "0-5km", peak_fare = 13.50, offpeak_fare = 10.50),
-            MyCitiFare(distance_band = "5-10km", peak_fare = 18.50, offpeak_fare = 13.50),
-            MyCitiFare(distance_band = "10-20km", peak_fare = 23.50, offpeak_fare = 18.50),
-            MyCitiFare(distance_band = "20-30km", peak_fare = 25.50, offpeak_fare = 21.50),
-            MyCitiFare(distance_band = "30-40km", peak_fare = 27.50, offpeak_fare = 23.50),
-            MyCitiFare(distance_band = "40-50km", peak_fare = 31.50, offpeak_fare = 28.50),
-            MyCitiFare(distance_band = "50-60km", peak_fare = 38.50, offpeak_fare = 31.50),
-            MyCitiFare(distance_band = "60km+", peak_fare = 39.50, offpeak_fare = 33.50)
+            MyCitiFare(distance_band_lower_limit = 0, peak_fare = 13.50, offpeak_fare = 10.50),
+            MyCitiFare(distance_band_lower_limit = 5000, peak_fare = 18.50, offpeak_fare = 13.50),
+            MyCitiFare(distance_band_lower_limit = 10000, peak_fare = 23.50, offpeak_fare = 18.50),
+            MyCitiFare(distance_band_lower_limit = 20000, peak_fare = 25.50, offpeak_fare = 21.50),
+            MyCitiFare(distance_band_lower_limit = 30000, peak_fare = 27.50, offpeak_fare = 23.50),
+            MyCitiFare(distance_band_lower_limit = 40000, peak_fare = 31.50, offpeak_fare = 28.50),
+            MyCitiFare(distance_band_lower_limit = 50000, peak_fare = 38.50, offpeak_fare = 31.50),
+            MyCitiFare(distance_band_lower_limit = 60000, peak_fare = 39.50, offpeak_fare = 33.50)
         ))
         println("✅ Created 8 MyCiti fare bands")
 

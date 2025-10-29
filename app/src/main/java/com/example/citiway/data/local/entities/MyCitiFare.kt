@@ -9,7 +9,7 @@ import androidx.room.PrimaryKey
 data class MyCitiFare(
     @PrimaryKey(autoGenerate = true)
     val myciti_fare_id: Int = 0,
-    val distance_band: String? = null,
+    val distance_band_lower_limit: Int? = null,
     val peak_fare: Double? = null,
     val offpeak_fare: Double? = null
 )
