@@ -4,10 +4,10 @@ import com.example.citiway.data.remote.Step
 
 class MetrorailService: ITransportService<MetrorailService> {
 
-    private var _fare: Float = 0.0f
+    private var _fare: Double = 0.0
     private var highestZone: MetrorailZone = MetrorailZone.ZONE_1
 
-    private val STATION_ZONE_MAP: Map<String, Int> = mapOf(
+    private val stationZoneMap: Map<String, Int> = mapOf(
         // --- ZONE 1 (1 - 15) ---
         "athlone" to 1,
         "bonteheuwel" to 1,
@@ -132,10 +132,10 @@ class MetrorailService: ITransportService<MetrorailService> {
     override val travelMode: String
         get() = "HEAVY_RAIL"
 
-    override fun adjustFare(step: Step): MetrorailService {
+    override suspend fun adjustFare(step: Step): MetrorailService {
         val stopDetails = step.transitDetails?.stopDetails
-        val arrivalZone = STATION_ZONE_MAP[normalizeStationName(stopDetails?.arrivalStop?.name)] ?: 0
-        val departureZone = STATION_ZONE_MAP[normalizeStationName(stopDetails?.departureStop?.name)] ?: 0
+        val arrivalZone = stationZoneMap[normalizeStationName(stopDetails?.arrivalStop?.name)] ?: 0
+        val departureZone = stationZoneMap[normalizeStationName(stopDetails?.departureStop?.name)] ?: 0
 
         val highestZoneOfStep = MetrorailZone.fromNumber(maxOf(arrivalZone, departureZone))
 
@@ -148,12 +148,12 @@ class MetrorailService: ITransportService<MetrorailService> {
         return this
     }
 
-    override fun getFare(): Float {
+    override fun getFare(): Double {
         return _fare
     }
 
     override fun resetFare() {
-        _fare = 0f
+        _fare = 0.0
     }
 
     private fun normalizeStationName(stationName: String?): String? {
@@ -164,11 +164,11 @@ class MetrorailService: ITransportService<MetrorailService> {
     }
 }
 
-enum class MetrorailZone(val zoneNumber: Int, val singleRate: Float) {
-    ZONE_1(1, 10f),
-    ZONE_2(2, 12f),
-    ZONE_3(3, 14f),
-    ZONE_4(4, 16f);
+enum class MetrorailZone(val zoneNumber: Int, val singleRate: Double) {
+    ZONE_1(1, 10.0),
+    ZONE_2(2, 12.0),
+    ZONE_3(3, 14.0),
+    ZONE_4(4, 16.0);
 
     companion object {
         /** Helper function to safely convert a number (e.g., from a data source) to a zone. */

@@ -5,7 +5,7 @@ import com.example.citiway.data.remote.Step
 interface ITransportService<T: ITransportService<T>> {
     val agencyName: String
     val travelMode: String
-    fun adjustFare(step: Step): T
-    fun getFare(): Float
+    suspend fun adjustFare(step: Step): T
+    fun getFare(): Double
     fun resetFare()
 }
