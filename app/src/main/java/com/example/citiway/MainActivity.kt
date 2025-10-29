@@ -1,6 +1,5 @@
 package com.example.citiway
 
-import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -44,7 +43,7 @@ class MainActivity : ComponentActivity() {
 
         // Seed database on first launch
         lifecycleScope.launch {
-//            seeder.seedDatabase()  // comment this line out after 1st app launch to avoid duplicated data
+            seeder.seedDatabase()  // comment this line out after 1st app launch to avoid duplicated data
         }
 
         enableEdgeToEdge()

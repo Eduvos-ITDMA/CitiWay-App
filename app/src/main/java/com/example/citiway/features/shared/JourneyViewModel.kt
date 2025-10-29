@@ -11,6 +11,7 @@ import com.example.citiway.core.utils.convertHourToInstantIso
 import com.example.citiway.core.utils.convertIsoToHhmm
 import com.example.citiway.core.utils.getNearestHalfHour
 import com.example.citiway.core.utils.toSecondsInt
+import com.example.citiway.data.local.entities.MyCitiFare
 import com.example.citiway.data.remote.Route
 import com.example.citiway.data.remote.RoutesManager
 import com.example.citiway.data.remote.SelectedLocation
@@ -54,7 +55,7 @@ class JourneyViewModel(
     }
 
     init {
-        viewModelScope.launch() {
+        viewModelScope.launch {
             // Recalculate the nextDeparture duration from the original departure time
             // This triggers a recomposition in the UI when the minute ticks down
             ticker.collect {
@@ -293,8 +294,9 @@ class JourneyViewModel(
                         var fare = 0.0f
                         steps.forEach { step ->
                             if (step.travelMode == "TRANSIT") {
+                                var MyCitiFare =
                                 when (getVehicle(step)?.type?.uppercase()) {
-                                    "BUS" -> fare += 20f
+                                    "BUS" ->
                                     "HEAVY_RAIL", "RAIL" -> fare += 10f
                                     else -> fare = 0f
                                 }
