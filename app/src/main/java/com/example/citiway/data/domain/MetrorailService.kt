@@ -2,10 +2,10 @@ package com.example.citiway.data.domain
 
 import com.example.citiway.data.remote.Step
 
-class MetrorailService: ITransportService<MetrorailService> {
+class MetrorailService(): ITransportService<MetrorailService> {
 
     private var _fare: Double = 0.0
-    private var highestZone: MetrorailZone = MetrorailZone.ZONE_1
+    private var highestZone: MetrorailZone = MetrorailZone.ZONE_0
 
     private val stationZoneMap: Map<String, Int> = mapOf(
         // --- ZONE 1 (1 - 15) ---
@@ -165,6 +165,7 @@ class MetrorailService: ITransportService<MetrorailService> {
 }
 
 enum class MetrorailZone(val zoneNumber: Int, val singleRate: Double) {
+    ZONE_0(0, 0.0), // <- for initialization
     ZONE_1(1, 10.0),
     ZONE_2(2, 12.0),
     ZONE_3(3, 14.0),

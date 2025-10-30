@@ -18,8 +18,7 @@ private val MORNING_PEAK_END = LocalTime.of(8, 0).plusNanos(1)
 private val AFTERNOON_PEAK_START = LocalTime.of(16, 15).minusNanos(1)
 private val AFTERNOON_PEAK_END = LocalTime.of(17, 30).plusNanos(1)
 
-class MycitiBusService : ITransportService<MycitiBusService> {
-    private val repository: CitiWayRepository = App.appModule.repository
+class MycitiBusService(val repository: CitiWayRepository = App.appModule.repository) : ITransportService<MycitiBusService> {
     private var unbrokenTrips: MutableList<UnbrokenTrip> = mutableListOf()
     private var _fare: Double = 0.0
 

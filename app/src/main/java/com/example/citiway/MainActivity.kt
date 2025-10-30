@@ -48,18 +48,13 @@ class MainActivity : ComponentActivity() {
 
         enableEdgeToEdge()
         setContent {
-            // Initializing DrawerViewModel to manage app settings (theme, location, etc.)
             val drawerViewModel: DrawerViewModel = viewModel()
-
-            // Collect dark mode state from DataStore
             val darkModeEnabled by drawerViewModel.darkModeEnabled.collectAsState()
 
-            // Apply theme based on user's preference from drawer toggle
             CitiWayTheme(darkTheme = darkModeEnabled) {
-                // Setting up navigation
                 val navController = rememberNavController()
 
-                // Check if user exists to determine start route
+                // Check if user exists to determine start screen
                 var startRoute by remember { mutableStateOf<String?>(null) }
 
                 LaunchedEffect(Unit) {
@@ -71,7 +66,6 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                // Only show app once we've determined the start route
                 startRoute?.let { route ->
                     CitiWayApp(navController, route)
                 }
