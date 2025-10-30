@@ -11,6 +11,8 @@ import com.example.citiway.core.utils.convertHourToInstantIso
 import com.example.citiway.core.utils.convertIsoToHhmm
 import com.example.citiway.core.utils.getNearestHalfHour
 import com.example.citiway.core.utils.toSecondsInt
+import com.example.citiway.data.domain.MetrorailService
+import com.example.citiway.data.domain.MycitiBusService
 import com.example.citiway.data.remote.Route
 import com.example.citiway.data.remote.RoutesManager
 import com.example.citiway.data.remote.SelectedLocation
@@ -54,7 +56,7 @@ class JourneyViewModel(
     }
 
     init {
-        viewModelScope.launch() {
+        viewModelScope.launch {
             // Recalculate the nextDeparture duration from the original departure time
             // This triggers a recomposition in the UI when the minute ticks down
             ticker.collect {
@@ -164,9 +166,10 @@ class JourneyViewModel(
 
     fun setJourney(id: String) {
         val route = _state.value.routesResponse?.get(id)
+        val fareTotal = _state.value.journeyOptions?.find { it.uuid == id }?.fareTotal ?: 0.0
 
         if (route != null) {
-            val journey = routeToJourney(route)
+            val journey = routeToJourney(route, fareTotal)
             _state.update { it.copy(journey = journey) }
         }
     }
@@ -206,6 +209,9 @@ class JourneyViewModel(
         val start: LatLng? = state.value.startLocation?.latLng
         val destination: LatLng? = state.value.destination?.latLng
         if (start != null && destination != null) {
+
+            val metrorailService = MetrorailService()
+            val mycitiBusService = MycitiBusService()
 
             scope.launch(dispatcher) {
                 val filter = state.value.filter
@@ -289,17 +295,16 @@ class JourneyViewModel(
                             nextDeparture.toMinutes() < ceil(0.75 * firstWalkDuration)
                         if (nextDeparture.isNegative || departureTooSoonToWalk || arrivalTooFarInFuture) return@mapNotNull null
 
-                        // TODO: fareTotal
-                        var fare = 0.0f
+                        // Calculate fares
                         steps.forEach { step ->
                             if (step.travelMode == "TRANSIT") {
                                 when (getVehicle(step)?.type?.uppercase()) {
-                                    "BUS" -> fare += 20f
-                                    "HEAVY_RAIL", "RAIL" -> fare += 10f
-                                    else -> fare = 0f
+                                    "BUS" -> mycitiBusService.adjustFare(step)
+                                    "HEAVY_RAIL", "RAIL" -> metrorailService.adjustFare(step)
                                 }
                             }
                         }
+                        val fareTotal = mycitiBusService.getFare() + metrorailService.getFare()
 
                         val details = JourneyDetails(
                             firstWalkMinutes = firstWalkDuration,
@@ -308,7 +313,7 @@ class JourneyViewModel(
                             nextDeparture = nextDeparture,
                             departureTimeInstant = departureInstant,
                             arrivalTime = arrivalTime,
-                            fareTotal = fare,
+                            fareTotal = fareTotal,
                             totalDurationMinutes = totalDurationMinutes
                         )
 
@@ -340,7 +345,7 @@ class JourneyViewModel(
         return null
     }
 
-    fun routeToJourney(route: Route): Journey {
+    fun routeToJourney(route: Route, fareTotal: Double = 0.0): Journey {
         val instructions: MutableList<Instruction> = mutableListOf()
         val stops: MutableList<Stop> = mutableListOf()
         var distance = 0
@@ -446,7 +451,7 @@ class JourneyViewModel(
             instructions.add(Instruction("Walk ${distance}m", duration / 60, "WALK"))
         }
 
-        return Journey(stops, instructions, arrivalTime, distanceMeters)
+        return Journey(stops, instructions, arrivalTime, distanceMeters, fareTotal)
     }
 }
 
@@ -469,7 +474,7 @@ data class JourneyDetails(
     val nextDeparture: Duration?,
     val departureTimeInstant: Instant,
     val arrivalTime: Instant?,
-    val fareTotal: Float = 0f,
+    val fareTotal: Double = 0.0,
     val totalDurationMinutes: Int? = null
 )
 
@@ -495,7 +500,8 @@ data class Journey(
     val stops: List<Stop>,
     val instructions: List<Instruction>,
     val arrivalTime: Instant?,
-    val distanceMeters: Int
+    val distanceMeters: Int,
+    val fareTotal: Double
 )
 
 data class Stop(

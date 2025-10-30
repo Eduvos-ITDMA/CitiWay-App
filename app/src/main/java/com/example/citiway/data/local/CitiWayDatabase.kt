@@ -26,7 +26,7 @@ import com.example.citiway.data.local.entities.*
         MetrorailFare::class,     // Stores Metrorail fare prices
 //        SavedPlace::class         // Stores saved places and favorite journeys
     ],
-    version = 4,                  // Database version - increment when schema changes
+    version = 6,                  // Database version - increment when schema changes
     exportSchema = false          // Set to true to export schema for version control
 )
 abstract class CitiWayDatabase : RoomDatabase() {
@@ -66,7 +66,7 @@ abstract class CitiWayDatabase : RoomDatabase() {
                 )
                     // Wipes the database and recreates it if version changes
                     // Remove this in production and use proper migrations instead
-                    .fallbackToDestructiveMigration()
+                    .fallbackToDestructiveMigration(true)
                     .build()
                 INSTANCE = instance
                 instance

@@ -5,16 +5,13 @@ import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.citiway.data.local.CitiWayDatabase
 import com.example.citiway.App
 import com.example.citiway.core.navigation.routes.Screen
 import com.example.citiway.core.utils.ScreenWrapper
-import com.example.citiway.data.repository.CitiWayRepository
 import com.example.citiway.di.viewModelFactory
 import com.example.citiway.features.shared.CompletedJourneysViewModel
 import com.example.citiway.features.shared.JourneyViewModel
@@ -55,15 +52,12 @@ data class HomeActions(
 fun HomeRoute(
     navController: NavController
 ) {
-    // Manual DI: Database → Repository → ViewModel
-    val context = LocalContext.current
-    val database = CitiWayDatabase.getDatabase(context)
-    val repository = CitiWayRepository(database)
+    val repository = App.appModule.repository
 
     // ViewModel for trip history and favorites management
     val completedJourneysViewModel: CompletedJourneysViewModel = viewModel(
         factory = viewModelFactory {
-            CompletedJourneysViewModel(repository = repository)
+            CompletedJourneysViewModel()
         }
     )
 

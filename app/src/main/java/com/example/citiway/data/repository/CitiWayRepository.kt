@@ -28,7 +28,6 @@ class CitiWayRepository(private val database: CitiWayDatabase) {
     private val monthlySpendDao = database.monthlySpendDao()
     private val myCitiFareDao = database.myCitiFareDao()
     private val metrorailFareDao = database.metrorailFareDao()
-    // TripRouteDao REMOVED - no longer needed
 
     // Launch Check if DB has a user, for onboarding purposes
     suspend fun hasUser(): Boolean {
@@ -111,8 +110,8 @@ class CitiWayRepository(private val database: CitiWayDatabase) {
     // ========== FARE OPERATIONS ==========
     suspend fun insertMyCitiFares(fares: List<MyCitiFare>) =
         myCitiFareDao.insertMyCitiFares(fares)
-    suspend fun getMyCitiFare(distanceBand: String): MyCitiFare? =
-        myCitiFareDao.getFareByDistanceBand(distanceBand)
+    suspend fun getMyCitiFare(distanceMeters: Int): MyCitiFare? =
+        myCitiFareDao.getFareByDistance(distanceMeters)
 
 
 

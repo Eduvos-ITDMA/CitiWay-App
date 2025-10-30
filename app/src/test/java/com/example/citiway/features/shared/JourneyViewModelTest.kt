@@ -126,7 +126,7 @@ class JourneyViewModelTest {
         viewModel.setStartLocation(mockLocation)
         viewModel.setDestination(mockLocation)
 
-        val mockRoutes = loadRoutesFromJson("sample_routes_response.json")
+        val mockRoutes = loadRoutesFromJson("sample_routes_response.json", this.javaClass.classLoader!!)
         coEvery {
             mockRoutesManager.getTransitRoutes(
                 any(),
@@ -217,7 +217,7 @@ class JourneyViewModelTest {
     }
 
     private fun loadFirstRouteFromJson(fileName: String): Route {
-        val response = loadRoutesFromJson(fileName)
+        val response = loadRoutesFromJson(fileName, this.javaClass.classLoader!!)
         return response.first()
     }
 
@@ -292,14 +292,14 @@ class JourneyViewModelTest {
         val expectedArrivalTime = arrivalInstant.plusSeconds(13 * 60) // 13 minutes in seconds
         assertEquals(expectedArrivalTime, arrivalTime)
     }
+}
 
-    private fun loadRoutesFromJson(fileName: String): List<Route> {
-        val inputStream = this.javaClass.classLoader!!.getResourceAsStream(fileName)
-        val reader = InputStreamReader(inputStream)
-        // Use Gson to parse the JSON into our data class
-        val response = Gson().fromJson(reader, RoutesResponse::class.java)
-        reader.close()
+fun loadRoutesFromJson(fileName: String, classLoader: ClassLoader): List<Route> {
+    val inputStream = classLoader.getResourceAsStream(fileName)
+    val reader = InputStreamReader(inputStream)
+    // Use Gson to parse the JSON into our data class
+    val response = Gson().fromJson(reader, RoutesResponse::class.java)
+    reader.close()
 
-        return response.routes
-    }
+    return response.routes
 }

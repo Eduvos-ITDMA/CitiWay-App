@@ -434,7 +434,7 @@ fun JourneyCard(
  * Composable for the blue header of the card.
  */
 @Composable
-fun TripHeader(cornerRadius: Dp, totalDurationMinutes: Int?, arrivalTime: Instant?, fareTotal: Float) {
+fun TripHeader(cornerRadius: Dp, totalDurationMinutes: Int?, arrivalTime: Instant?, fareTotal: Double) {
     Row(
         modifier = Modifier
             .fillMaxWidth()

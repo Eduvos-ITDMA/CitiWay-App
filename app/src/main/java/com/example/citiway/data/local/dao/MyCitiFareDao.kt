@@ -13,8 +13,15 @@ interface MyCitiFareDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMyCitiFares(fares: List<MyCitiFare>)
 
-    @Query("SELECT * FROM myciti_fare WHERE distance_band = :distanceBand LIMIT 1")
-    suspend fun getFareByDistanceBand(distanceBand: String): MyCitiFare?
+    @Query(
+        """
+    SELECT * FROM myciti_fare 
+    WHERE distance_band_lower_limit <= :distanceMetres 
+    ORDER BY distance_band_lower_limit DESC
+    LIMIT 1
+    """
+    )
+    suspend fun getFareByDistance(distanceMetres: Int): MyCitiFare?
 
     @Query("SELECT * FROM myciti_fare")
     fun getAllMyCitiFares(): Flow<List<MyCitiFare>>
