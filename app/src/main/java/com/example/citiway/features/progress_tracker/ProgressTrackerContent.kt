@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.citiway.R
 import com.example.citiway.core.navigation.routes.Screen
+import com.example.citiway.core.ui.components.ConfirmationDialog
 import com.example.citiway.core.ui.components.HorizontalSpace
 import com.example.citiway.core.ui.components.VerticalSpace
 import com.example.citiway.core.utils.ProgressTrackerScreenPreview
@@ -56,6 +57,7 @@ fun ProgressTrackerContent(
     }
     var boxOffset by remember { mutableStateOf(Offset.Zero) }
     val connectorColour = MaterialTheme.colorScheme.secondary
+    var showCancellationDialog by remember { mutableStateOf(false) }
 
     fun updateCoordinate(index: Int, offset: Offset) {
         val localOffset = offset - boxOffset
@@ -188,12 +190,10 @@ fun ProgressTrackerContent(
             // Cancel Journey Button
             Box(
                 modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center // Centering the button horizontally
+                contentAlignment = Alignment.Center
             ) {
                 Button(
-                    // TODO: Reckon we just go back to home screen.
-                    // In future check if first stop has been reached, if so go back home, otherwise go back to journey selection
-                    onClick = { navController.navigate(Screen.Home.route) },
+                    onClick = { showCancellationDialog = true },
                     modifier = Modifier
                         .fillMaxWidth(0.6f)
                         .height(50.dp),
@@ -210,6 +210,23 @@ fun ProgressTrackerContent(
                     )
                 }
             }
+
+            // Confirm Cancellation Dialog
+            ConfirmationDialog(
+                visible = showCancellationDialog,
+                title = "Are you sure you want to cancel this journey?",
+                message = "This journey cannot be selected again if the first transit has already departed",
+                onConfirm = {
+                    if (journeyState.journey.stops[0].reached) {
+                        navController.navigate(Screen.Home.route)
+                    } else {
+                        navController.navigate(Screen.JourneySelection.route)
+                    }
+                },
+                onDismiss = {
+                    showCancellationDialog = false
+                },
+            )
 
             VerticalSpace(24)
         }
