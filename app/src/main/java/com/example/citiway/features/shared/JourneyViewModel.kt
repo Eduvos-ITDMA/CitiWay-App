@@ -166,9 +166,10 @@ class JourneyViewModel(
 
     fun setJourney(id: String) {
         val route = _state.value.routesResponse?.get(id)
+        val fareTotal = _state.value.journeyOptions?.find { it.uuid == id }?.fareTotal ?: 0.0
 
         if (route != null) {
-            val journey = routeToJourney(route)
+            val journey = routeToJourney(route, fareTotal)
             _state.update { it.copy(journey = journey) }
         }
     }
@@ -344,7 +345,7 @@ class JourneyViewModel(
         return null
     }
 
-    fun routeToJourney(route: Route): Journey {
+    fun routeToJourney(route: Route, fareTotal: Double = 0.0): Journey {
         val instructions: MutableList<Instruction> = mutableListOf()
         val stops: MutableList<Stop> = mutableListOf()
         var distance = 0
@@ -450,7 +451,7 @@ class JourneyViewModel(
             instructions.add(Instruction("Walk ${distance}m", duration / 60, "WALK"))
         }
 
-        return Journey(stops, instructions, arrivalTime, distanceMeters)
+        return Journey(stops, instructions, arrivalTime, distanceMeters, fareTotal)
     }
 }
 
@@ -499,7 +500,8 @@ data class Journey(
     val stops: List<Stop>,
     val instructions: List<Instruction>,
     val arrivalTime: Instant?,
-    val distanceMeters: Int
+    val distanceMeters: Int,
+    val fareTotal: Double
 )
 
 data class Stop(
