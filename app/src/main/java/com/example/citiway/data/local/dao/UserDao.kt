@@ -18,6 +18,9 @@ interface UserDao {
     @Delete
     suspend fun deleteUser(user: User)
 
+    @Query("SELECT * FROM user ORDER BY user_id ASC LIMIT 1")
+    suspend fun getFirstUser(): User?
+
     @Query("SELECT * FROM user WHERE user_id = :userId")
     suspend fun getUserById(userId: Int): User?
 
