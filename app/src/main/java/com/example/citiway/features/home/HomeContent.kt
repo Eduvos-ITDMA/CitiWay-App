@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -70,6 +71,7 @@ fun HomeContent(
             completedJourneysState.recentJourneys,
             homeActions.onToggleFavourite,
             "Recent Trips",
+            "No recent trips",
             onTitleClick = homeActions.onRecentTitleClick
         )
 
@@ -79,6 +81,7 @@ fun HomeContent(
             completedJourneysState.favouriteJourneys,
             homeActions.onToggleFavourite,
             "Favourite Trips",
+            "No trips saved as favourite yet",
             onTitleClick = homeActions.onFavouritesTitleClick
         )
         VerticalSpace(24)
@@ -139,7 +142,11 @@ private fun HeaderSection(userName: String) {
 }
 
 @Composable
-fun DestinationSearchBar(homeActions: HomeActions, placesState: PlacesState, placesActions: PlacesActions) {
+fun DestinationSearchBar(
+    homeActions: HomeActions,
+    placesState: PlacesState,
+    placesActions: PlacesActions
+) {
     LocationSearchField(
         icon = { modifier ->
             Icon(
@@ -160,12 +167,23 @@ fun CompletedTripsSection(
     journeys: List<CompletedJourney>,
     onToggleFavourite: (String) -> Unit,
     title: String,
+    noJourneysText: String,
     onTitleClick: (() -> Unit)? = null
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         SectionTitleWithArrow(title = title, onClick = onTitleClick)
 
         VerticalSpace(4)
+
+        if (journeys.isEmpty()) {
+            Text(
+                text = noJourneysText,
+                style = MaterialTheme.typography.bodyLarge,
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(vertical = 4.dp)
+            )
+        }
 
         journeys.forEach { journey ->
             key(journey.id) { // DO NOT REMOVE THIS. Recomposition will not be triggered without this

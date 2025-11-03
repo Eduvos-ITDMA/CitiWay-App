@@ -20,7 +20,6 @@ import com.example.citiway.data.remote.Step
 import com.example.citiway.data.remote.Vehicle
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -44,7 +43,6 @@ class JourneyViewModel(
     private val _state = MutableStateFlow(JourneyState())
     val state: StateFlow<JourneyState> = _state
 
-    private val scope = CoroutineScope(viewModelScope.coroutineContext)
     var recalculateRoutes = false
 
     // Timer that emits every second, used to update relative times in the UI
@@ -213,11 +211,12 @@ class JourneyViewModel(
             val metrorailService = MetrorailService()
             val mycitiBusService = MycitiBusService()
 
-            scope.launch(dispatcher) {
+            viewModelScope.launch(dispatcher) {
                 val filter = state.value.filter
+                val selectedTime = filter.resolveTime()
 
                 val routes = routesManager.getTransitRoutes(
-                    start, destination, filter.timeType, filter.resolveTime()
+                    start, destination, filter.timeType, selectedTime
                 )
                 val routesResponseDataMap = mutableMapOf<String, Route>()
 
@@ -287,12 +286,13 @@ class JourneyViewModel(
 
                         // Filter routes - nextDeparture must exceed walk duration, it must not be
                         // negative, and arrivalTime should not be more than 5 hours from the selected time
-                        val arrivalTooFarInFuture = (arrivalTime?.minus(Duration.ofHours(5))
-                            ?: Instant.MAX) > Instant.parse(
-                            _state.value.filter.resolveTime()
-                        )
-                        val departureTooSoonToWalk =
-                            nextDeparture.toMinutes() < ceil(0.75 * firstWalkDuration)
+
+                        /* IMPORTANT: removed departureTooSoonToWalk filter for demonstration - Google Maps does
+                        is unreliable and often returns routes for the next day even when its only early evening */
+                        val arrivalTooFarInFuture = false /*(arrivalTime?.minus(Duration.ofHours(5))
+                            ?: Instant.MAX) > Instant.parse(selectedTime)*/
+                        val departureTooSoonToWalk = nextDeparture.toMinutes() < ceil(0.75 * firstWalkDuration)
+
                         if (nextDeparture.isNegative || departureTooSoonToWalk || arrivalTooFarInFuture) return@mapNotNull null
 
                         // Calculate fares
