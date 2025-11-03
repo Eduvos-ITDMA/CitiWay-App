@@ -291,8 +291,7 @@ class JourneyViewModel(
                         is unreliable and often returns routes for the next day even when its only early evening */
                         val arrivalTooFarInFuture = false /*(arrivalTime?.minus(Duration.ofHours(5))
                             ?: Instant.MAX) > Instant.parse(selectedTime)*/
-                        val departureTooSoonToWalk = false
-                        nextDeparture.toMinutes() < ceil(0.75 * firstWalkDuration)
+                        val departureTooSoonToWalk = nextDeparture.toMinutes() < ceil(0.75 * firstWalkDuration)
 
                         if (nextDeparture.isNegative || departureTooSoonToWalk || arrivalTooFarInFuture) return@mapNotNull null
 
