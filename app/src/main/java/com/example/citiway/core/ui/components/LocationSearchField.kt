@@ -60,7 +60,6 @@ import com.google.android.libraries.places.api.model.AutocompletePrediction
  * @param onSelectPrediction The function to execute when a prediction from the dropdown is selected
  * @param placesState An instance of [PlacesState]
  * @param placesActions An instance of [PlacesActions]
- * @param initialValue The initial text to be displayed in the text field. Defaults to an empty string.
  * @param placeholder The placeholder text to be displayed when the text field is empty.
  *                    Defaults to an empty string.
  */
@@ -72,7 +71,6 @@ fun LocationSearchField(
     onSelectPrediction: ((AutocompletePrediction) -> Unit)? = null,
     placesState: PlacesState,
     placesActions: PlacesActions,
-    initialValue: String = "",
     placeholder: String = ""
 ) {
     // State variables
@@ -81,7 +79,7 @@ fun LocationSearchField(
     val expanded = showPredictions && predictions.isNotEmpty()
 
     val textFieldValue by remember(placesState.searchText) {
-        val text = placesState.searchText.ifEmpty { initialValue }
+        val text = placesState.searchText
         mutableStateOf(
             TextFieldValue(
                 text = text,
@@ -179,6 +177,8 @@ fun LocationSearchField(
                                     } else {
                                         placesActions.onSelectPlace(prediction)
                                     }
+
+                                    showPredictions = false
                                 }
                                 .padding(8.dp)) {
                             Text(

@@ -213,7 +213,6 @@ fun SelectedLocationFields(
                 actions.startLocationFieldActions,
                 startPlacesState,
                 startPlacesActions,
-                state.startLocation?.primaryText ?: "",
             ) { modifier ->
                 Icon(
                     painter = painterResource(R.drawable.ic_circle_full),
@@ -231,7 +230,6 @@ fun SelectedLocationFields(
                 actions.destinationFieldActions,
                 destPlacesState,
                 destPlacesActions,
-                state.destination?.primaryText ?: "",
             ) { modifier ->
                 Icon(
                     painter = painterResource(R.drawable.ic_location_on),
@@ -253,7 +251,6 @@ fun LocationFieldWithIcon(
     locationFieldActions: LocationFieldActions,
     placesState: PlacesState,
     placesActions: PlacesActions,
-    initialValue: String = "",
     connectorIcon: @Composable (Modifier) -> Unit
 ) {
     Row(
@@ -276,7 +273,6 @@ fun LocationFieldWithIcon(
             onSelectPrediction = locationFieldActions.onSelectPrediction,
             placesState = placesState,
             placesActions = placesActions,
-            initialValue = initialValue
         )
         Box(
             modifier = Modifier

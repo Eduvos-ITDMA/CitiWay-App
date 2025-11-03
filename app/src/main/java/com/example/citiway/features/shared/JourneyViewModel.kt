@@ -20,7 +20,6 @@ import com.example.citiway.data.remote.Step
 import com.example.citiway.data.remote.Vehicle
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -287,15 +286,13 @@ class JourneyViewModel(
 
                         // Filter routes - nextDeparture must exceed walk duration, it must not be
                         // negative, and arrivalTime should not be more than 5 hours from the selected time
-                        val arrivalTooFarInFuture = (arrivalTime?.minus(Duration.ofHours(5))
-                            ?: Instant.MAX) > Instant.parse(selectedTime)
-                        val departureTooSoonToWalk =
-                            nextDeparture.toMinutes() < ceil(0.75 * firstWalkDuration)
 
-                        Log.d("nextDeparture", nextDeparture.toMinutes().toString())
-                        Log.d("nextDeparture isNegative", nextDeparture.isNegative.toString())
-                        Log.d("arrivalTooFarInFuture", arrivalTooFarInFuture.toString())
-                        Log.d("departureTooSoonToWalk", departureTooSoonToWalk.toString())
+                        /* IMPORTANT: removed departureTooSoonToWalk filter for demonstration - Google Maps does
+                        is unreliable and often returns routes for the next day even when its only early evening */
+                        val arrivalTooFarInFuture = false /*(arrivalTime?.minus(Duration.ofHours(5))
+                            ?: Instant.MAX) > Instant.parse(selectedTime)*/
+                        val departureTooSoonToWalk = false
+                        nextDeparture.toMinutes() < ceil(0.75 * firstWalkDuration)
 
                         if (nextDeparture.isNegative || departureTooSoonToWalk || arrivalTooFarInFuture) return@mapNotNull null
 

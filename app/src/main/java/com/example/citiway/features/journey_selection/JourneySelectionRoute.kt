@@ -16,6 +16,7 @@ import com.example.citiway.App
 import com.example.citiway.core.navigation.routes.Screen
 import com.example.citiway.core.utils.ScreenWrapper
 import com.example.citiway.core.utils.getNearestHalfHour
+import com.example.citiway.data.remote.PlacesActions
 import com.example.citiway.di.viewModelFactory
 import com.example.citiway.features.shared.JourneySelectionActions
 import com.example.citiway.features.shared.JourneyViewModel
@@ -31,8 +32,7 @@ fun JourneySelectionRoute(
         viewModelStoreOwner = LocalActivity.current as ComponentActivity,
         factory = viewModelFactory {
             JourneyViewModel(navController)
-        }
-    )
+        })
     journeyViewModel.setTime(getNearestHalfHour())
     journeyViewModel.getJourneyOptions()
 
@@ -67,48 +67,48 @@ fun JourneySelectionRoute(
         }
     }
 
+    val onSelectionPrediction: (PlacesActions, AutocompletePrediction) -> Unit =
+        { placesActions, prediction ->
+            journeyViewModel.viewModelScope.launch {
+                val selectedLocation = placesActions.getPlace(prediction)
+                if (selectedLocation != null) {
+                    placesActions.onSetSearchText(selectedLocation.primaryText)
+                    journeyViewModel.actions.onSetDestination(selectedLocation)
+                    journeyViewModel.getJourneyOptions()
+                }
+            }
+        }
+
     val journeySelectionActions = JourneySelectionScreenActions(
         journeyViewModel.actions,
         { id ->
             journeyViewModel.actions.onSetJourney(id)
             navController.navigate(Screen.ProgressTracker.route)
         },
-        LocationFieldActions(
-            onFieldIconClick = {
-                val startLocation = journeyState.startLocation
-                if (startLocation != null) {
-                    startPlacesActions.onSetSearchText(startLocation.primaryText)
-                    startPlacesActions.onSetSelectedLocation(startLocation)
-                    navController.navigate(Screen.StartLocationSelection.route)
-                }
-            },
-            onSelectPrediction = { prediction ->
-                journeyViewModel.viewModelScope.launch {
-                    val selectedLocation = startPlacesActions.getPlace(prediction)
-                    if (selectedLocation != null) {
-                        journeyViewModel.actions.onSetStartLocation(selectedLocation)
-                    }
-                }
+        LocationFieldActions(onFieldIconClick = {
+            val startLocation = journeyState.startLocation
+            if (startLocation != null) {
+                startPlacesActions.onSetSearchText(startLocation.primaryText)
+                startPlacesActions.onSetSelectedLocation(startLocation)
+                navController.navigate(Screen.StartLocationSelection.route)
             }
-        ),
-        LocationFieldActions(
-            onFieldIconClick = {
-                val destination = journeyState.startLocation
-                if (destination != null) {
-                    destPlacesActions.onSetSearchText(destination.primaryText)
-                    destPlacesActions.onSetSelectedLocation(destination)
-                    navController.navigate(Screen.DestinationSelection.route)
-                }
-            },
-            onSelectPrediction = { prediction ->
-                journeyViewModel.viewModelScope.launch {
-                    val selectedLocation = destPlacesActions.getPlace(prediction)
-                    if (selectedLocation != null) {
-                        journeyViewModel.actions.onSetDestination(selectedLocation)
-                    }
-                }
+        }, onSelectPrediction = { prediction ->
+            onSelectionPrediction(
+                startPlacesActions, prediction
+            )
+        }),
+        LocationFieldActions(onFieldIconClick = {
+            val destination = journeyState.destination
+            if (destination != null) {
+                destPlacesActions.onSetSearchText(destination.primaryText)
+                destPlacesActions.onSetSelectedLocation(destination)
+                navController.navigate(Screen.DestinationSelection.route)
             }
-        ),
+        }, onSelectPrediction = { prediction ->
+            onSelectionPrediction(
+                destPlacesActions, prediction
+            )
+        }),
 
         )
 
