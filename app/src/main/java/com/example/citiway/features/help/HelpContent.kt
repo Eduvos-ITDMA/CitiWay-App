@@ -37,6 +37,13 @@ import androidx.compose.ui.platform.LocalContext
 import android.widget.Toast
 import androidx.compose.ui.draw.shadow
 
+/**
+ * Main content container for the Help screen.
+ *
+ * @param paddingValues Padding from the scaffold to respect system bars
+ * @param userEmail Optional pre-filled email from the logged-in user
+ * @param userName Optional user name for personalizing support requests
+ */
 @Composable
 fun HelpContent(
     paddingValues: PaddingValues,
@@ -55,6 +62,17 @@ fun HelpContent(
     }
 }
 
+// ========================================
+// FAQ Components
+// ========================================
+
+/**
+ * Expandable FAQ item card with question and answer.
+ *
+ * @param question The FAQ question text
+ * @param answer The FAQ answer text, shown when expanded
+ * @param modifier Optional modifier for the card
+ */
 @Composable
 fun FAQItem(
     question: String,
@@ -81,6 +99,7 @@ fun FAQItem(
                 .fillMaxWidth()
                 .padding(14.dp)
         ) {
+            // Question header with expand/collapse indicator
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -102,6 +121,7 @@ fun FAQItem(
                 )
             }
 
+            // Show answer when expanded
             if (expanded) {
                 Spacer(modifier = Modifier.height(10.dp))
                 Text(
@@ -116,6 +136,9 @@ fun FAQItem(
     }
 }
 
+/**
+ * Scrollable list of frequently asked questions with scroll indicator.
+ */
 @Composable
 fun FAQScreen() {
     val scrollState = rememberScrollState()
@@ -152,13 +175,13 @@ fun FAQScreen() {
                 answer = "Use the contact form below or visit our website support page to send feedback or report errors."
             )
 
-            // Add extra space at bottom for scroll indicator
+            // Extra space at bottom for scroll indicator
             Spacer(modifier = Modifier.height(8.dp))
         }
 
-        // Scroll indicator at bottom
+        // Gradient scroll indicator at bottom when more content is available
         if (!scrollState.canScrollForward && scrollState.maxValue > 0) {
-            // At bottom - no indicator
+            // At bottom - no indicator needed
         } else {
             Box(
                 modifier = Modifier
@@ -178,6 +201,18 @@ fun FAQScreen() {
     }
 }
 
+// ========================================
+// Contact Form Components
+// ========================================
+
+/**
+ * Contact form for submitting support questions via email.
+ *
+ * Opens the device's email client with pre-filled information when submitted.
+ *
+ * @param userEmail Optional pre-filled email address from user profile
+ * @param userName Optional user name for personalizing the email subject
+ */
 @Composable
 fun ContactForm(
     userEmail: String? = null,
@@ -187,13 +222,14 @@ fun ContactForm(
     var email by remember { mutableStateOf(TextFieldValue(userEmail ?: "")) }
     var message by remember { mutableStateOf(TextFieldValue("")) }
 
-    // Update email field when userEmail changes
+    // Pre-fill email field when user data becomes available
     LaunchedEffect(userEmail) {
         if (userEmail != null && email.text.isEmpty()) {
             email = TextFieldValue(userEmail)
         }
     }
 
+    // Enable submit button only when both fields have content
     val isSubmitEnabled = email.text.isNotBlank() && message.text.isNotBlank()
 
     Card(
@@ -211,6 +247,7 @@ fun ContactForm(
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
+            // Form header
             Text(
                 text = "Can't see your question?",
                 color = Color(0xFF109FD6),
@@ -226,6 +263,7 @@ fun ContactForm(
                 fontStyle = FontStyle.Italic
             )
 
+            // Email input field
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
@@ -247,6 +285,7 @@ fun ContactForm(
 
             Spacer(modifier = Modifier.height(10.dp))
 
+            // Message input field
             OutlinedTextField(
                 value = message,
                 onValueChange = { message = it },
@@ -268,9 +307,13 @@ fun ContactForm(
 
             Spacer(modifier = Modifier.height(12.dp))
 
+            // Submit button - opens email client with pre-filled data
             Button(
                 onClick = {
+                    // Use username if available, otherwise extract from email
                     val displayName = userName ?: email.text.substringBefore("@")
+
+                    // Create email intent with pre-filled subject and body
                     val intent = Intent(Intent.ACTION_SENDTO).apply {
                         data = Uri.parse("mailto:")
                         putExtra(Intent.EXTRA_EMAIL, arrayOf("citiwayapp@gmail.com"))
@@ -279,9 +322,12 @@ fun ContactForm(
                             "Message:\n${message.text}"
                         )
                     }
+
+                    // Attempt to open email client with error handling
                     try {
                         context.startActivity(Intent.createChooser(intent, "Send Email"))
                     } catch (e: Exception) {
+                        // Show user-friendly error if no email app is installed
                         Toast.makeText(
                             context,
                             "No email app found on your device.",
@@ -311,6 +357,16 @@ fun ContactForm(
     }
 }
 
+// ========================================
+// Screen Composition
+// ========================================
+
+/**
+ * Combined FAQ and contact form screen.
+ *
+ * @param userEmail Optional pre-filled email address
+ * @param userName Optional user name for personalization
+ */
 @Composable
 fun FAQAndContactScreen(
     userEmail: String? = null,
@@ -322,6 +378,7 @@ fun FAQAndContactScreen(
         HeaderSection()
         VerticalSpace(16)
 
+        // Scrollable FAQ section
         Box(
             modifier = Modifier
                 .weight(1f)
@@ -331,11 +388,16 @@ fun FAQAndContactScreen(
         }
 
         Spacer(modifier = Modifier.height(16.dp))
+
+        // Contact form at bottom
         ContactForm(userEmail = userEmail, userName = userName)
         Spacer(modifier = Modifier.height(8.dp))
     }
 }
 
+/**
+ * Header section displaying the FAQ title.
+ */
 @Composable
 private fun HeaderSection() {
     Row(modifier = Modifier.fillMaxWidth()) {
