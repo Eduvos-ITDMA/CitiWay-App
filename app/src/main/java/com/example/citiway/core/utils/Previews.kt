@@ -278,7 +278,7 @@ fun ProgressTrackerScreenPreview() {
             ),
             arrivalTime = Instant.parse("2025-10-21T16:06:00Z"),
             distanceMeters = 5000,
-            fareTotal = 0.0
+            fareTotal = 0.0,
         ),
         null,
     )
