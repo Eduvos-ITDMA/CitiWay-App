@@ -44,6 +44,14 @@ android {
     buildFeatures {
         compose = true
     }
+
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            merges += "META-INF/LICENSE.md"
+            merges += "META-INF/LICENSE-notice.md"
+        }
+    }
 }
 
 kotlin {
@@ -54,19 +62,10 @@ kotlin {
 }
 
 dependencies {
-    // For Room testing
-    testImplementation("androidx.room:room-testing:2.6.1")
-// For JUnit tests
-    testImplementation("junit:junit:4.13.2")
-// For coroutines test support
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0")
-// For AndroidX test utilities
-    testImplementation("androidx.test:core:1.5.0")
-
+    testImplementation(libs.androidx.room.testing)
+    testImplementation(libs.androidx.core)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
-    testImplementation(libs.junit.junit)
-    testImplementation(libs.junit.jupiter)
     ksp(libs.androidx.room.compiler)
     implementation(libs.logging.interceptor)
     implementation(libs.androidx.core.ktx)
@@ -95,10 +94,14 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.mockk)
     testImplementation(libs.converter.gson)
+    testImplementation(libs.junit.jupiter)
+    androidTestImplementation(libs.androidx.navigation.testing)
     androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    androidTestImplementation(libs.mockk)
+    androidTestImplementation(libs.junit.jupiter)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 }
