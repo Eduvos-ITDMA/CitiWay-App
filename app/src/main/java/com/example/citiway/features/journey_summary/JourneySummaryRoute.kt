@@ -8,11 +8,9 @@ import com.example.citiway.core.utils.ScreenWrapper
 fun JourneySummaryRoute(
     navController: NavController,
 ) {
-//    val state by viewModel.screenState.collectAsState()
 
     ScreenWrapper(navController, true, { paddingValues ->
          JourneySummaryContent(
-        //    state = state,
             paddingValues = paddingValues,
              navController = navController,
         )
