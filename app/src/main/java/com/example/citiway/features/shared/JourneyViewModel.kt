@@ -44,12 +44,13 @@ class JourneyViewModel(
     val state: StateFlow<JourneyState> = _state
 
     var recalculateRoutes = false
+    var progressCountdownSeconds = 1L
 
     // Timer that emits every second, used to update relative times in the UI
     private val ticker = flow {
         while (true) {
             emit(Unit)
-            delay(1000)
+            delay(1000L)
         }
     }
 
@@ -74,17 +75,20 @@ class JourneyViewModel(
                 // For times on Progress Tracker Screen
                 if (_state.value.journey != null) {
                     _state.update { currentState ->
-                        val stops = currentState.journey?.stops?.mapNotNull { stop ->
+                        val stops = currentState.journey?.stops?.map { stop ->
                             // Only update times for departures/arrivals that have not passed yet
-                            if (stop.nextEventInMin == 0) return@mapNotNull null
-
-                            val nextEventIn = stop.nextEventIn?.minusSeconds(1)
-                            val nextEventInMin = nextEventIn?.toMinutes()?.toInt() ?: 0
-                            stop.copy(
-                                nextEventIn = nextEventIn,
-                                nextEventInMin = nextEventInMin,
-                                reached = nextEventInMin == 0
-                            )
+                            if (stop.nextEventInMin == 0) {
+                                stop
+                            } else {
+                                val nextEventIn =
+                                    stop.nextEventIn?.minusSeconds(progressCountdownSeconds)
+                                val nextEventInMin = nextEventIn?.toMinutes()?.toInt() ?: 0
+                                stop.copy(
+                                    nextEventIn = nextEventIn,
+                                    nextEventInMin = nextEventInMin,
+                                    reached = nextEventInMin == 0
+                                )
+                            }
                         }
                         val newState = currentState.journey?.copy(stops = stops ?: emptyList())
                         currentState.copy(journey = newState)
@@ -102,8 +106,37 @@ class JourneyViewModel(
         onSetStartLocation = ::setStartLocation,
         onGetJourneyOptions = ::getJourneyOptions,
         onSetJourneyOptions = ::setJourneyOptions,
-        onSetJourney = ::setJourney
+        onSetJourney = ::setJourney,
     )
+
+    fun toggleProgressSpeedUp() {
+        // Reduce minutes to 2
+        _state.update { currentState ->
+            val firstDepartureIn = currentState.journey?.stops?.first()?.nextEventInMin ?: 0
+
+            if (firstDepartureIn > 2) {
+                val stops = currentState.journey?.stops?.map { stop ->
+
+                    val nextEventIn =
+                        stop.nextEventIn?.minusMinutes((firstDepartureIn - 2).toLong())
+                    val nextEventInMin = nextEventIn?.toMinutes()?.toInt() ?: 0
+                    stop.copy(
+                        nextEventIn = nextEventIn,
+                        nextEventInMin = nextEventInMin,
+                        reached = nextEventInMin == 0
+                    )
+                }
+                val newState = currentState.journey?.copy(stops = stops ?: emptyList())
+                currentState.copy(journey = newState)
+            } else {
+                currentState
+            }
+        }
+
+        // Increase countdown rate
+        progressCountdownSeconds = if (progressCountdownSeconds == 1L) 20L else 1L
+        Log.d("JourneyViewModel", "Toggle speed up")
+    }
 
     fun setTimeType(type: TimeType) {
         _state.update { currentState ->
@@ -291,9 +324,12 @@ class JourneyViewModel(
                         is unreliable and often returns routes for the next day even when its only early evening */
                         val arrivalTooFarInFuture = false /*(arrivalTime?.minus(Duration.ofHours(5))
                             ?: Instant.MAX) > Instant.parse(selectedTime)*/
-                        val departureTooSoonToWalk = nextDeparture.toMinutes() < ceil(0.75 * firstWalkDuration)
+                        val departureTooSoonToWalk =
+                            nextDeparture.toMinutes() < ceil(0.75 * firstWalkDuration)
 
-                        if (nextDeparture.isNegative || departureTooSoonToWalk || arrivalTooFarInFuture) return@mapNotNull null
+                        if (nextDeparture.isNegative || departureTooSoonToWalk || arrivalTooFarInFuture) {
+                            return@mapNotNull null
+                        }
 
                         // Calculate fares
                         steps.forEach { step ->
@@ -324,6 +360,7 @@ class JourneyViewModel(
 
                     setJourneyOptions(journeyOptions, routesResponseDataMap)
                 } catch (e: Exception) {
+                    Log.e("getJourneyOptions failed", e.message ?: "")
                     setJourneyOptions()
                 }
             }
@@ -485,7 +522,7 @@ data class JourneySelectionActions(
     val onSetDestination: (SelectedLocation) -> Unit,
     val onGetJourneyOptions: () -> Unit,
     val onSetJourneyOptions: (List<JourneyDetails>, Map<String, Route>) -> Unit,
-    val onSetJourney: (id: String) -> Unit
+    val onSetJourney: (id: String) -> Unit,
 )
 
 data class JourneyFilter(

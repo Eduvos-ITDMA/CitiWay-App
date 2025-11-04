@@ -29,7 +29,8 @@ fun ProgressTrackerRoute(
         ProgressTrackerContent(
             journeyState = journeyState,
             paddingValues = paddingValues,
-            navController = navController
+            navController = navController,
+            journeyViewModel::toggleProgressSpeedUp
         )
     }
 }
