@@ -13,6 +13,7 @@ package com.example.citiway.data.repository
 import com.example.citiway.data.local.CitiWayDatabase
 import com.example.citiway.data.local.entities.*
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
 
 /**
  * Repository class that provides a clean API for data access
@@ -38,6 +39,7 @@ class CitiWayRepository(private val database: CitiWayDatabase) {
     suspend fun insertUser(user: User) = userDao.insertUser(user)
     suspend fun getUserById(userId: Int) = userDao.getUserById(userId)
     suspend fun getUserByEmail(email: String) = userDao.getUserByEmail(email)
+    suspend fun getFirstUser(): User? = userDao.getFirstUser()
     fun getAllUsers(): Flow<List<User>> = userDao.getAllUsers()
 
 
