@@ -16,7 +16,7 @@ fun NavGraphBuilder.homeNavGraph(
     navigation(startDestination = Screen.Home.route, route = HOME_ROUTE) {
         // Home screen
         composable(Screen.Home.route) {
-            HomeRoute(navController) // Passing new ViewModel
+            HomeRoute(navController)
         }
 
         // Schedules screen
@@ -26,7 +26,7 @@ fun NavGraphBuilder.homeNavGraph(
 
         // Favourites screen
         composable(Screen.Favourites.route) {
-            FavouritesRoute(navController) // Passing new ViewModel
+            FavouritesRoute(navController)
         }
     }
 }

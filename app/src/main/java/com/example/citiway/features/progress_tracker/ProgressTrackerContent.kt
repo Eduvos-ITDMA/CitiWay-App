@@ -1,6 +1,7 @@
 package com.example.citiway.features.progress_tracker
 
 import android.icu.text.DecimalFormat
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -27,6 +28,7 @@ import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
@@ -49,7 +51,8 @@ import com.example.citiway.features.shared.StopType
 fun ProgressTrackerContent(
     journeyState: JourneyState,
     paddingValues: PaddingValues,
-    navController: NavController
+    navController: NavController,
+    toggleSpeedUp: () -> Unit,
 ) {
     // Track coordinates for progress line
     val journey = journeyState.journey
@@ -97,7 +100,8 @@ fun ProgressTrackerContent(
 
             ETACard(
                 eta = convertIsoToHhmm(journey.arrivalTime.toString()),
-                distance = distanceText
+                distance = distanceText,
+                toggleSpeedUp
             )
             VerticalSpace(24)
 
@@ -183,6 +187,11 @@ fun ProgressTrackerContent(
                     ) { offset ->
                         updateCoordinate(journey.stops.size, offset)
                     }
+
+                    // Complete Journey Logic
+                    if (journey.stops.last().reached){
+                        navController.navigate(Screen.JourneySummary.route)
+                    }
                 }
             }
 
@@ -235,7 +244,7 @@ fun ProgressTrackerContent(
 }
 
 @Composable
-fun ETACard(eta: String, distance: String) {
+fun ETACard(eta: String, distance: String, toggleSpeedUp: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
@@ -280,6 +289,26 @@ fun ETACard(eta: String, distance: String) {
                 )
             }
         }
+
+        val buttonShape = RoundedCornerShape(25.dp)
+        Button(
+            onClick = toggleSpeedUp,
+            contentPadding = PaddingValues(0.dp),
+            modifier = Modifier
+                .fillMaxWidth(0.5f)
+                .height(50.dp)
+                .padding(bottom = 7.dp)
+                .align(Alignment.CenterHorizontally)
+                .border(
+                    BorderStroke(2.dp, MaterialTheme.colorScheme.secondary.copy(0.7f)),
+                    shape = buttonShape
+                ),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.secondary.copy(0.4f)
+            ),
+            shape = buttonShape,
+            content = { Text("Speed Up (demo)", color = MaterialTheme.colorScheme.onBackground) }
+        )
     }
 }
 
@@ -513,6 +542,8 @@ fun TransitStopCard(
                         VerticalSpace(2)
 
                         // "Next bus in 11min" with orange color for time
+                        val stopNotReached = stop.nextEventInMin != null && stop.nextEventInMin > 0
+                        Log.d("Journey progress", "Stop reached in ${stop.nextEventInMin}")
                         val annotatedString = buildAnnotatedString {
                             withStyle(
                                 style = SpanStyle(
@@ -522,29 +553,44 @@ fun TransitStopCard(
                             ) {
                                 when (stop.stopType) {
                                     StopType.ARRIVAL -> {
-                                        append("Arrives in ")
+                                        if (stopNotReached) {
+                                            append("Arrives in ")
+                                        } else {
+                                            withStyle(style = SpanStyle(fontStyle = FontStyle.Italic)) {
+                                                append("Arrived")
+                                            }
+                                        }
                                     }
 
                                     StopType.DEPARTURE -> {
-                                        when (stop.travelMode) {
-                                            "HEAVY_RAIL" -> {
-                                                append("Next train in ")
-                                            }
+                                        if (stopNotReached) {
+                                            when (stop.travelMode) {
+                                                "HEAVY_RAIL" -> {
+                                                    append("Next train in ")
+                                                }
 
-                                            "BUS" -> {
-                                                append("Next bus in ")
+                                                "BUS" -> {
+                                                    append("Next bus in ")
+                                                }
+                                            }
+                                        } else {
+                                            withStyle(style = SpanStyle(fontStyle = FontStyle.Italic)) {
+                                                append("Departed")
                                             }
                                         }
                                     }
                                 }
                             }
-                            withStyle(
-                                style = SpanStyle(
-                                    color = MaterialTheme.colorScheme.secondary,
-                                    fontWeight = FontWeight.ExtraBold
-                                )
-                            ) {
-                                append("${stop.nextEventInMin} min")
+
+                            if (stopNotReached) {
+                                withStyle(
+                                    style = SpanStyle(
+                                        color = MaterialTheme.colorScheme.secondary,
+                                        fontWeight = FontWeight.ExtraBold
+                                    )
+                                ) {
+                                    append("${stop.nextEventInMin} min")
+                                }
                             }
                         }
 
@@ -655,7 +701,11 @@ fun TransitStopCard(
                                     modifier = Modifier
                                         .width(2.dp)
                                         .height(28.dp)
-                                        .background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f))
+                                        .background(
+                                            MaterialTheme.colorScheme.onBackground.copy(
+                                                alpha = 0.3f
+                                            )
+                                        )
                                 )
                             }
 
