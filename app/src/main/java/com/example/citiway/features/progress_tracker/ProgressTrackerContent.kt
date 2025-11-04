@@ -21,6 +21,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.res.painterResource
@@ -458,6 +459,11 @@ fun TransitStopCard(
             StopType.ARRIVAL -> R.drawable.ic_left_chevron
         }
 
+        val arrowColor = when (stop.stopType) {
+            StopType.DEPARTURE -> MaterialTheme.colorScheme.secondary // Keeping yellow for boarding
+            StopType.ARRIVAL -> MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f) // Darker for disembarking
+        }
+
         Icon(
             painter = painterResource(iconRes),
             contentDescription = "",
@@ -466,7 +472,7 @@ fun TransitStopCard(
                 .fillMaxHeight()
                 .align(Alignment.CenterVertically)
                 .padding(end = 8.dp, top = 8.dp, start = 0.dp, bottom = 0.dp),
-            tint = MaterialTheme.colorScheme.secondary
+            tint = arrowColor
         )
 
         Column(verticalArrangement = Arrangement.Center, modifier = Modifier.weight(1f)) {
@@ -475,7 +481,8 @@ fun TransitStopCard(
                     StopType.DEPARTURE -> "Board"
                     StopType.ARRIVAL -> "Disembark"
                 },
-                style = MaterialTheme.typography.labelLarge,
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier
                     .padding(end = 10.dp, bottom = 2.dp)
@@ -547,8 +554,8 @@ fun TransitStopCard(
                         )
                     }
 
-                    // Route info section with vertical divider (The card)
-                    if (stop.routeName != null) {
+                    // Route info section with visual action indicators
+                    if (stop.routeName != null || stop.stopType == StopType.ARRIVAL) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -566,13 +573,102 @@ fun TransitStopCard(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text(
-                                text = stop.routeName,
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary,
-                                textAlign = TextAlign.End
-                            )
+                            // Left side: Action icons showing what to do
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                when (stop.stopType) {
+                                    StopType.DEPARTURE -> {
+                                        // Walking to stop
+                                        Icon(
+                                            painter = painterResource(R.drawable.ic_walk),
+                                            contentDescription = "Walk",
+                                            tint = MaterialTheme.colorScheme.onBackground,
+                                            modifier = Modifier.size(24.dp)
+                                        )
+
+                                        HorizontalSpace(4)
+
+                                        // Arrow indicating direction to transit
+                                        Icon(
+                                            painter = painterResource(R.drawable.double_arrow_right),
+                                            contentDescription = "To",
+                                            tint = MaterialTheme.colorScheme.secondary,
+                                            modifier = Modifier.size(28.dp)
+                                        )
+
+                                        HorizontalSpace(4)
+
+                                        // Transit mode (bus/train)
+                                        Icon(
+                                            painter = painterResource(
+                                                when (stop.travelMode) {
+                                                    "HEAVY_RAIL" -> R.drawable.ic_train
+                                                    "BUS" -> R.drawable.ic_bus
+                                                    else -> R.drawable.ic_bus
+                                                }
+                                            ),
+                                            contentDescription = "Transit",
+                                            tint = MaterialTheme.colorScheme.onBackground,
+                                            modifier = Modifier.size(24.dp)
+                                        )
+                                    }
+
+                                    StopType.ARRIVAL -> {
+                                        // Transit mode (bus/train)
+                                        Icon(
+                                            painter = painterResource(R.drawable.outside_man),
+                                            contentDescription = "Transit",
+                                            tint = MaterialTheme.colorScheme.onBackground,
+                                            modifier = Modifier.size(24.dp)
+                                        )
+
+                                        HorizontalSpace(4)
+
+                                        // Arrow indicating exit from transit
+                                        Icon(
+                                            painter = painterResource(R.drawable.double_arrow_left),
+                                            contentDescription = "From",
+                                            tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
+                                            modifier = Modifier.size(28.dp)
+                                        )
+
+                                        HorizontalSpace(4)
+
+                                        // Destination/exit indicator (placeholder - can be customized)
+                                        Icon(
+                                            painter = painterResource(R.drawable.ic_walk),
+                                            contentDescription = "Exit",
+                                            tint = MaterialTheme.colorScheme.onBackground,
+                                            modifier = Modifier
+                                                .size(24.dp)
+                                                .graphicsLayer(scaleX = -1f) // Flip walking man to face left
+                                        )
+                                    }
+                                }
+
+                                HorizontalSpace(12)
+
+                                // Vertical divider separating actions from route info
+                                Box(
+                                    modifier = Modifier
+                                        .width(2.dp)
+                                        .height(28.dp)
+                                        .background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f))
+                                )
+                            }
+
+                            // Right side: Route name/number (only shown if its available)
+                            if (stop.routeName != null) {
+                                Text(
+                                    text = stop.routeName,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    textAlign = TextAlign.End
+                                )
+                            }
                         }
                     }
                 }
