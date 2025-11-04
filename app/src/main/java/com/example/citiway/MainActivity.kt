@@ -39,12 +39,6 @@ class MainActivity : ComponentActivity() {
         // Initialize database
         val database = CitiWayDatabase.getDatabase(this)
         val repository = CitiWayRepository(database)
-        val seeder = DatabaseSeeder(repository)
-
-        // Seed database on first launch
-        lifecycleScope.launch {
-//            seeder.seedDatabase()  // comment this line out after 1st app launch to avoid duplicated data
-        }
 
         enableEdgeToEdge()
         setContent {

@@ -2,6 +2,7 @@ package com.example.citiway.features.shared
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.citiway.data.local.DatabaseSeeder
 import com.example.citiway.data.local.entities.User
 import com.example.citiway.data.repository.CitiWayRepository
 import kotlinx.coroutines.launch
@@ -19,6 +20,7 @@ class OnboardingViewModel(
     ) {
         viewModelScope.launch {
             try {
+                // 1. Creating and inserting the user with repo
                 val user = User(
                     name = name,
                     email = email,
@@ -27,8 +29,16 @@ class OnboardingViewModel(
                 )
 
                 repository.insertUser(user)
+                println("✅ User saved: $name ($email)")
+
+                // 2. Seeding the database with test data straight after onboarding
+                val seeder = DatabaseSeeder(repository)
+                seeder.seedDatabase()
+
+                // 3. Navigate to home screen
                 onSuccess()
             } catch (e: Exception) {
+                println("❌ Error in onboarding: ${e.message}")
                 onError(e.message ?: "Failed to save user")
             }
         }
