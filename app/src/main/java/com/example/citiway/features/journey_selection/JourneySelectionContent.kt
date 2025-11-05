@@ -1,5 +1,6 @@
 package com.example.citiway.features.journey_selection
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -118,7 +119,6 @@ fun JourneySelectionContent(
         VerticalSpace(3)
 
         SelectedLocationFields(
-            state,
             actions,
             startPlacesState,
             startPlacesActions,
@@ -146,7 +146,6 @@ fun JourneySelectionContent(
 
 @Composable
 fun SelectedLocationFields(
-    state: JourneyState,
     actions: JourneySelectionScreenActions,
     startPlacesState: PlacesState,
     startPlacesActions: PlacesActions,
@@ -294,6 +293,7 @@ fun JourneyOptionsSection(
         TimeSlotSelector(state, actions.journeySelectionActions)
         VerticalSpace(12)
 
+        Log.d("JourneyOptionsSection", "Recomp")
         if (state.journeyOptions == null) {
             JourneyLoadingIndicator()
         } else if (state.journeyOptions.isEmpty()) {
