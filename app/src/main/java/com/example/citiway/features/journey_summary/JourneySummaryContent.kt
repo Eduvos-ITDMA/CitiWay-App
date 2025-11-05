@@ -25,11 +25,39 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.citiway.R
+import com.example.citiway.core.navigation.routes.Screen
 import com.example.citiway.core.ui.components.HorizontalSpace
 import com.example.citiway.core.ui.components.VerticalSpace
+import com.example.citiway.features.shared.Journey
 
 @Composable
-fun JourneySummaryContent(navController: NavController, paddingValues: PaddingValues) {
+fun JourneySummaryContent(
+    journey: Journey?,
+    navController: NavController,
+    paddingValues: PaddingValues
+) {
+
+    if (journey == null) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = "No journey selected for summary",
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.primary
+            )
+            VerticalSpace(16)
+            Button(onClick = { navController.navigate(Screen.Home.route) }) {
+                Text("Go back home")
+            }
+        }
+    }
 
     // Track coordinates for progress line
     var stepCoordinates by remember { mutableStateOf<List<Offset>>(emptyList()) }
@@ -318,7 +346,8 @@ fun JourneySummaryContent(navController: NavController, paddingValues: PaddingVa
             contentAlignment = Alignment.Center
         ) {
             Button(
-                onClick = { navController.popBackStack() },
+                // TODO: Go home if just come from progress tracker, otherwise pop backstack
+                onClick = { navController.navigate(Screen.Home.route) },
                 modifier = Modifier
                     .fillMaxWidth(0.6f)
                     .height(50.dp),
