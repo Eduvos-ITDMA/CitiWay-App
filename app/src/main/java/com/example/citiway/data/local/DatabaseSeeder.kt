@@ -1,29 +1,36 @@
 package com.example.citiway.data.local
 
-//seeder and repo
-
 import com.example.citiway.data.local.entities.*
 import com.example.citiway.data.repository.CitiWayRepository
+import kotlinx.coroutines.flow.firstOrNull
 
 /**
  * Helper class to seed the database with test data
- * Call this from your MainActivity
+ * IMPORTANT: This should be called AFTER onboarding completes
+ * It will use the existing user created during onboarding
  */
+
 class DatabaseSeeder(private val repository: CitiWayRepository) {
 
     suspend fun seedDatabase() {
         println("🌱 Starting database seeding...")
 
-        // 1. Create test user (only 1 user since no login)
-        val userId = repository.insertUser(
-            User(
-                name = "Test User",
-                email = "user@citiway.com",
-                preferred_language = "en",
-                created_at = System.currentTimeMillis()
-            )
-        ).toInt()
-        println("✅ Created user (ID: $userId)")
+        // 1. Get the existing user (created from onboarding)
+        val existingUser = repository.getFirstUser()
+        if (existingUser == null) {
+            println("⚠️ No user found! Please complete onboarding first.")
+            return
+        }
+
+        val userId = existingUser.user_id
+        println("✅ Using existing user (ID: $userId, Name: ${existingUser.name})")
+
+        // Check if data already exists to avoid duplicate seeding
+        val existingTrips = repository.getAllTripsForUser(userId).firstOrNull()
+        if (existingTrips != null && existingTrips.isNotEmpty()) {
+            println("⚠️ Database already has trips. Skipping seeding to avoid duplicates.")
+            return
+        }
 
         // 2. Create providers
         val myCitiId = repository.insertProvider(
@@ -52,7 +59,7 @@ class DatabaseSeeder(private val repository: CitiWayRepository) {
         println("✅ Created 3 providers")
 
         // 3. Create MyCiti fare structure
-        val myCitiFare1 = repository.insertMyCitiFares(listOf(
+        repository.insertMyCitiFares(listOf(
             MyCitiFare(distance_band_lower_limit = 0, peak_fare = 13.50, offpeak_fare = 10.50),
             MyCitiFare(distance_band_lower_limit = 5000, peak_fare = 18.50, offpeak_fare = 13.50),
             MyCitiFare(distance_band_lower_limit = 10000, peak_fare = 23.50, offpeak_fare = 18.50),
@@ -64,7 +71,7 @@ class DatabaseSeeder(private val repository: CitiWayRepository) {
         ))
         println("✅ Created 8 MyCiti fare bands")
 
-// 4. Create Metrorail fare structure
+        // 4. Create Metrorail fare structure
         repository.insertMetrorailFares(listOf(
             MetrorailFare(zone = "Zone 1", ticket_type = "single", fare = 10.00, includes_return = false),
             MetrorailFare(zone = "Zone 1", ticket_type = "return", fare = 20.00, includes_return = true),
@@ -418,7 +425,7 @@ class DatabaseSeeder(private val repository: CitiWayRepository) {
 
         println("🎉 Created 10 trips!")
 
-        // 9. Create monthly spend entries
+        // 6. Create monthly spend entries
         repository.insertMonthlySpend(
             MonthlySpend(
                 user_id = userId,
@@ -426,46 +433,16 @@ class DatabaseSeeder(private val repository: CitiWayRepository) {
                 total_amount = 450.50
             )
         )
-        println("✅ Created 1 monthly spend entries")
-
-        // 10. Create saved places
-//        repository.insertSavedPlace(
-//            SavedPlace(
-//                user_id = user1Id,
-//                place_name = "Home",
-//                address = "123 Main Street, Cape Town",
-//                latitude = -33.9249,
-//                longitude = 18.4241,
-//                place_type = "home",
-//                is_favorite = true,
-//                last_used_timestamp = System.currentTimeMillis()
-//            )
-//        )
-//
-//        repository.insertSavedPlace(
-//            SavedPlace(
-//                user_id = user1Id,
-//                place_name = "Work",
-//                address = "V&A Waterfront, Cape Town",
-//                latitude = -33.9020,
-//                longitude = 18.4197,
-//                place_type = "work",
-//                is_favorite = true,
-//                last_used_timestamp = System.currentTimeMillis()
-//            )
-//        )
-//        println("✅ Created 2 saved places")
+        println("✅ Created 1 monthly spend entry")
 
         println("🎉 Database seeding complete!")
         println("📊 Summary:")
-        println("   - 1 User")
+        println("   - User: ${existingUser.name} (${existingUser.email})")
         println("   - 3 Providers (MyCiTi, Metrorail, Golden Arrow)")
         println("   - 10 Trips (4 Multi-mode, 6 Single-mode)")
-        println("   - 6 Route legs")
-        println("   - 3 MyCiti fare bands")
-        println("   - 4 Metrorail fares")
+        println("   - 8 MyCiti fare bands")
+        println("   - 8 Metrorail fares")
         println("   - 1 Monthly spend record")
-        println("   - 2 Saved places")
     }
 
     suspend fun clearAllData() {
