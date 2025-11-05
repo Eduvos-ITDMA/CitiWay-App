@@ -70,7 +70,7 @@ fun FavouritesContent(
                     modifier = Modifier.padding(horizontal = 32.dp)
                 )
             }
-
+        } else {
             journeys.forEach { journey ->
                 key(journey.id) {
                     VerticalSpace(12)
