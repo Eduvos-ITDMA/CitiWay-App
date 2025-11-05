@@ -41,6 +41,99 @@ private val mockMapActions = MapActions(
     updateLocationPermission = {}
 )
 
+private val mockJourney = Journey(
+    stops = listOf(
+        Stop(
+            name = "Mowbray Station",
+            stopType = StopType.DEPARTURE,
+            latLng = LatLng(-33.9455, 18.4756),
+            nextEventIn = Duration.ofMinutes(5),
+            nextEventInMin = 5,
+            routeName = "Southern Line",
+            travelMode = "HEAVY_RAIL",
+        ),
+        Stop(
+            name = "Salt River Station",
+            stopType = StopType.ARRIVAL,
+            latLng = LatLng(-33.9295, 18.4528),
+            nextEventIn = Duration.ofMinutes(5),
+            nextEventInMin = 5,
+        ),
+        Stop(
+            name = "Salt River Rail North",
+            stopType = StopType.DEPARTURE,
+            latLng = LatLng(-33.9275, 18.4533),
+            nextEventIn = Duration.ofMinutes(5),
+            nextEventInMin = 5,
+            routeName = "260 Omuramba",
+            travelMode = "BUS",
+        ),
+        Stop(
+            name = "Quest",
+            stopType = StopType.ARRIVAL,
+            latLng = LatLng(-33.8953, 18.5147),
+            nextEventIn = Duration.ofMinutes(5),
+            nextEventInMin = 5,
+        ),
+        Stop(
+            name = "Oasis",
+            stopType = StopType.DEPARTURE,
+            latLng = LatLng(-33.8935, 18.5085),
+            nextEventIn = Duration.ofMinutes(5),
+            nextEventInMin = 5,
+            routeName = "262 SummerGreens",
+            travelMode = "BUS",
+        ),
+        Stop(
+            name = "Final stop",
+            stopType = StopType.ARRIVAL,
+            latLng = LatLng(-33.8935, 18.5085),
+            nextEventIn = Duration.ofMinutes(5),
+            nextEventInMin = 5,
+        )
+    ),
+    instructions = listOf(
+        Instruction(
+            text = "Walk 350m",
+            durationMinutes = 6,
+            travelMode = "WALK"
+        ),
+        Instruction(
+            text = "Take train for 2 stations",
+            durationMinutes = 5,
+            travelMode = "HEAVY_RAIL"
+        ),
+        Instruction(
+            text = "Walk 329m",
+            durationMinutes = 8,
+            travelMode = "WALK"
+        ),
+        Instruction(
+            text = "Take MyCiTi bus for 13 stops",
+            durationMinutes = 22,
+            travelMode = "BUS"
+        ),
+        Instruction(
+            text = "Walk 42m",
+            durationMinutes = 1,
+            travelMode = "WALK"
+        ),
+        Instruction(
+            text = "Take MyCiTi bus for 5 stops",
+            durationMinutes = 13,
+            travelMode = "BUS"
+        ),
+        Instruction(
+            text = "Walk 89m",
+            durationMinutes = 1,
+            travelMode = "WALK"
+        )
+    ),
+    arrivalTime = Instant.parse("2025-10-21T16:06:00Z"),
+    distanceMeters = 5000,
+    fareTotal = 0.0,
+)
+
 val mockPlacesActions = PlacesActions(
     onSetSearchText = {},
     onSearchPlaces = {},
@@ -174,6 +267,7 @@ fun JourneySelectionScreenPreview() {
 fun JourneySummaryScreenPreview() {
     CitiWayTheme {
         JourneySummaryContent(
+            journey = mockJourney,
             paddingValues = PaddingValues(),
             navController = rememberNavController(),
         )
@@ -188,98 +282,7 @@ fun ProgressTrackerScreenPreview() {
         SelectedLocation(LatLng(0.0, 0.0), "mock_id", "Mowbray"),
         SelectedLocation(LatLng(0.0, 0.0), "mock_id_2", "Century City"),
         null,
-        Journey(
-            stops = listOf(
-                Stop(
-                    name = "Mowbray Station",
-                    stopType = StopType.DEPARTURE,
-                    latLng = LatLng(-33.9455, 18.4756),
-                    nextEventIn = Duration.ofMinutes(5),
-                    nextEventInMin = 5,
-                    routeName = "Southern Line",
-                    travelMode = "HEAVY_RAIL",
-                ),
-                Stop(
-                    name = "Salt River Station",
-                    stopType = StopType.ARRIVAL,
-                    latLng = LatLng(-33.9295, 18.4528),
-                    nextEventIn = Duration.ofMinutes(5),
-                    nextEventInMin = 5,
-                ),
-                Stop(
-                    name = "Salt River Rail North",
-                    stopType = StopType.DEPARTURE,
-                    latLng = LatLng(-33.9275, 18.4533),
-                    nextEventIn = Duration.ofMinutes(5),
-                    nextEventInMin = 5,
-                    routeName = "260 Omuramba",
-                    travelMode = "BUS",
-                ),
-                Stop(
-                    name = "Quest",
-                    stopType = StopType.ARRIVAL,
-                    latLng = LatLng(-33.8953, 18.5147),
-                    nextEventIn = Duration.ofMinutes(5),
-                    nextEventInMin = 5,
-                ),
-                Stop(
-                    name = "Oasis",
-                    stopType = StopType.DEPARTURE,
-                    latLng = LatLng(-33.8935, 18.5085),
-                    nextEventIn = Duration.ofMinutes(5),
-                    nextEventInMin = 5,
-                    routeName = "262 SummerGreens",
-                    travelMode = "BUS",
-                ),
-                Stop(
-                    name = "Final stop",
-                    stopType = StopType.ARRIVAL,
-                    latLng = LatLng(-33.8935, 18.5085),
-                    nextEventIn = Duration.ofMinutes(5),
-                    nextEventInMin = 5,
-                )
-            ),
-            instructions = listOf(
-                Instruction(
-                    text = "Walk 350m",
-                    durationMinutes = 6,
-                    travelMode = "WALK"
-                ),
-                Instruction(
-                    text = "Take train for 2 stations",
-                    durationMinutes = 5,
-                    travelMode = "HEAVY_RAIL"
-                ),
-                Instruction(
-                    text = "Walk 329m",
-                    durationMinutes = 8,
-                    travelMode = "WALK"
-                ),
-                Instruction(
-                    text = "Take MyCiTi bus for 13 stops",
-                    durationMinutes = 22,
-                    travelMode = "BUS"
-                ),
-                Instruction(
-                    text = "Walk 42m",
-                    durationMinutes = 1,
-                    travelMode = "WALK"
-                ),
-                Instruction(
-                    text = "Take MyCiTi bus for 5 stops",
-                    durationMinutes = 13,
-                    travelMode = "BUS"
-                ),
-                Instruction(
-                    text = "Walk 89m",
-                    durationMinutes = 1,
-                    travelMode = "WALK"
-                )
-            ),
-            arrivalTime = Instant.parse("2025-10-21T16:06:00Z"),
-            distanceMeters = 5000,
-            fareTotal = 0.0,
-        ),
+        mockJourney,
         null,
     )
 

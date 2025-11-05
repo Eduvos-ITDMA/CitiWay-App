@@ -396,6 +396,7 @@ class JourneyViewModel(
         val steps = route.legs.firstOrNull()?.steps ?: emptyList()
         val distanceMeters = route.distanceMeters
         val arrivalTime = calculateArrivalTime(steps)
+        var stopsCount = 0
 
         steps.forEachIndexed { index, step ->
             when (step.travelMode) {
@@ -406,6 +407,7 @@ class JourneyViewModel(
                 }
 
                 "TRANSIT" -> {
+                    stopsCount += step.transitDetails?.stopCount ?: 0
                     // ======== Add walk instruction ========
                     val minutes = duration / 60
                     if (fromMode == "WALK") {
@@ -477,8 +479,8 @@ class JourneyViewModel(
                             latLng,
                             nextEventIn,
                             nextEventInMin,
-                            null, // routeName - not needed for arrival
-                            vehicleType, // ADD THIS: travelMode so we know what transit we're getting off
+                            null, // routeName not needed for arrival
+                            vehicleType,
                         )
                     )
 
@@ -509,7 +511,7 @@ class JourneyViewModel(
             instructions.add(Instruction("Walk ${distance}m", duration / 60, "WALK"))
         }
 
-        return Journey(stops, instructions, arrivalTime, distanceMeters, fareTotal)
+        return Journey(stops, instructions, arrivalTime, distanceMeters, fareTotal, stopsCount)
     }
 
     /**
@@ -720,7 +722,8 @@ data class Journey(
     val instructions: List<Instruction>,
     val arrivalTime: Instant?,
     val distanceMeters: Int,
-    val fareTotal: Double
+    val fareTotal: Double,
+    val totalStopsCount: Int = 0
 )
 
 data class Stop(

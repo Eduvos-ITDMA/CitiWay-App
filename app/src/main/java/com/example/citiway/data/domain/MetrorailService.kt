@@ -1,5 +1,6 @@
 package com.example.citiway.data.domain
 
+import android.util.Log
 import com.example.citiway.data.remote.Step
 
 class MetrorailService(): ITransportService<MetrorailService> {
@@ -9,6 +10,8 @@ class MetrorailService(): ITransportService<MetrorailService> {
 
     private val stationZoneMap: Map<String, Int> = mapOf(
         // --- ZONE 1 (1 - 15) ---
+
+        // TODO: Double check all stations are here
         "athlone" to 1,
         "bonteheuwel" to 1,
         "century city" to 1,
@@ -24,6 +27,7 @@ class MetrorailService(): ITransportService<MetrorailService> {
         "langa" to 1,
         "maitland" to 1,
         "monte vista" to 1,
+        "mowbray" to 1,
         "mutual" to 1,
         "ndabeni" to 1,
         "newlands" to 1,

@@ -47,6 +47,12 @@ import com.example.citiway.features.shared.JourneyState
 import com.example.citiway.features.shared.Stop
 import com.example.citiway.features.shared.StopType
 
+private enum class InitialJourneyStatus {
+    NO_JOURNEY,
+    COMPLETED,
+    ACTIVE
+}
+
 @Composable
 fun ProgressTrackerContent(
     journeyState: JourneyState,
@@ -62,6 +68,7 @@ fun ProgressTrackerContent(
     var boxOffset by remember { mutableStateOf(Offset.Zero) }
     val connectorColour = MaterialTheme.colorScheme.secondary
     var showCancellationDialog by remember { mutableStateOf(false) }
+    var initialStatus by remember { mutableStateOf(InitialJourneyStatus.NO_JOURNEY) }
 
     fun updateCoordinate(index: Int, offset: Offset) {
         val localOffset = offset - boxOffset
@@ -89,16 +96,30 @@ fun ProgressTrackerContent(
         VerticalSpace(16)
 
         // No Active Journey
-        if (journey == null) {
-            NoActiveJourney(navController)
-            return
-        } else if (journey.stops.last().reached) {
-            PreviousJourneyCompleted(navController)
-            return
+        LaunchedEffect(Unit) {
+            initialStatus = if (journey == null) {
+                InitialJourneyStatus.NO_JOURNEY
+            } else if (journey.stops.last().reached) {
+                InitialJourneyStatus.COMPLETED
+            } else {
+                InitialJourneyStatus.ACTIVE
+            }
+        }
+
+        when (initialStatus){
+            InitialJourneyStatus.NO_JOURNEY -> {
+                NoActiveJourney(navController)
+                return
+            }
+            InitialJourneyStatus.COMPLETED -> {
+                PreviousJourneyCompleted(navController)
+                return
+            }
+            InitialJourneyStatus.ACTIVE -> {}
         }
 
         // ETA and Distance Card
-        val meters = journey.distanceMeters
+        val meters = journey!!.distanceMeters
         val distanceText = if (meters >= 1000) {
             "${DecimalFormat("0.0").format(meters / 1000.0)}km"
         } else {
