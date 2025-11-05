@@ -148,7 +148,7 @@ fun JourneySummaryContent(navController: NavController, paddingValues: PaddingVa
                     }
                 )
 
-                VerticalSpace(20)
+                VerticalSpace(32)
 
                 // Walk 1
                 SummaryWalkStep(
@@ -162,7 +162,7 @@ fun JourneySummaryContent(navController: NavController, paddingValues: PaddingVa
                     }
                 )
 
-                VerticalSpace(20)
+                VerticalSpace(32)
 
                 // Bus Stop 1
                 SummaryTransitStep(
@@ -177,7 +177,7 @@ fun JourneySummaryContent(navController: NavController, paddingValues: PaddingVa
                     }
                 )
 
-                VerticalSpace(20)
+                VerticalSpace(32)
 
                 // Walk 2
                 SummaryWalkStep(
@@ -191,7 +191,7 @@ fun JourneySummaryContent(navController: NavController, paddingValues: PaddingVa
                     }
                 )
 
-                VerticalSpace(20)
+                VerticalSpace(32)
 
                 // Train Stop 1
                 SummaryTransitStep(
@@ -206,7 +206,7 @@ fun JourneySummaryContent(navController: NavController, paddingValues: PaddingVa
                     }
                 )
 
-                VerticalSpace(20)
+                VerticalSpace(32)
 
                 // Bus Stop 2
                 SummaryTransitStep(
@@ -221,7 +221,7 @@ fun JourneySummaryContent(navController: NavController, paddingValues: PaddingVa
                     }
                 )
 
-                VerticalSpace(20)
+                VerticalSpace(32)
 
                 // Walk 3
                 SummaryWalkStep(
@@ -235,7 +235,7 @@ fun JourneySummaryContent(navController: NavController, paddingValues: PaddingVa
                     }
                 )
 
-                VerticalSpace(20)
+                VerticalSpace(32)
 
                 // Train Stop 2
                 SummaryTransitStep(
@@ -250,7 +250,7 @@ fun JourneySummaryContent(navController: NavController, paddingValues: PaddingVa
                     }
                 )
 
-                VerticalSpace(20)
+                VerticalSpace(32)
 
                 // Walk 4
                 SummaryWalkStep(
@@ -264,7 +264,7 @@ fun JourneySummaryContent(navController: NavController, paddingValues: PaddingVa
                     }
                 )
 
-                VerticalSpace(20)
+                VerticalSpace(32)
 
                 // Bus Stop 3
                 SummaryTransitStep(
@@ -279,7 +279,7 @@ fun JourneySummaryContent(navController: NavController, paddingValues: PaddingVa
                     }
                 )
 
-                VerticalSpace(20)
+                VerticalSpace(32)
 
                 // Walk 5
                 SummaryWalkStep(
@@ -293,7 +293,7 @@ fun JourneySummaryContent(navController: NavController, paddingValues: PaddingVa
                     }
                 )
 
-                VerticalSpace(20)
+                VerticalSpace(32)
 
                 // End Location
                 SummaryLocationStep(
@@ -313,23 +313,26 @@ fun JourneySummaryContent(navController: NavController, paddingValues: PaddingVa
         VerticalSpace(40)
 
         // Done Button
-        Button(
-            onClick = { navController.popBackStack() },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .height(56.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary
-            ),
-            shape = RoundedCornerShape(12.dp)
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = "Done",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp
-            )
+            Button(
+                onClick = { navController.popBackStack() },
+                modifier = Modifier
+                    .fillMaxWidth(0.6f)
+                    .height(50.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                ),
+                shape = RoundedCornerShape(25.dp)
+            ) {
+                Text(
+                    text = "Done",
+                    color = Color.White,
+                    style = MaterialTheme.typography.labelLarge
+                )
+            }
         }
 
         VerticalSpace(32)
@@ -474,7 +477,7 @@ fun SummaryLocationStep(
         // Icon indicator - Larger
         Box(
             modifier = Modifier
-                .width(56.dp)
+                .width(48.dp)
                 .fillMaxHeight()
                 .onGloballyPositioned { coordinates ->
                     val center = Offset(
@@ -488,7 +491,7 @@ fun SummaryLocationStep(
             if (isStart) {
                 Box(
                     modifier = Modifier
-                        .size(32.dp)
+                        .size(24.dp)
                         .background(
                             MaterialTheme.colorScheme.primary,
                             shape = CircleShape
@@ -499,7 +502,7 @@ fun SummaryLocationStep(
                     painter = painterResource(R.drawable.ic_location_on),
                     contentDescription = "Destination",
                     tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(36.dp)
+                    modifier = Modifier.size(28.dp)
                 )
             }
         }
@@ -542,7 +545,7 @@ fun SummaryWalkStep(
         // Walk Icon - Larger
         Box(
             modifier = Modifier
-                .width(56.dp)
+                .width(48.dp)
                 .fillMaxHeight()
                 .onGloballyPositioned { coordinates ->
                     val center = Offset(
@@ -557,7 +560,7 @@ fun SummaryWalkStep(
                 imageVector = Icons.AutoMirrored.Filled.DirectionsWalk,
                 contentDescription = "Walk",
                 tint = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.size(36.dp)
+                modifier = Modifier.size(28.dp)
             )
         }
 
@@ -599,7 +602,7 @@ fun SummaryTransitStep(
         // Transit Icon - Larger
         Box(
             modifier = Modifier
-                .width(56.dp)
+                .width(48.dp)
                 .fillMaxHeight()
                 .onGloballyPositioned { coordinates ->
                     val center = Offset(
@@ -616,7 +619,7 @@ fun SummaryTransitStep(
                 ),
                 contentDescription = if (isStation) "Train" else "Bus",
                 tint = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.size(36.dp)
+                modifier = Modifier.size(28.dp)
             )
         }
 
