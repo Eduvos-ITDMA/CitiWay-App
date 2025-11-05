@@ -1,6 +1,7 @@
 package com.example.citiway.features.journey_selection
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
@@ -20,6 +21,7 @@ import com.example.citiway.data.remote.PlacesActions
 import com.example.citiway.di.viewModelFactory
 import com.example.citiway.features.shared.JourneySelectionActions
 import com.example.citiway.features.shared.JourneyViewModel
+import com.example.citiway.features.shared.LocationType
 import com.google.android.libraries.places.api.model.AutocompletePrediction
 import kotlinx.coroutines.launch
 
@@ -67,13 +69,28 @@ fun JourneySelectionRoute(
         }
     }
 
-    val onSelectionPrediction: (PlacesActions, AutocompletePrediction) -> Unit =
-        { placesActions, prediction ->
+    val onSelectionPrediction: (LocationType, AutocompletePrediction) -> Unit =
+        { locationType, prediction ->
+            val placesActions = when (locationType) {
+                LocationType.START -> startPlacesActions
+                LocationType.END -> destPlacesActions
+            }
+
             journeyViewModel.viewModelScope.launch {
                 val selectedLocation = placesActions.getPlace(prediction)
                 if (selectedLocation != null) {
                     placesActions.onSetSearchText(selectedLocation.primaryText)
-                    journeyViewModel.actions.onSetDestination(selectedLocation)
+                    when (locationType) {
+                        LocationType.START -> journeyViewModel.actions.onSetStartLocation(
+                            selectedLocation
+                        )
+
+                        LocationType.END -> journeyViewModel.actions.onSetDestination(
+                            selectedLocation
+                        )
+                    }
+
+
                     journeyViewModel.getJourneyOptions()
                 }
             }
@@ -94,7 +111,7 @@ fun JourneySelectionRoute(
             }
         }, onSelectPrediction = { prediction ->
             onSelectionPrediction(
-                startPlacesActions, prediction
+                LocationType.START, prediction
             )
         }),
         LocationFieldActions(onFieldIconClick = {
@@ -106,7 +123,7 @@ fun JourneySelectionRoute(
             }
         }, onSelectPrediction = { prediction ->
             onSelectionPrediction(
-                destPlacesActions, prediction
+                LocationType.END, prediction
             )
         }),
 

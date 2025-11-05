@@ -259,6 +259,7 @@ class JourneyViewModel(
                 try {
                     journeyOptions = routes.mapNotNull { route ->
                         val steps = route.legs.firstOrNull()?.steps ?: emptyList()
+                        Log.d("JourneyViewModel steps", steps.toString())
 
                         // firstNodeType: find first TRANSIT step and decide STOP vs STATION
                         val firstTransitStep = steps.firstOrNull { it.travelMode == "TRANSIT" }
@@ -268,6 +269,7 @@ class JourneyViewModel(
                                 else -> TravelPoint.STOP
                             }
                         } ?: TravelPoint.STOP
+                        Log.d("JourneyViewModel firstTransitStep", firstTransitStep.toString())
 
                         // routeSegments: iterate through steps to build string segments
                         var firstWalkOver = false
@@ -304,13 +306,9 @@ class JourneyViewModel(
                         }
                         firstWalkDuration /= 60
 
-                        val departureTime =
-                            firstTransitStep?.transitDetails?.stopDetails?.departureTime
-                        val departureInstant = Instant.parse(departureTime)
-
-                        // nextDeparture: time until next departure
-                        val nextDeparture =
-                            Duration.between(Instant.now(), Instant.parse(departureTime))
+                        Log.d("JourneyViewModel departureTime", firstTransitStep?.transitDetails?.stopDetails?.departureTime ?: "null")
+                        val departureTime = Instant.parse(firstTransitStep?.transitDetails?.stopDetails?.departureTime)
+                        val nextDeparture = Duration.between(Instant.now(), departureTime)
 
                         // arrivalTime: current time + route.duration.value
                         val arrivalTime = calculateArrivalTime(steps)
@@ -347,7 +345,7 @@ class JourneyViewModel(
                             firstNodeType = firstNodeType,
                             routeSegments = segments,
                             nextDeparture = nextDeparture,
-                            departureTimeInstant = departureInstant,
+                            departureTimeInstant = departureTime,
                             arrivalTime = arrivalTime,
                             fareTotal = fareTotal,
                             totalDurationMinutes = totalDurationMinutes
@@ -360,7 +358,7 @@ class JourneyViewModel(
 
                     setJourneyOptions(journeyOptions, routesResponseDataMap)
                 } catch (e: Exception) {
-                    Log.e("getJourneyOptions failed", e.message ?: "")
+                    Log.e("JourneyViewModel", "Failed to retrieve and parse Routes: ${e.message}")
                     setJourneyOptions()
                 }
             }

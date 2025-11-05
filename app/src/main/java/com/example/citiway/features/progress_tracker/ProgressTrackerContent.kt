@@ -88,169 +88,169 @@ fun ProgressTrackerContent(
         )
         VerticalSpace(16)
 
-        if (journey != null) {
-            // ETA and Distance Card
-            val meters = journey.distanceMeters
-            val distanceText =
-                if (meters >= 1000) {
-                    "${DecimalFormat("0.0").format(meters / 1000.0)}km"
-                } else {
-                    "${meters}m"
-                }
-
-            ETACard(
-                eta = convertIsoToHhmm(journey.arrivalTime.toString()),
-                distance = distanceText,
-                toggleSpeedUp
-            )
-            VerticalSpace(24)
-
-            // Container for all progress tracker data, including connector lines
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .onGloballyPositioned { coordinates ->
-                        boxOffset = coordinates.positionInRoot()
-                    }
-            )
-            {
-                // Canvas on which to draw connector lines
-                Canvas(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .align(Alignment.TopStart)
-                ) {
-                    // Draw connecting lines between stops
-                    for (i in stepCoordinates.dropLast(1).indices) {
-                        val start = stepCoordinates[i]
-                        val end = stepCoordinates[i + 1]
-
-                        val pathEffect = if (!journey.stops[i].reached) {
-                            PathEffect.dashPathEffect(floatArrayOf(15f, 15f))
-                        } else null
-
-                        if (start != Offset.Zero && start != null && end != Offset.Zero && end != null) {
-                            drawLine(
-                                color = connectorColour,
-                                start = start,
-                                end = end,
-                                strokeWidth = 4.dp.toPx(),
-                                pathEffect = pathEffect
-                            )
-                        }
-                    }
-                }
-                // ======================================================================
-                // Currently assuming start location and destination are not also stops
-                // e.g. when a user starts at a station
-                // TODO: Adjust UI if start location is first stop or destination is last stop
-                // ======================================================================
-
-                Column(modifier = Modifier.fillMaxWidth()) {
-
-                    // ======================================================
-                    // Start Location
-                    // ======================================================
-                    JourneyStep(
-                        isStart = true,
-                        title = journeyState.startLocation?.primaryText
-                            ?: "Error: Unknown Location",
-                        hasEditIcon = true,
-                    ) { offset ->
-                        updateCoordinate(0, offset)
-                    }
-                    VerticalSpace(12)
-                    InstructionStep(journey.instructions.first())
-
-                    // ======================================================
-                    // Create card for each stop with instruction below it
-                    // ======================================================
-                    journey.stops.forEachIndexed { index, stop ->
-                        // Stop
-                        TransitStopCard(stop) { offset ->
-                            updateCoordinate(index + 1, offset)
-                        }
-
-                        // Instruction
-                        val instruction = journey.instructions[index + 1]
-                        InstructionStep(instruction)
-                    }
-
-                    // ======================================================
-                    // End Location
-                    // ======================================================
-                    JourneyStep(
-                        isStart = false,
-                        title = journeyState.destination?.primaryText
-                            ?: "Error: Unknown Location",
-                        hasEditIcon = true,
-                    ) { offset ->
-                        updateCoordinate(journey.stops.size, offset)
-                    }
-
-                    // Complete Journey Logic
-                    if (journey.stops.last().reached){
-                        navController.navigate(Screen.JourneySummary.route)
-                    }
-                }
-            }
-
-            VerticalSpace(24)
-
-            // Cancel Journey Button
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                Button(
-                    onClick = { showCancellationDialog = true },
-                    modifier = Modifier
-                        .fillMaxWidth(0.6f)
-                        .height(50.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.error.copy(0.5f)
-                    ),
-                    border = BorderStroke(2.dp, MaterialTheme.colorScheme.error),
-                    shape = RoundedCornerShape(25.dp)
-                ) {
-                    Text(
-                        text = "Cancel Journey",
-                        color = Color.White,
-                        style = MaterialTheme.typography.labelLarge
-                    )
-                }
-            }
-
-            // Confirm Cancellation Dialog
-            ConfirmationDialog(
-                visible = showCancellationDialog,
-                title = "Are you sure you want to cancel this journey?",
-                message = "This journey cannot be selected again if the first transit has already departed",
-                onConfirm = {
-                    if (journeyState.journey.stops[0].reached) {
-                        navController.navigate(Screen.Home.route)
-                    } else {
-                        navController.navigate(Screen.JourneySelection.route)
-                    }
-                },
-                onDismiss = {
-                    showCancellationDialog = false
-                },
-            )
-
-            VerticalSpace(24)
+        // No Active Journey
+        if (journey == null) {
+            NoActiveJourney(navController)
+            return
+        } else if (journey.stops.last().reached) {
+            PreviousJourneyCompleted(navController)
+            return
         }
+
+        // ETA and Distance Card
+        val meters = journey.distanceMeters
+        val distanceText = if (meters >= 1000) {
+            "${DecimalFormat("0.0").format(meters / 1000.0)}km"
+        } else {
+            "${meters}m"
+        }
+        
+        ETACard(
+            eta = convertIsoToHhmm(journey.arrivalTime.toString()),
+            distance = distanceText,
+            toggleSpeedUp
+        )
+        VerticalSpace(24)
+
+        // Container for all progress tracker data, including connector lines
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .onGloballyPositioned { coordinates ->
+                    boxOffset = coordinates.positionInRoot()
+                }) {
+            // Canvas on which to draw connector lines
+            Canvas(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .align(Alignment.TopStart)
+            ) {
+                // Draw connecting lines between stops
+                for (i in stepCoordinates.dropLast(1).indices) {
+                    val start = stepCoordinates[i]
+                    val end = stepCoordinates[i + 1]
+
+                    val pathEffect = if (!journey.stops[i].reached) {
+                        PathEffect.dashPathEffect(floatArrayOf(15f, 15f))
+                    } else null
+
+                    if (start != Offset.Zero && start != null && end != Offset.Zero && end != null) {
+                        drawLine(
+                            color = connectorColour,
+                            start = start,
+                            end = end,
+                            strokeWidth = 4.dp.toPx(),
+                            pathEffect = pathEffect
+                        )
+                    }
+                }
+            }
+            // ======================================================================
+            // Currently assuming start location and destination are not also stops
+            // e.g. when a user starts at a station
+            // TODO: Adjust UI if start location is first stop or destination is last stop
+            // ======================================================================
+
+            Column(modifier = Modifier.fillMaxWidth()) {
+
+                // ======================================================
+                // Start Location
+                // ======================================================
+                JourneyStep(
+                    isStart = true,
+                    title = journeyState.startLocation?.primaryText ?: "Error: Unknown Location",
+                    hasEditIcon = true,
+                ) { offset ->
+                    updateCoordinate(0, offset)
+                }
+                VerticalSpace(12)
+                InstructionStep(journey.instructions.first())
+
+                // ======================================================
+                // Create card for each stop with instruction below it
+                // ======================================================
+                journey.stops.forEachIndexed { index, stop ->
+                    // Stop
+                    TransitStopCard(stop) { offset ->
+                        updateCoordinate(index + 1, offset)
+                    }
+
+                    // Instruction
+                    val instruction = journey.instructions[index + 1]
+                    InstructionStep(instruction)
+                }
+
+                // ======================================================
+                // End Location
+                // ======================================================
+                JourneyStep(
+                    isStart = false,
+                    title = journeyState.destination?.primaryText ?: "Error: Unknown Location",
+                    hasEditIcon = true,
+                ) { offset ->
+                    updateCoordinate(journey.stops.size, offset)
+                }
+
+                // Complete Journey Logic
+                if (journey.stops.last().reached){
+                    navController.navigate(Screen.JourneySummary.route)
+                }
+            }
+        }
+
+        VerticalSpace(24)
+
+        // Cancel Journey Button
+        Box(
+            modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center
+        ) {
+            Button(
+                onClick = { showCancellationDialog = true },
+                modifier = Modifier
+                    .fillMaxWidth(0.6f)
+                    .height(50.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.error.copy(0.5f)
+                ),
+                border = BorderStroke(2.dp, MaterialTheme.colorScheme.error),
+                shape = RoundedCornerShape(25.dp)
+            ) {
+                Text(
+                    text = "Cancel Journey",
+                    color = Color.White,
+                    style = MaterialTheme.typography.labelLarge
+                )
+            }
+        }
+
+        // Confirm Cancellation Dialog
+        ConfirmationDialog(
+            visible = showCancellationDialog,
+            title = "Are you sure you want to cancel this journey?",
+            message = "This journey cannot be selected again if the first transit has already departed",
+            onConfirm = {
+                if (journey.stops[0].reached) {
+                    navController.navigate(Screen.Home.route)
+                } else {
+                    navController.navigate(Screen.JourneySelection.route)
+                }
+            },
+            onDismiss = {
+                showCancellationDialog = false
+            },
+        )
+
+        VerticalSpace(24)
     }
+
 }
 
 @Composable
 fun ETACard(eta: String, distance: String, toggleSpeedUp: () -> Unit) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
+        modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
-        ),
-        shape = RoundedCornerShape(12.dp)
+        ), shape = RoundedCornerShape(12.dp)
     ) {
         Row(
             modifier = Modifier
@@ -314,10 +314,7 @@ fun ETACard(eta: String, distance: String, toggleSpeedUp: () -> Unit) {
 
 @Composable
 fun JourneyStep(
-    isStart: Boolean,
-    title: String,
-    hasEditIcon: Boolean,
-    onCoordinatesChanged: (Offset) -> Unit
+    isStart: Boolean, title: String, hasEditIcon: Boolean, onCoordinatesChanged: (Offset) -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -337,16 +334,14 @@ fun JourneyStep(
                         y = coordinates.positionInRoot().y + coordinates.size.height / 2f
                     )
                     onCoordinatesChanged(center)
-                },
-            contentAlignment = Alignment.Center
+                }, contentAlignment = Alignment.Center
         ) {
             if (isStart) {
                 Box(
                     modifier = Modifier
                         .size(16.dp)
                         .background(
-                            MaterialTheme.colorScheme.onBackground,
-                            shape = CircleShape
+                            MaterialTheme.colorScheme.onBackground, shape = CircleShape
                         )
                 )
             } else {
@@ -416,8 +411,7 @@ fun InstructionStep(instruction: Instruction) {
         HorizontalSpace(12) // gap for alignment leave space for the tracker
 
         Row(
-            modifier = Modifier.weight(1f),
-            verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 painter = painterResource(modeIcon(instruction.travelMode)),
@@ -448,8 +442,7 @@ fun InstructionStep(instruction: Instruction) {
 
 @Composable
 fun TransitStopCard(
-    stop: Stop,
-    onCoordinatesChanged: (Offset) -> Unit
+    stop: Stop, onCoordinatesChanged: (Offset) -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -469,16 +462,14 @@ fun TransitStopCard(
                         y = coordinates.positionInRoot().y + coordinates.size.height / 2f
                     )
                     onCoordinatesChanged(center)
-                },
-            contentAlignment = Alignment.Center
+                }, contentAlignment = Alignment.Center
         ) {
             Box(
                 modifier = Modifier
                     .padding(top = 8.dp)
                     .size(16.dp)
                     .background(
-                        MaterialTheme.colorScheme.primary,
-                        shape = CircleShape
+                        MaterialTheme.colorScheme.primary, shape = CircleShape
                     )
             )
         }
@@ -607,8 +598,7 @@ fun TransitStopCard(
                         }
 
                         Text(
-                            text = annotatedString,
-                            style = MaterialTheme.typography.bodyMedium
+                            text = annotatedString, style = MaterialTheme.typography.bodyMedium
                         )
                     }
 
@@ -622,8 +612,7 @@ fun TransitStopCard(
                                     width = 1.dp,
                                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f),
                                     shape = RoundedCornerShape(
-                                        bottomStart = 12.dp,
-                                        bottomEnd = 12.dp
+                                        bottomStart = 12.dp, bottomEnd = 12.dp
                                     )
                                 )
                                 .background(
@@ -782,6 +771,59 @@ fun TransitStopCard(
                 }
             }
             VerticalSpace(16)
+        }
+    }
+}
+
+@Composable
+private fun NoActiveJourney(navController: NavController) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Icon(
+            painterResource(R.drawable.ic_directionless), contentDescription = "No Active Journey",
+            tint = MaterialTheme.colorScheme.onBackground
+        )
+        Text(
+            text = "There is currently no active journey.",
+            style = MaterialTheme.typography.titleMedium,
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
+        )
+        VerticalSpace(16)
+        Button(onClick = { navController.navigate(Screen.DestinationSelection.route) }) {
+            Text("Plan a New Journey")
+        }
+    }
+}
+
+@Composable
+private fun PreviousJourneyCompleted(navController: NavController) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Icon(
+            painterResource(R.drawable.ic_journey_complete), contentDescription = "No Active Journey",
+            tint = MaterialTheme.colorScheme.onBackground
+        )
+        Text(
+            text = "Previous journey completed!",
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.primary
+        )
+        VerticalSpace(16)
+        Button(onClick = { navController.navigate(Screen.DestinationSelection.route) }) {
+            Text("Start a New Journey")
         }
     }
 }
