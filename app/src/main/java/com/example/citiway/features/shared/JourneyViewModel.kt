@@ -13,11 +13,14 @@ import com.example.citiway.core.utils.getNearestHalfHour
 import com.example.citiway.core.utils.toSecondsInt
 import com.example.citiway.data.domain.MetrorailService
 import com.example.citiway.data.domain.MycitiBusService
+import com.example.citiway.data.local.dao.RouteDao
+import com.example.citiway.data.local.dao.TripDao
 import com.example.citiway.data.remote.Route
 import com.example.citiway.data.remote.RoutesManager
 import com.example.citiway.data.remote.SelectedLocation
 import com.example.citiway.data.remote.Step
 import com.example.citiway.data.remote.Vehicle
+import com.example.citiway.data.repository.CitiWayRepository
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -27,6 +30,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalTime
@@ -42,6 +46,9 @@ class JourneyViewModel(
 ) : ViewModel() {
     private val _state = MutableStateFlow(JourneyState())
     val state: StateFlow<JourneyState> = _state
+
+    // Using Repo to access Db
+    private val repository: CitiWayRepository = App.appModule.repository
 
     var recalculateRoutes = false
     var progressCountdownSeconds = 1L
@@ -503,6 +510,167 @@ class JourneyViewModel(
         }
 
         return Journey(stops, instructions, arrivalTime, distanceMeters, fareTotal)
+    }
+
+    /**
+     * Saves the completed journey to the database.
+     * Call this when the user reaches their final destination.
+     */
+    suspend fun saveCompletedJourney(userId: Int) {
+        val currentJourney = _state.value.journey ?: run {
+            Log.e("JourneyViewModel", "Cannot save: No journey data")
+            return
+        }
+
+        val startLocation = _state.value.startLocation ?: run {
+            Log.e("JourneyViewModel", "Cannot save: No start location")
+            return
+        }
+
+        val destination = _state.value.destination ?: run {
+            Log.e("JourneyViewModel", "Cannot save: No destination")
+            return
+        }
+
+        viewModelScope.launch(dispatcher) {
+            try {
+                // 1. Build the trip entity
+                val trip = buildTripFromJourney(userId, currentJourney, startLocation, destination)
+
+                // 2. Build the route entities
+                val routes = buildRoutesFromJourney(currentJourney)
+
+                // 3. Save everything via repository in a single transaction
+                val tripId = repository.saveCompletedJourney(trip, routes)
+
+                Log.d("JourneyViewModel", "🎉 Journey saved! Trip ID: $tripId with ${routes.size} route(s)")
+
+            } catch (e: Exception) {
+                Log.e("JourneyViewModel", "❌ Failed to save journey: ${e.message}", e)
+                e.printStackTrace()
+            }
+        }
+    }
+
+    /**
+     * Builds a Trip entity from journey data
+     */
+    private fun buildTripFromJourney(
+        userId: Int,
+        journey: Journey,
+        startLocation: SelectedLocation,
+        destination: SelectedLocation
+    ): com.example.citiway.data.local.entities.Trip {
+        // Determine overall trip mode
+        val modes = journey.instructions
+            .map { it.travelMode }
+            .filter { it != "WALK" }
+            .distinct()
+
+        val tripMode = when {
+            modes.isEmpty() -> "Walk"
+            modes.size == 1 -> when(modes[0]) {
+                "HEAVY_RAIL" -> "Train"
+                "BUS" -> "Bus"
+                else -> "Other"
+            }
+            else -> "Multi"
+        }
+
+        val totalDurationMinutes = journey.instructions.sumOf { it.durationMinutes }
+        val dateString = java.time.LocalDate.now().toString()
+
+        return com.example.citiway.data.local.entities.Trip(
+            user_id = userId,
+            start_stop = startLocation.primaryText,
+            end_stop = destination.primaryText,
+            date = dateString,
+            trip_time = "${totalDurationMinutes}min",
+            mode = tripMode,
+            total_distance_km = journey.distanceMeters / 1000.0,
+            total_fare = journey.fareTotal,
+            is_favourite = false,
+            created_at = System.currentTimeMillis()
+        )
+    }
+
+    /**
+     * Extracts route entities from journey data
+     */
+    private fun buildRoutesFromJourney(journey: Journey): List<com.example.citiway.data.local.entities.Route> {
+        val routes = mutableListOf<com.example.citiway.data.local.entities.Route>()
+
+        val originalRoute = _state.value.routesResponse?.values?.firstOrNull()
+        val steps = originalRoute?.legs?.firstOrNull()?.steps ?: emptyList()
+
+        var currentDepartureStop: Stop? = null
+        var stepIndex = 0
+
+        journey.stops.forEach { stop ->
+            when (stop.stopType) {
+                StopType.DEPARTURE -> {
+                    currentDepartureStop = stop
+                }
+
+                StopType.ARRIVAL -> {
+                    if (currentDepartureStop != null && !stop.isTransfer) {
+                        val transitStep = steps.getOrNull(stepIndex)
+                        val distanceMeters = transitStep?.distanceMeters ?: 0
+
+                        val providerId = when (stop.travelMode?.uppercase()) {
+                            "BUS" -> 1
+                            "HEAVY_RAIL", "RAIL" -> 2
+                            else -> null
+                        }
+
+                        val modeString = when (stop.travelMode?.uppercase()) {
+                            "BUS" -> "bus"
+                            "HEAVY_RAIL", "RAIL" -> "train"
+                            else -> "other"
+                        }
+
+                        val myCitiFareId: Int?
+                        val metrorailFareId: Int?
+
+                        when (stop.travelMode?.uppercase()) {
+                            "BUS" -> {
+                                val fareData = runBlocking { repository.getMyCitiFare(distanceMeters) }
+                                myCitiFareId = fareData?.myciti_fare_id
+                                metrorailFareId = null
+                            }
+                            "HEAVY_RAIL", "RAIL" -> {
+                                myCitiFareId = null
+                                metrorailFareId = 1  // Default to Zone 1 for now
+                            }
+                            else -> {
+                                myCitiFareId = null
+                                metrorailFareId = null
+                            }
+                        }
+
+                        routes.add(
+                            com.example.citiway.data.local.entities.Route(
+                                trip_id = null,  // Will be set by repository transaction
+                                provider_id = providerId,
+                                start_location = currentDepartureStop!!.name,
+                                destination = stop.name,
+                                mode = modeString,
+                                distance_km = distanceMeters / 1000.0,
+                                fare_contribution = null,
+                                schedule = null,
+                                myciti_fare_id = myCitiFareId,
+                                metrorail_fare_id = metrorailFareId
+                            )
+                        )
+
+                        currentDepartureStop = null
+                        stepIndex++
+                    }
+                }
+            }
+        }
+
+        return routes
     }
 }
 

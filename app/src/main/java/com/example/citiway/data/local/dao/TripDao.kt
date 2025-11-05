@@ -19,6 +19,7 @@ interface TripDao {
     @Query("SELECT * FROM trip WHERE trip_id = :tripId")
     suspend fun getTripById(tripId: Int): Trip?
 
+    //getRecentTrips() orders by date DESC but should order by created_at DESC for true chronological order: WIP
     @Query("SELECT * FROM trip WHERE user_id = :userId ORDER BY date DESC")
     fun getTripsByUser(userId: Int): Flow<List<Trip>>
 

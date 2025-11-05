@@ -97,7 +97,8 @@ class PlacesManager(
         Place.Field.ID,
         Place.Field.DISPLAY_NAME,
         Place.Field.LOCATION,
-        Place.Field.FORMATTED_ADDRESS
+        Place.Field.FORMATTED_ADDRESS,
+        Place.Field.ADDRESS_COMPONENTS  // NEW: Needed for neighborhood extraction
     )
 
     /*
@@ -135,6 +136,51 @@ class PlacesManager(
     private fun clearSearch() {
         _state.update { currentState ->
             currentState.copy(searchText = "", predictions = emptyList())
+        }
+    }
+
+    /**
+     * Formats an address with street and neighborhood only
+     * Example: "1 ABC Road, Tableview" instead of full address
+     */
+    private fun formatAddressWithNeighborhood(place: Place): String {
+        val addressComponents = place.addressComponents?.asList() ?: return place.displayName ?: "Unknown Location"
+
+        var streetNumber = ""
+        var route = ""
+        var neighborhood = ""
+
+        // Extracting street number, route, and neighborhood from address components
+        for (component in addressComponents) {
+            when {
+                component.types.contains("street_number") -> streetNumber = component.name
+                component.types.contains("route") -> route = component.name
+                component.types.contains("sublocality") ||
+                        component.types.contains("sublocality_level_1") -> neighborhood = component.name
+                // Fallback to neighborhood type if sublocality not found
+                component.types.contains("neighborhood") && neighborhood.isEmpty() -> neighborhood = component.name
+            }
+        }
+
+        // Default to "Cape Town" if no neighborhood found
+        if (neighborhood.isEmpty()) {
+            neighborhood = "Cape Town"
+        }
+
+        // Building the formatted address (street + neighborhood only)
+        val streetAddress = buildString {
+            if (streetNumber.isNotEmpty()) append("$streetNumber ")
+            append(route)
+        }.trim()
+
+        return if (streetAddress.isNotEmpty() && neighborhood.isNotEmpty()) {
+            "$streetAddress, $neighborhood"
+        } else if (streetAddress.isNotEmpty()) {
+            streetAddress
+        } else if (neighborhood.isNotEmpty()) {
+            neighborhood
+        } else {
+            place.displayName ?: "Unknown Location"
         }
     }
 
@@ -214,7 +260,8 @@ class PlacesManager(
             autocompleteSessionToken = AutocompleteSessionToken.newInstance()
 
             val latLng = place.location ?: throw Exception("Place location is null.")
-            val primaryText = place.displayName ?: prediction.getPrimaryText(null).toString()
+            // Using formatAddressWithNeighborhood instead of displayName
+            val primaryText = formatAddressWithNeighborhood(place)
 
             return SelectedLocation(latLng, place.id ?: "", primaryText)
         } catch (e: Exception) {
@@ -253,10 +300,11 @@ class PlacesManager(
             currentState.copy(userLocation = latLng)
         }
 
+        // Using formatAddressWithNeighborhood for consistent short format
         return SelectedLocation(
             latLng = latLng,
             placeId = place.id ?: placeId,
-            primaryText = place.displayName ?: place.formattedAddress ?: "Map Click Location"
+            primaryText = formatAddressWithNeighborhood(place)
         )
     }
 

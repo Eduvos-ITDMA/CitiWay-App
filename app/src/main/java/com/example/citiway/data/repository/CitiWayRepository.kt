@@ -10,6 +10,7 @@ package com.example.citiway.data.repository
  * @Inject constructor() allows Dagger/Hilt to create an instance of this repository.
  */
 
+import androidx.room.withTransaction
 import com.example.citiway.data.local.CitiWayDatabase
 import com.example.citiway.data.local.entities.*
 import kotlinx.coroutines.flow.Flow
@@ -114,14 +115,38 @@ class CitiWayRepository(private val database: CitiWayDatabase) {
         myCitiFareDao.insertMyCitiFares(fares)
     suspend fun getMyCitiFare(distanceMeters: Int): MyCitiFare? =
         myCitiFareDao.getFareByDistance(distanceMeters)
-
-
-
     suspend fun insertMetrorailFares(fares: List<MetrorailFare>) =
         metrorailFareDao.insertMetrorailFares(fares)
     suspend fun getMetrorailFare(zone: String, ticketType: String): MetrorailFare? =
         metrorailFareDao.getFareByZoneAndType(zone, ticketType)
 
+
+    // ========== JOURNEY SAVE OPERATIONS (for completed trips) ==========
+
+    /**
+     * Saves a complete journey (trip + routes) in a single atomic transaction.
+     * This ensures that either both trip and routes are saved, or neither are.
+     *
+     * @param trip The trip entity containing overall journey info
+     * @param routes List of route entities representing each leg of the journey
+     * @return The ID of the newly created trip
+     */
+    suspend fun saveCompletedJourney(trip: Trip, routes: List<Route>): Long {
+        // Use withTransaction to ensure atomicity - all or nothing
+        return database.withTransaction {
+            // 1. Insert trip and get the generated trip_id
+            val tripId = tripDao.insertTrip(trip).toInt()
+
+            // 2. Update all routes with the trip_id
+            val routesWithTripId = routes.map { it.copy(trip_id = tripId) }
+
+            // 3. Insert all routes
+            routeDao.insertRoutes(routesWithTripId)
+
+            // 4. Return the trip ID
+            tripId.toLong()
+        }
+    }
 
 
     // ========== UTILITY OPERATIONS ==========
