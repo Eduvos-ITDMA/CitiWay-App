@@ -23,11 +23,16 @@ data class Trip(
     val user_id: Int? = null,
     val start_stop: String? = null,
     val end_stop: String? = null,
-    val date: String? = null,
-    val trip_time: String? = null,
-    val mode: String? = null, // ENUM: "Bus", "Train", "Multi"
+    val date: String? = null,              // e.g., "2025-10-19"
+    val trip_time: String? = null,         // e.g., "18min"
+    val mode: String? = null,              // "Bus", "Train", "Multi"
     val total_distance_km: Double? = null,
     val total_fare: Double? = null,
     val is_favourite: Boolean = false,
-    val created_at: Long? = null
+    val created_at: Long? = null,  //Using system time now, so will have same time and when journey ends.
+
+    // NEW FIELDS for v1. wip
+    val departure_time: String? = null,    // ISO format or HH:mm
+    val arrival_time: String? = null,      // ISO format or HH:mm
+    //val completed_at: Long? = null         // Timestamp when journey ended
 )
