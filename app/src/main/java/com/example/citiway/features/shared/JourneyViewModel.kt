@@ -471,7 +471,9 @@ class JourneyViewModel(
                             StopType.ARRIVAL,
                             latLng,
                             nextEventIn,
-                            nextEventInMin
+                            nextEventInMin,
+                            null, // routeName - not needed for arrival
+                            vehicleType, // ADD THIS: travelMode so we know what transit we're getting off
                         )
                     )
 
@@ -480,6 +482,20 @@ class JourneyViewModel(
                 }
 
                 else -> throw Exception("Unexpected travel mode '${step.travelMode}'")
+            }
+        }
+
+        // ======== Detecting transfers at same location ========
+        // Marked ARRIVAL stops that are followed by DEPARTURE at the same location as transfers
+        for (i in 0 until stops.size - 1) {
+            val currentStop = stops[i]
+            val nextStop = stops[i + 1]
+
+            if (currentStop.stopType == StopType.ARRIVAL &&
+                nextStop.stopType == StopType.DEPARTURE &&
+                currentStop.name == nextStop.name) {
+                // This is a transfer - update the stop
+                stops[i] = currentStop.copy(isTransfer = true)
             }
         }
 
@@ -550,6 +566,7 @@ data class Stop(
     val routeName: String? = null,
     val travelMode: String? = null,
     var reached: Boolean = false,
+    val isTransfer: Boolean = false, // Indicates transfer at same location (bus or train station)
 )
 
 data class Instruction(

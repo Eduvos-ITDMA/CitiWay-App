@@ -522,7 +522,15 @@ fun TransitStopCard(
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.background
                 ),
-                border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary),
+                border = BorderStroke(
+                    2.dp,
+                    // Grey border for disembark, primary for boarding
+                    if (stop.stopType == StopType.ARRIVAL) {
+                        MaterialTheme.colorScheme.secondary
+                    } else {
+                        MaterialTheme.colorScheme.primary
+                    }
+                ),
                 shape = RoundedCornerShape(20.dp)
             ) {
                 Column(modifier = Modifier.fillMaxWidth()) {
@@ -585,7 +593,11 @@ fun TransitStopCard(
                             if (stopNotReached) {
                                 withStyle(
                                     style = SpanStyle(
-                                        color = MaterialTheme.colorScheme.secondary,
+                                        color = if (stop.stopType == StopType.ARRIVAL) {
+                                            MaterialTheme.colorScheme.primary
+                                        } else {
+                                            MaterialTheme.colorScheme.secondary
+                                        },
                                         fontWeight = FontWeight.ExtraBold
                                     )
                                 ) {
@@ -614,7 +626,14 @@ fun TransitStopCard(
                                         bottomEnd = 12.dp
                                     )
                                 )
-                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f))
+                                .background(
+                                    // Grey out disembark cards for visual distinction
+                                    if (stop.stopType == StopType.ARRIVAL) {
+                                        MaterialTheme.colorScheme.secondary.copy(alpha = 0.15f)
+                                    } else {
+                                        MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
+                                    }
+                                )
                                 .padding(12.dp, 8.dp),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween
@@ -624,8 +643,46 @@ fun TransitStopCard(
                                 verticalAlignment = Alignment.CenterVertically,
                                 modifier = Modifier.weight(1f)
                             ) {
-                                when (stop.stopType) {
-                                    StopType.DEPARTURE -> {
+                                when {
+                                    // Transfer at same location (bus to bus, train to train)
+                                    stop.isTransfer -> {
+                                        // Current transit journey
+                                        Icon(
+                                            painter = painterResource(
+                                                when (stop.travelMode) {
+                                                    "HEAVY_RAIL" -> R.drawable.ic_train
+                                                    "BUS" -> R.drawable.ic_transfer_board
+                                                    else -> R.drawable.ic_transfer_board
+                                                }
+                                            ),
+                                            contentDescription = "Current transit",
+                                            tint = MaterialTheme.colorScheme.primary,
+                                            modifier = Modifier.size(24.dp)
+                                        )
+
+                                        HorizontalSpace(4)
+
+                                        // Arrow indicating transfer/switch
+                                        Icon(
+                                            painter = painterResource(R.drawable.double_arrow_left),
+                                            contentDescription = "Transfer",
+                                            tint = MaterialTheme.colorScheme.onBackground,
+                                            modifier = Modifier.size(28.dp)
+                                        )
+
+                                        HorizontalSpace(4)
+
+                                        // Transfer/station icon (or same transit icon)
+                                        Icon(
+                                            painter = painterResource(R.drawable.ic_station_transfer),
+                                            contentDescription = "Next transit",
+                                            tint = MaterialTheme.colorScheme.primary,
+                                            modifier = Modifier.size(24.dp)
+                                        )
+                                    }
+
+                                    // Regular boarding
+                                    stop.stopType == StopType.DEPARTURE -> {
                                         // Walking to stop
                                         Icon(
                                             painter = painterResource(R.drawable.ic_walk),
@@ -661,7 +718,8 @@ fun TransitStopCard(
                                         )
                                     }
 
-                                    StopType.ARRIVAL -> {
+                                    // Regular disembarking
+                                    stop.stopType == StopType.ARRIVAL -> {
                                         // Transit mode (bus/train)
                                         Icon(
                                             painter = painterResource(R.drawable.outside_man),
@@ -682,7 +740,7 @@ fun TransitStopCard(
 
                                         HorizontalSpace(4)
 
-                                        // Destination/exit indicator (placeholder - can be customized)
+                                        // Destination/exit indicator
                                         Icon(
                                             painter = painterResource(R.drawable.ic_walk),
                                             contentDescription = "Exit",
@@ -709,7 +767,7 @@ fun TransitStopCard(
                                 )
                             }
 
-                            // Right side: Route name/number (only shown if its available)
+                            // Right side: Route name/number (only shown if available)
                             if (stop.routeName != null) {
                                 Text(
                                     text = stop.routeName,
