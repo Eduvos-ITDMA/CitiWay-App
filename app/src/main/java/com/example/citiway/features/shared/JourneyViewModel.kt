@@ -555,6 +555,30 @@ class JourneyViewModel(
     }
 
     /**
+     * Called when the journey is complete. Saves to database and navigates to summary.
+     */
+    fun onJourneyComplete() {
+        viewModelScope.launch(dispatcher) {
+            try {
+                // TODO: Get actual user ID from system, but its always 1
+                val userId = 1  // Hardcoded for now
+
+                saveCompletedJourney(userId)
+
+                Log.d("JourneyViewModel", "✅ Journey completed and saved!")
+
+                // Navigate to summary screen
+                navController.navigate(Screen.JourneySummary.route)
+
+            } catch (e: Exception) {
+                Log.e("JourneyViewModel", "❌ Failed to complete journey: ${e.message}", e)
+                // Still navigate even if save fails (user experience)
+                navController.navigate(Screen.JourneySummary.route)
+            }
+        }
+    }
+
+    /**
      * Builds a Trip entity from journey data
      */
     private fun buildTripFromJourney(
@@ -582,14 +606,21 @@ class JourneyViewModel(
         val totalDurationMinutes = journey.instructions.sumOf { it.durationMinutes }
         val dateString = java.time.LocalDate.now().toString()
 
+        // Get neighborhood from first/last stop names instead
+        val startNeighborhood = journey.stops.firstOrNull()?.name ?: startLocation.primaryText ?: "Unknown"
+        val endNeighborhood = journey.stops.lastOrNull()?.name ?: destination.primaryText ?: "Unknown"
+
+        // Round distance to 2 decimal places
+        val distanceKm = String.format("%.2f", journey.distanceMeters / 1000.0).toDouble()
+
         return com.example.citiway.data.local.entities.Trip(
             user_id = userId,
-            start_stop = startLocation.primaryText,
-            end_stop = destination.primaryText,
+            start_stop = startNeighborhood,
+            end_stop = endNeighborhood,
             date = dateString,
-            trip_time = "${totalDurationMinutes}min",
+            trip_time = "${totalDurationMinutes} min",
             mode = tripMode,
-            total_distance_km = journey.distanceMeters / 1000.0,
+            total_distance_km = distanceKm,  // Maybe we use .5 rounds
             total_fare = journey.fareTotal,
             is_favourite = false,
             created_at = System.currentTimeMillis()
@@ -618,6 +649,9 @@ class JourneyViewModel(
                     if (currentDepartureStop != null && !stop.isTransfer) {
                         val transitStep = steps.getOrNull(stepIndex)
                         val distanceMeters = transitStep?.distanceMeters ?: 0
+
+                        // Rounding distance to 2 decimal places
+                        val distanceKm = String.format("%.2f", distanceMeters / 1000.0).toDouble()
 
                         val providerId = when (stop.travelMode?.uppercase()) {
                             "BUS" -> 1
@@ -654,10 +688,10 @@ class JourneyViewModel(
                             com.example.citiway.data.local.entities.Route(
                                 trip_id = null,  // Will be set by repository transaction
                                 provider_id = providerId,
-                                start_location = currentDepartureStop!!.name,
+                                start_location = currentDepartureStop.name,
                                 destination = stop.name,
                                 mode = modeString,
-                                distance_km = distanceMeters / 1000.0,
+                                distance_km = distanceKm,
                                 fare_contribution = null,
                                 schedule = null,
                                 myciti_fare_id = myCitiFareId,

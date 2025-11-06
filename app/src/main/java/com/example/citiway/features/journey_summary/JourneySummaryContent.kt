@@ -715,14 +715,3 @@ fun SummaryTransitStep(
         }
     }
 }
-//// WIP: Waiting on inject, will be called when journey is done for VW code to run and save to DB. Ask caleb
-//fun onJourneyComplete() {
-//    val userId = getCurrentUserId()  // Getting  user from db/auth will be 1
-//
-//    viewModelScope.launch {
-//        saveCompletedJourney(userId)
-//
-//        // Then navigate to home
-//        navController.navigate(Screen.Home.route)
-//    }
-//}

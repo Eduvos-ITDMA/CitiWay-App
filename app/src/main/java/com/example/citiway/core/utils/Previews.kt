@@ -291,7 +291,8 @@ fun ProgressTrackerScreenPreview() {
             journeyState = mockJourneyState,
             paddingValues = PaddingValues(),
             navController = rememberNavController(), // Or callbacks like onCancelJourney
-            {}
+            {},
+            onJourneyComplete = {}
         )
     }
 }
