@@ -81,8 +81,9 @@ fun JourneySummaryContent(
     val fareTotal = journey.fareTotal
 
     // Track coordinates for progress line
+    val stepsCount = journey.stops.size.times(2).plus(2)
     var stepCoordinates by remember {
-        mutableStateOf(Array<Offset?>(journey.stops.size.times(2).plus(2)) { null })
+        mutableStateOf(Array<Offset?>(stepsCount) { null })
     }
     var boxOffset by remember { mutableStateOf(Offset.Zero) }
     val connectorColour = MaterialTheme.colorScheme.secondary
@@ -208,7 +209,7 @@ fun JourneySummaryContent(
                     name = destination.primaryText,
                     isStart = false
                 ) { offset ->
-                    updateCoordinate(journey.stops.size, offset)
+                    updateCoordinate(stepsCount - 1, offset)
                 }
             }
         }

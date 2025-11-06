@@ -91,7 +91,7 @@ class JourneyViewModel(
                                 stop.copy(
                                     nextEventIn = nextEventIn,
                                     nextEventInMin = nextEventInMin,
-                                    reached = nextEventInMin == 0
+                                    reached = nextEventInMin <= 0
                                 )
                             }
                         }
