@@ -6,6 +6,7 @@ package com.example.citiway.core.ui.components
  * and navigation state.
  */
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -38,6 +39,7 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.citiway.core.navigation.routes.BottomNavScreen
+import kotlin.math.log
 
 @Composable
 fun BottomNavigationBar(navController: NavController) {
@@ -83,14 +85,21 @@ fun RowScope.BottomNavItem(
         verticalArrangement = Arrangement.Center,
         modifier = Modifier
             .clickable {
-                // This code ensures we pop the current tab's back stack before navigating to the
-                // specified screen BUT save the state so it can be restored when needed
-                navController.navigate(item.route) {
-                    popUpTo(navController.graph.findStartDestination().id) {
-                        saveState = true
+                if (!isSelected) {
+                    // This code ensures we pop the current tab's back stack before navigating to the
+                    // specified screen BUT save the state so it can be restored when needed
+                    Log.d("BackStack route", navController.graph.route.toString())
+                    val currentTabRootId = navController.currentDestination?.parent?.id
+                        ?: navController.graph.findStartDestination().id
+
+                    navController.navigate(item.route) {
+                        popUpTo(currentTabRootId) {
+                            saveState = true
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
                     }
-                    launchSingleTop = true
-                    restoreState = true
                 }
             }
             .weight(1f)) {
