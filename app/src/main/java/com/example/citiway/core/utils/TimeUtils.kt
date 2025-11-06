@@ -25,6 +25,10 @@ fun Instant.toDisplayableLocalTime(zoneId: ZoneId = ZoneId.systemDefault()): Str
     return localDateTime.format(formatter)
 }
 
+fun Instant.toLocalDateTime(zoneId: ZoneId = ZoneId.systemDefault()): LocalDateTime {
+    return LocalDateTime.ofInstant(this, zoneId)
+}
+
 /**
  * Converts an hour string (e.g., "04:00") to an ISO 8601 formatted string (Instant.toString())
  * using the current system date and the system's default time zone.
@@ -105,7 +109,7 @@ fun formatMinutesToHoursAndMinutes(totalMinutes: Int): String {
 
         if (remainingMinutes > 0 || hours == 0) {
             // Include minutes if non-zero, or if minutes is the only component (e.g., "45 min")
-            append("${remainingMinutes}min")
+            append("${remainingMinutes}m")
         }
     }
 }

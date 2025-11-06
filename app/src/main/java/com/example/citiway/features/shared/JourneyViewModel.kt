@@ -13,8 +13,6 @@ import com.example.citiway.core.utils.getNearestHalfHour
 import com.example.citiway.core.utils.toSecondsInt
 import com.example.citiway.data.domain.MetrorailService
 import com.example.citiway.data.domain.MycitiBusService
-import com.example.citiway.data.local.dao.RouteDao
-import com.example.citiway.data.local.dao.TripDao
 import com.example.citiway.data.remote.Route
 import com.example.citiway.data.remote.RoutesManager
 import com.example.citiway.data.remote.SelectedLocation
@@ -403,6 +401,7 @@ class JourneyViewModel(
         var fromMode = ""
         val steps = route.legs.firstOrNull()?.steps ?: emptyList()
         val distanceMeters = route.distanceMeters
+        val startTime = Instant.now()
         val arrivalTime = calculateArrivalTime(steps)
         var stopsCount = 0
 
@@ -520,7 +519,7 @@ class JourneyViewModel(
             instructions.add(Instruction("Walk ${distance}m", duration / 60, "WALK"))
         }
 
-        return Journey(stops, instructions, arrivalTime, distanceMeters, fareTotal, stopsCount)
+        return Journey(stops, instructions, startTime, arrivalTime, distanceMeters, fareTotal, stopsCount)
     }
 
     /**
@@ -729,6 +728,7 @@ data class JourneyFilter(
 data class Journey(
     val stops: List<Stop>,
     val instructions: List<Instruction>,
+    val startTime: Instant,
     val arrivalTime: Instant?,
     val distanceMeters: Int,
     val fareTotal: Double,

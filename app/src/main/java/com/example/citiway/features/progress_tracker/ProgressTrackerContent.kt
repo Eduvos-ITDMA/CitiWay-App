@@ -42,15 +42,14 @@ import com.example.citiway.core.ui.components.HorizontalSpace
 import com.example.citiway.core.ui.components.VerticalSpace
 import com.example.citiway.core.utils.ProgressTrackerScreenPreview
 import com.example.citiway.core.utils.convertIsoToHhmm
+import com.example.citiway.core.utils.formatMinutesToHoursAndMinutes
 import com.example.citiway.features.shared.Instruction
 import com.example.citiway.features.shared.JourneyState
 import com.example.citiway.features.shared.Stop
 import com.example.citiway.features.shared.StopType
 
 private enum class InitialJourneyStatus {
-    NO_JOURNEY,
-    COMPLETED,
-    ACTIVE
+    NO_JOURNEY, COMPLETED, ACTIVE
 }
 
 @Composable
@@ -106,15 +105,17 @@ fun ProgressTrackerContent(
             }
         }
 
-        when (initialStatus){
+        when (initialStatus) {
             InitialJourneyStatus.NO_JOURNEY -> {
                 NoActiveJourney(navController)
                 return
             }
+
             InitialJourneyStatus.COMPLETED -> {
                 PreviousJourneyCompleted(navController)
                 return
             }
+
             InitialJourneyStatus.ACTIVE -> {}
         }
 
@@ -125,7 +126,7 @@ fun ProgressTrackerContent(
         } else {
             "${meters}m"
         }
-        
+
         ETACard(
             eta = convertIsoToHhmm(journey.arrivalTime.toString()),
             distance = distanceText,
@@ -213,7 +214,7 @@ fun ProgressTrackerContent(
                 }
 
                 // Complete Journey Logic
-                if (journey.stops.last().reached){
+                if (journey.stops.last().reached) {
                     navController.navigate(Screen.JourneySummary.route)
                 }
             }
@@ -326,8 +327,7 @@ fun ETACard(eta: String, distance: String, toggleSpeedUp: () -> Unit) {
             ),
             shape = buttonShape,
             border = BorderStroke(2.dp, MaterialTheme.colorScheme.secondary.copy(0.7f)),
-            content = { Text("Speed Up (demo)", color = MaterialTheme.colorScheme.onBackground) }
-        )
+            content = { Text("Speed Up (demo)", color = MaterialTheme.colorScheme.onBackground) })
     }
 }
 
@@ -449,7 +449,7 @@ fun InstructionStep(instruction: Instruction) {
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 Text(
-                    text = "approx. ${instruction.durationMinutes} min",
+                    text = "approx. ${formatMinutesToHoursAndMinutes(instruction.durationMinutes)} min",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
                 )
@@ -528,11 +528,9 @@ fun TransitStopCard(
                     .align(Alignment.End)
             )
             Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
+                modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.background
-                ),
-                border = BorderStroke(
+                ), border = BorderStroke(
                     2.dp,
                     // Grey border for disembark, primary for boarding
                     if (stop.stopType == StopType.ARRIVAL) {
@@ -540,8 +538,7 @@ fun TransitStopCard(
                     } else {
                         MaterialTheme.colorScheme.primary
                     }
-                ),
-                shape = RoundedCornerShape(20.dp)
+                ), shape = RoundedCornerShape(20.dp)
             ) {
                 Column(modifier = Modifier.fillMaxWidth()) {
                     // Header
@@ -607,8 +604,7 @@ fun TransitStopCard(
                                             MaterialTheme.colorScheme.primary
                                         } else {
                                             MaterialTheme.colorScheme.secondary
-                                        },
-                                        fontWeight = FontWeight.ExtraBold
+                                        }, fontWeight = FontWeight.ExtraBold
                                     )
                                 ) {
                                     append("${stop.nextEventInMin} min")
@@ -804,7 +800,8 @@ private fun NoActiveJourney(navController: NavController) {
         verticalArrangement = Arrangement.Center
     ) {
         Icon(
-            painterResource(R.drawable.ic_directionless), contentDescription = "No Active Journey",
+            painterResource(R.drawable.ic_directionless),
+            contentDescription = "No Active Journey",
             tint = MaterialTheme.colorScheme.onBackground
         )
         Text(
@@ -830,7 +827,8 @@ private fun PreviousJourneyCompleted(navController: NavController) {
         verticalArrangement = Arrangement.Center
     ) {
         Icon(
-            painterResource(R.drawable.ic_journey_complete), contentDescription = "No Active Journey",
+            painterResource(R.drawable.ic_journey_complete),
+            contentDescription = "No Active Journey",
             tint = MaterialTheme.colorScheme.onBackground
         )
         Text(

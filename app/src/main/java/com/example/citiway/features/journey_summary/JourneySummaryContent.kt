@@ -21,6 +21,7 @@ import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -28,16 +29,25 @@ import com.example.citiway.R
 import com.example.citiway.core.navigation.routes.Screen
 import com.example.citiway.core.ui.components.HorizontalSpace
 import com.example.citiway.core.ui.components.VerticalSpace
+import com.example.citiway.core.utils.JourneySummaryScreenPreview
+import com.example.citiway.core.utils.formatMinutesToHoursAndMinutes
+import com.example.citiway.core.utils.toDisplayableLocalTime
+import com.example.citiway.core.utils.toLocalDateTime
+import com.example.citiway.data.remote.SelectedLocation
+import com.example.citiway.features.shared.Instruction
 import com.example.citiway.features.shared.Journey
+import java.time.Duration
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun JourneySummaryContent(
     journey: Journey?,
+    startLocation: SelectedLocation?,
+    destination: SelectedLocation?,
     navController: NavController,
     paddingValues: PaddingValues
 ) {
-
-    if (journey == null) {
+    if (journey == null || startLocation == null || destination == null) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -57,53 +67,32 @@ fun JourneySummaryContent(
                 Text("Go back home")
             }
         }
+        return
     }
 
-    // ========== DYNAMIC JOURNEY DATA CALCULATIONS ==========
-    // These values are calculated from the journey data passed from JourneyViewModel
-    // and formatted for display in the summary screen
-
-    // Calculating start and end times
-    val startTime = remember {
-        // Start time: Current system time when user clicks "Start Journey"
-        java.time.LocalTime.now().format(java.time.format.DateTimeFormatter.ofPattern("h:mm a"))
-    }
-
-    val endTime = remember(journey?.arrivalTime) {
-        // End time: Arrival time from journey data (calculated in ViewModel)
-        journey?.arrivalTime?.atZone(java.time.ZoneId.systemDefault())?.toLocalTime()
-            ?.format(java.time.format.DateTimeFormatter.ofPattern("h:mm a"))
-            ?: "Unknown"
-    }
-
-    // Calculate date and duration
-    val currentDate = remember {
-        // Date: Current system date for demo purposes
-        java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("d MMMM yyyy"))
-    }
-
-    val duration = remember(journey) {
-        // Duration: Sum of all instruction durations from journey
-        journey?.instructions?.sumOf { it.durationMinutes } ?: 0
-    }
-
-    val formattedDuration = remember(duration) {
-        // Format duration as "Xhr Ymins" or "Ymins" if less than 1 hour
-        val hours = duration / 60
-        val mins = duration % 60
-        if (hours > 0) "${hours}hr ${mins}mins" else "${mins}mins"
-    }
-
-    val fareTotal = remember(journey?.fareTotal) {
-        // Fare total: Total cost calculated in ViewModel, formatted as currency
-        "R%.2f".format(journey?.fareTotal ?: 0.0)
-    }
-    // ========== END OF DYNAMIC JOURNEY DATA CALCULATIONS ==========
-
+    // ========== Journey Data Extraction ==========
+    val formatter = DateTimeFormatter.ofPattern("dd MMM yyyy")
+    val startTime = journey.startTime.toDisplayableLocalTime()
+    val arrivalTime = journey.arrivalTime?.toDisplayableLocalTime() ?: startTime
+    val journeyDate = journey.startTime.toLocalDateTime().toLocalDate().format(formatter)
+    val journeyDuration =
+        Duration.between(journey.startTime, journey.arrivalTime ?: journey.startTime).toMinutes()
+            .toInt()
+    val fareTotal = journey.fareTotal
 
     // Track coordinates for progress line
-    var stepCoordinates by remember { mutableStateOf<List<Offset>>(emptyList()) }
+    var stepCoordinates by remember {
+        mutableStateOf(Array<Offset?>(journey.stops.size.times(2).plus(2)) { null })
+    }
     var boxOffset by remember { mutableStateOf(Offset.Zero) }
+    val connectorColour = MaterialTheme.colorScheme.secondary
+
+    fun updateCoordinate(index: Int, offset: Offset) {
+        val localOffset = offset - boxOffset
+        stepCoordinates[index] = localOffset
+        // Trigger recomposition when stepCoordinatesState changes
+        stepCoordinates = stepCoordinates.clone()
+    }
 
     Column(
         modifier = Modifier
@@ -128,15 +117,15 @@ fun JourneySummaryContent(
         // Start and End Time with Line
         JourneyTimelineHeader(
             startTime = startTime,
-            endTime = endTime
+            arrivalTime = arrivalTime
         )
 
         VerticalSpace(24)
 
         // Journey Details Card
         JourneyDetailsCard(
-            date = currentDate,
-            duration = formattedDuration,
+            date = journeyDate,
+            duration = journeyDuration,
             fareTotal = fareTotal
         )
 
@@ -156,51 +145,25 @@ fun JourneySummaryContent(
                     .fillMaxSize()
                     .align(Alignment.TopStart)
             ) {
-                // Draw connecting lines between steps with gaps around icons
-                for (i in 0 until stepCoordinates.size - 1) {
-                    val start = stepCoordinates[i]
-                    val end = stepCoordinates[i + 1]
+                val yOffset = 20.dp.toPx()
 
-                    if (start != Offset.Zero && end != Offset.Zero) {
-                        val adjustedStart = Offset(
-                            x = start.x - boxOffset.x,
-                            y = start.y - boxOffset.y
+                // Draw connecting lines between steps
+                for (i in stepCoordinates.dropLast(1).indices) {
+                    val current = stepCoordinates[i]
+                    val next = stepCoordinates[i + 1]
+
+                    if (current != Offset.Zero && current != null && next != Offset.Zero && next != null) {
+
+                        val startPoint = Offset(current.x, current.y + yOffset)
+                        val endPoint = Offset(next.x, next.y - yOffset)
+
+                        drawLine(
+                            color = connectorColour,
+                            start = startPoint,
+                            end = endPoint,
+                            strokeWidth = 4.dp.toPx(),
+                            pathEffect = PathEffect.dashPathEffect(floatArrayOf(15f, 15f))
                         )
-                        val adjustedEnd = Offset(
-                            x = end.x - boxOffset.x,
-                            y = end.y - boxOffset.y
-                        )
-
-                        // Calculate gap offset (spacing from icon center)
-                        val gapSize = 24.dp.toPx()
-                        val dx = adjustedEnd.x - adjustedStart.x
-                        val dy = adjustedEnd.y - adjustedStart.y
-                        val distance = kotlin.math.sqrt(dx * dx + dy * dy)
-
-                        if (distance > gapSize * 2) {
-                            // Normalize direction
-                            val dirX = dx / distance
-                            val dirY = dy / distance
-
-                            // Apply gap from both ends
-                            val lineStart = Offset(
-                                x = adjustedStart.x + dirX * gapSize,
-                                y = adjustedStart.y + dirY * gapSize
-                            )
-                            val lineEnd = Offset(
-                                x = adjustedEnd.x - dirX * gapSize,
-                                y = adjustedEnd.y - dirY * gapSize
-                            )
-
-                            // Dashed line between steps with gaps
-                            drawLine(
-                                color = Color(0xFFFFB74D),
-                                start = lineStart,
-                                end = lineEnd,
-                                strokeWidth = 3.dp.toPx(),
-                                pathEffect = PathEffect.dashPathEffect(floatArrayOf(12f, 12f))
-                            )
-                        }
                     }
                 }
             }
@@ -208,175 +171,45 @@ fun JourneySummaryContent(
             Column(modifier = Modifier.fillMaxWidth()) {
                 // Start Location
                 SummaryLocationStep(
-                    location = "52 Pienaar Rd, Milnerton, Cape Town, 7441",
-                    subtitle = "Starting Location",
-                    isStart = true,
-                    onCoordinatesChanged = { offset ->
-                        stepCoordinates = stepCoordinates.toMutableList().apply {
-                            if (isEmpty()) add(offset) else set(0, offset)
-                        }
+                    name = startLocation.primaryText,
+                    isStart = true
+                ) { offset ->
+                    updateCoordinate(0, offset)
+                }
+
+                VerticalSpace(40)
+
+                // First Instruction
+                SummaryInstructionStep(journey.instructions.first()) { offset ->
+                    updateCoordinate(1, offset)
+                }
+
+                // =========================================
+                // Create step for each stop and instruction
+                // =========================================
+                journey.stops.forEachIndexed { index, stop ->
+                    val coordsIndex = (index + 1) * 2
+
+                    VerticalSpace(40)
+                    SummaryTransitStep(stop.name, stop.routeName, stop.travelMode) { offset ->
+                        updateCoordinate(coordsIndex, offset)
                     }
-                )
 
-                VerticalSpace(32)
-
-                // Walk 1
-                SummaryWalkStep(
-                    distanceMeters = 350,
-                    durationMinutes = 6,
-                    onCoordinatesChanged = { offset ->
-                        stepCoordinates = stepCoordinates.toMutableList().apply {
-                            while (size < 2) add(Offset.Zero)
-                            set(1, offset)
-                        }
+                    VerticalSpace(40)
+                    val instruction = journey.instructions[index + 1]
+                    SummaryInstructionStep(instruction) { offset ->
+                        updateCoordinate(coordsIndex + 1, offset)
                     }
-                )
+                }
 
-                VerticalSpace(32)
-
-                // Bus Stop 1
-                SummaryTransitStep(
-                    stopName = "Narwhal Bus Stop",
-                    routeInfo = "Route T04",
-                    isStation = false,
-                    onCoordinatesChanged = { offset ->
-                        stepCoordinates = stepCoordinates.toMutableList().apply {
-                            while (size < 3) add(Offset.Zero)
-                            set(2, offset)
-                        }
-                    }
-                )
-
-                VerticalSpace(32)
-
-                // Walk 2
-                SummaryWalkStep(
-                    distanceMeters = 200,
-                    durationMinutes = 4,
-                    onCoordinatesChanged = { offset ->
-                        stepCoordinates = stepCoordinates.toMutableList().apply {
-                            while (size < 4) add(Offset.Zero)
-                            set(3, offset)
-                        }
-                    }
-                )
-
-                VerticalSpace(32)
-
-                // Train Stop 1
-                SummaryTransitStep(
-                    stopName = "Woodstock Station",
-                    routeInfo = "Southern Line",
-                    isStation = true,
-                    onCoordinatesChanged = { offset ->
-                        stepCoordinates = stepCoordinates.toMutableList().apply {
-                            while (size < 5) add(Offset.Zero)
-                            set(4, offset)
-                        }
-                    }
-                )
-
-                VerticalSpace(32)
-
-                // Bus Stop 2
-                SummaryTransitStep(
-                    stopName = "Observatory Bus Stop",
-                    routeInfo = "Route T02",
-                    isStation = false,
-                    onCoordinatesChanged = { offset ->
-                        stepCoordinates = stepCoordinates.toMutableList().apply {
-                            while (size < 6) add(Offset.Zero)
-                            set(5, offset)
-                        }
-                    }
-                )
-
-                VerticalSpace(32)
-
-                // Walk 3
-                SummaryWalkStep(
-                    distanceMeters = 180,
-                    durationMinutes = 3,
-                    onCoordinatesChanged = { offset ->
-                        stepCoordinates = stepCoordinates.toMutableList().apply {
-                            while (size < 7) add(Offset.Zero)
-                            set(6, offset)
-                        }
-                    }
-                )
-
-                VerticalSpace(32)
-
-                // Train Stop 2
-                SummaryTransitStep(
-                    stopName = "Rondebosch Station",
-                    routeInfo = "Northern Line",
-                    isStation = true,
-                    onCoordinatesChanged = { offset ->
-                        stepCoordinates = stepCoordinates.toMutableList().apply {
-                            while (size < 8) add(Offset.Zero)
-                            set(7, offset)
-                        }
-                    }
-                )
-
-                VerticalSpace(32)
-
-                // Walk 4
-                SummaryWalkStep(
-                    distanceMeters = 420,
-                    durationMinutes = 7,
-                    onCoordinatesChanged = { offset ->
-                        stepCoordinates = stepCoordinates.toMutableList().apply {
-                            while (size < 9) add(Offset.Zero)
-                            set(8, offset)
-                        }
-                    }
-                )
-
-                VerticalSpace(32)
-
-                // Bus Stop 3
-                SummaryTransitStep(
-                    stopName = "Mowbray Station",
-                    routeInfo = "Route T06",
-                    isStation = false,
-                    onCoordinatesChanged = { offset ->
-                        stepCoordinates = stepCoordinates.toMutableList().apply {
-                            while (size < 10) add(Offset.Zero)
-                            set(9, offset)
-                        }
-                    }
-                )
-
-                VerticalSpace(32)
-
-                // Walk 5
-                SummaryWalkStep(
-                    distanceMeters = 150,
-                    durationMinutes = 3,
-                    onCoordinatesChanged = { offset ->
-                        stepCoordinates = stepCoordinates.toMutableList().apply {
-                            while (size < 11) add(Offset.Zero)
-                            set(10, offset)
-                        }
-                    }
-                )
-
-                VerticalSpace(32)
-
+                VerticalSpace(40)
                 // End Location
                 SummaryLocationStep(
-                    location = "Claremont Train Station",
-                    subtitle = "Final Destination",
-                    isStart = false,
-                    onCoordinatesChanged = { offset ->
-                        stepCoordinates = stepCoordinates.toMutableList().apply {
-                            while (size < 12) add(Offset.Zero)
-                            set(11, offset)
-                        }
-                    }
-                )
+                    name = destination.primaryText,
+                    isStart = false
+                ) { offset ->
+                    updateCoordinate(journey.stops.size, offset)
+                }
             }
         }
 
@@ -411,7 +244,7 @@ fun JourneySummaryContent(
 }
 
 @Composable
-fun JourneyTimelineHeader(startTime: String, endTime: String) {
+fun JourneyTimelineHeader(startTime: String, arrivalTime: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -461,7 +294,7 @@ fun JourneyTimelineHeader(startTime: String, endTime: String) {
             )
             VerticalSpace(8)
             Text(
-                text = endTime,
+                text = arrivalTime,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground
@@ -471,7 +304,7 @@ fun JourneyTimelineHeader(startTime: String, endTime: String) {
 }
 
 @Composable
-fun JourneyDetailsCard(date: String, duration: String, fareTotal: String) {
+fun JourneyDetailsCard(date: String, duration: Int, fareTotal: Double) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -497,12 +330,12 @@ fun JourneyDetailsCard(date: String, duration: String, fareTotal: String) {
             VerticalSpace(16)
 
             // Duration
-            DetailRow(label = "Duration:", value = duration)
+            DetailRow(label = "Duration:", value = formatMinutesToHoursAndMinutes(duration))
 
             VerticalSpace(16)
 
             // Fare Total
-            DetailRow(label = "Fare Total:", value = fareTotal)
+            DetailRow(label = "Fare Total:", value = "R$fareTotal")
         }
     }
 }
@@ -533,8 +366,7 @@ fun DetailRow(label: String, value: String) {
 
 @Composable
 fun SummaryLocationStep(
-    location: String,
-    subtitle: String,
+    name: String,
     isStart: Boolean,
     onCoordinatesChanged: (Offset) -> Unit
 ) {
@@ -582,28 +414,19 @@ fun SummaryLocationStep(
 
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = location,
+                text = name,
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground,
                 fontSize = 17.sp
-            )
-            VerticalSpace(4)
-            Text(
-                text = subtitle,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
-                fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
-                fontSize = 14.sp
             )
         }
     }
 }
 
 @Composable
-fun SummaryWalkStep(
-    distanceMeters: Int,
-    durationMinutes: Int,
+fun SummaryInstructionStep(
+    instruction: Instruction,
     onCoordinatesChanged: (Offset) -> Unit
 ) {
     Row(
@@ -639,15 +462,14 @@ fun SummaryWalkStep(
 
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = "Walk ${distanceMeters}m",
+                text = instruction.text,
                 style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground,
                 fontSize = 17.sp
             )
             VerticalSpace(2)
             Text(
-                text = "Approx. $durationMinutes min",
+                text = "Approx. ${instruction.durationMinutes} min",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
                 fontSize = 14.sp
@@ -659,8 +481,8 @@ fun SummaryWalkStep(
 @Composable
 fun SummaryTransitStep(
     stopName: String,
-    routeInfo: String,
-    isStation: Boolean,
+    routeName: String?,
+    travelMode: String?,
     onCoordinatesChanged: (Offset) -> Unit
 ) {
     Row(
@@ -685,10 +507,8 @@ fun SummaryTransitStep(
             contentAlignment = Alignment.Center
         ) {
             Icon(
-                painter = painterResource(
-                    if (isStation) R.drawable.ic_train else R.drawable.ic_bus
-                ),
-                contentDescription = if (isStation) "Train" else "Bus",
+                painter = painterResource(modeIcon(travelMode)),
+                contentDescription = travelMode ?: "Unknown travel mode",
                 tint = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.size(28.dp)
             )
@@ -706,7 +526,7 @@ fun SummaryTransitStep(
             )
             VerticalSpace(2)
             Text(
-                text = routeInfo,
+                text = routeName ?: "",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.secondary,
                 fontWeight = FontWeight.SemiBold,
@@ -715,6 +535,22 @@ fun SummaryTransitStep(
         }
     }
 }
+
+private fun modeIcon(travelMode: String?): Int {
+    return when (travelMode) {
+        "WALK" -> R.drawable.ic_walk
+        "BUS" -> R.drawable.ic_bus
+        "HEAVY_RAIL" -> R.drawable.ic_train
+        else -> R.drawable.ic_question_mark
+    }
+}
+
+@Preview
+@Composable
+fun JourneySummaryPrevious() {
+    JourneySummaryScreenPreview()
+}
+
 //// WIP: Waiting on inject, will be called when journey is done for VW code to run and save to DB. Ask caleb
 //fun onJourneyComplete() {
 //    val userId = getCurrentUserId()  // Getting  user from db/auth will be 1

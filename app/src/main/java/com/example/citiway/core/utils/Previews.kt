@@ -58,6 +58,7 @@ private val mockJourney = Journey(
             latLng = LatLng(-33.9295, 18.4528),
             nextEventIn = Duration.ofMinutes(5),
             nextEventInMin = 5,
+            travelMode = "HEAVY_RAIL",
         ),
         Stop(
             name = "Salt River Rail North",
@@ -74,6 +75,7 @@ private val mockJourney = Journey(
             latLng = LatLng(-33.8953, 18.5147),
             nextEventIn = Duration.ofMinutes(5),
             nextEventInMin = 5,
+            travelMode = "BUS",
         ),
         Stop(
             name = "Oasis",
@@ -129,9 +131,10 @@ private val mockJourney = Journey(
             travelMode = "WALK"
         )
     ),
+    startTime = Instant.parse("2025-10-21T12:41:00Z"),
     arrivalTime = Instant.parse("2025-10-21T16:06:00Z"),
     distanceMeters = 5000,
-    fareTotal = 0.0,
+    fareTotal = 13.50,
 )
 
 val mockPlacesActions = PlacesActions(
@@ -268,6 +271,8 @@ fun JourneySummaryScreenPreview() {
     CitiWayTheme {
         JourneySummaryContent(
             journey = mockJourney,
+            startLocation = SelectedLocation(LatLng(0.0, 0.0), "mock_id", "Mowbray"),
+            destination = SelectedLocation(LatLng(0.0, 0.0), "mock_id_2", "Century City"),
             paddingValues = PaddingValues(),
             navController = rememberNavController(),
         )

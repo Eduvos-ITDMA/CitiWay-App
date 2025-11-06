@@ -22,11 +22,17 @@ fun JourneySummaryRoute(
             JourneyViewModel(navController)
         }
     )
-    val journey = journeyViewModel.state.collectAsState().value.journey
+
+    val journeyState = journeyViewModel.state.collectAsState().value
+    val journey = journeyState.journey
+    val startLocation = journeyState.startLocation
+    val destination = journeyState.destination
 
     ScreenWrapper(navController, true, { paddingValues ->
         JourneySummaryContent(
             journey = journey,
+            startLocation = startLocation,
+            destination = destination,
             paddingValues = paddingValues,
             navController = navController,
         )
