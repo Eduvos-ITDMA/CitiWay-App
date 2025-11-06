@@ -20,6 +20,7 @@ import com.example.citiway.core.navigation.graphs.SetupNavGraph
 import com.example.citiway.core.navigation.routes.HOME_ROUTE
 import com.example.citiway.core.navigation.routes.Screen
 import com.example.citiway.core.ui.theme.CitiWayTheme
+import com.example.citiway.core.utils.NavStackLogger
 import com.example.citiway.features.shared.DrawerViewModel
 import com.google.android.libraries.places.api.Places
 
@@ -70,5 +71,6 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun CitiWayApp(navController: NavHostController, startRoute: String = HOME_ROUTE) {
+    NavStackLogger(navController)
     SetupNavGraph(navController, startRoute)
 }

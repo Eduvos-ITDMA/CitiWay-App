@@ -319,15 +319,13 @@ fun ETACard(eta: String, distance: String, toggleSpeedUp: () -> Unit) {
                 .fillMaxWidth(0.5f)
                 .height(50.dp)
                 .padding(bottom = 7.dp)
-                .align(Alignment.CenterHorizontally)
-                .border(
-                    BorderStroke(2.dp, MaterialTheme.colorScheme.secondary.copy(0.7f)),
-                    shape = buttonShape
-                ),
+                .align(Alignment.CenterHorizontally),
             colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.secondary.copy(0.4f)
+                containerColor = MaterialTheme.colorScheme.secondary.copy(0.4f),
+                contentColor = MaterialTheme.colorScheme.onBackground
             ),
             shape = buttonShape,
+            border = BorderStroke(2.dp, MaterialTheme.colorScheme.secondary.copy(0.7f)),
             content = { Text("Speed Up (demo)", color = MaterialTheme.colorScheme.onBackground) }
         )
     }

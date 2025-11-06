@@ -10,8 +10,6 @@ class MetrorailService(): ITransportService<MetrorailService> {
 
     private val stationZoneMap: Map<String, Int> = mapOf(
         // --- ZONE 1 (1 - 15) ---
-
-        // TODO: Double check all stations are here
         "athlone" to 1,
         "bonteheuwel" to 1,
         "century city" to 1,
@@ -26,6 +24,7 @@ class MetrorailService(): ITransportService<MetrorailService> {
         "koeberg road" to 1,
         "langa" to 1,
         "maitland" to 1,
+        "observatory" to 1,
         "monte vista" to 1,
         "mowbray" to 1,
         "mutual" to 1,
