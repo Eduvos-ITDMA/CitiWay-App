@@ -134,8 +134,12 @@ class JourneyViewModel(
         }
 
         // Increase countdown rate
-        progressCountdownSeconds = if (progressCountdownSeconds == 1L) 20L else 1L
-        Log.d("JourneyViewModel", "Toggle speed up")
+        progressCountdownSeconds = when (progressCountdownSeconds) {
+            1L -> 20L
+            20L -> 200L
+            200L -> 1L
+            else -> 1L
+        }
     }
 
     fun setTimeType(type: TimeType) {
@@ -306,8 +310,12 @@ class JourneyViewModel(
                         }
                         firstWalkDuration /= 60
 
-                        Log.d("JourneyViewModel departureTime", firstTransitStep?.transitDetails?.stopDetails?.departureTime ?: "null")
-                        val departureTime = Instant.parse(firstTransitStep?.transitDetails?.stopDetails?.departureTime)
+                        Log.d(
+                            "JourneyViewModel departureTime",
+                            firstTransitStep?.transitDetails?.stopDetails?.departureTime ?: "null"
+                        )
+                        val departureTime =
+                            Instant.parse(firstTransitStep?.transitDetails?.stopDetails?.departureTime)
                         val nextDeparture = Duration.between(Instant.now(), departureTime)
 
                         // arrivalTime: current time + route.duration.value
@@ -493,7 +501,8 @@ class JourneyViewModel(
 
             if (currentStop.stopType == StopType.ARRIVAL &&
                 nextStop.stopType == StopType.DEPARTURE &&
-                currentStop.name == nextStop.name) {
+                currentStop.name == nextStop.name
+            ) {
                 // This is a transfer - update the stop
                 stops[i] = currentStop.copy(isTransfer = true)
             }
