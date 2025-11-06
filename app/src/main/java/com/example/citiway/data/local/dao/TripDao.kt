@@ -23,7 +23,7 @@ interface TripDao {
     @Query("SELECT * FROM trip WHERE user_id = :userId ORDER BY date DESC")
     fun getTripsByUser(userId: Int): Flow<List<Trip>>
 
-    @Query("SELECT * FROM trip WHERE user_id = :userId ORDER BY date DESC LIMIT :limit")
+    @Query("SELECT * FROM trip WHERE user_id = :userId ORDER BY created_at DESC LIMIT :limit")
     fun getRecentTrips(userId: Int, limit: Int = 10): Flow<List<Trip>>
 
     @Query("SELECT * FROM trip WHERE user_id = :userId AND is_favourite = 1 ORDER BY date DESC")

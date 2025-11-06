@@ -619,7 +619,7 @@ class JourneyViewModel(
         val endNeighborhood = journey.stops.lastOrNull()?.name ?: destination.primaryText ?: "Unknown"
 
         // Round distance to 2 decimal places
-        val distanceKm = String.format("%.2f", journey.distanceMeters / 1000.0).toDouble()
+        val distanceKm = kotlin.math.round(journey.distanceMeters / 1000.0 * 100) / 100
 
         return com.example.citiway.data.local.entities.Trip(
             user_id = userId,
@@ -659,7 +659,7 @@ class JourneyViewModel(
                         val distanceMeters = transitStep?.distanceMeters ?: 0
 
                         // Rounding distance to 2 decimal places
-                        val distanceKm = String.format("%.2f", distanceMeters / 1000.0).toDouble()
+                        val distanceKm = kotlin.math.round(journey.distanceMeters / 1000.0 * 100) / 100
 
                         val providerId = when (stop.travelMode?.uppercase()) {
                             "BUS" -> 1
