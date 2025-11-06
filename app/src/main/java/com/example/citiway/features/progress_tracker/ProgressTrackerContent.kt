@@ -81,6 +81,7 @@ fun ProgressTrackerContent(
     paddingValues: PaddingValues,
     navController: NavController,
     toggleSpeedUp: () -> Unit,
+    onJourneyComplete: () -> Unit,
 ) {
     // Track coordinates for progress line
     val journey = journeyState.journey
@@ -237,9 +238,12 @@ fun ProgressTrackerContent(
                     updateCoordinate(journey.stops.size, offset)
                 }
 
-                // Complete Journey Logic
-                if (journey.stops.last().reached) {
-                    navController.navigate(Screen.JourneySummary.route)
+                // Complete Journey Logic - triggers when last stop is reached
+                LaunchedEffect(journey?.stops?.last()?.reached) {
+                    if (journey.stops.last().reached) {
+                        Log.d("ProgressTracker", "🎉 Last stop reached! Saving journey...")
+                        onJourneyComplete()
+                    }
                 }
             }
         }
