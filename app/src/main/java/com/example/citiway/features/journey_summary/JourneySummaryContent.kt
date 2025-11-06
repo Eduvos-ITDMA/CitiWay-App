@@ -59,6 +59,48 @@ fun JourneySummaryContent(
         }
     }
 
+    // ========== DYNAMIC JOURNEY DATA CALCULATIONS ==========
+    // These values are calculated from the journey data passed from JourneyViewModel
+    // and formatted for display in the summary screen
+
+    // Calculating start and end times
+    val startTime = remember {
+        // Start time: Current system time when user clicks "Start Journey"
+        java.time.LocalTime.now().format(java.time.format.DateTimeFormatter.ofPattern("h:mm a"))
+    }
+
+    val endTime = remember(journey?.arrivalTime) {
+        // End time: Arrival time from journey data (calculated in ViewModel)
+        journey?.arrivalTime?.atZone(java.time.ZoneId.systemDefault())?.toLocalTime()
+            ?.format(java.time.format.DateTimeFormatter.ofPattern("h:mm a"))
+            ?: "Unknown"
+    }
+
+    // Calculate date and duration
+    val currentDate = remember {
+        // Date: Current system date for demo purposes
+        java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("d MMMM yyyy"))
+    }
+
+    val duration = remember(journey) {
+        // Duration: Sum of all instruction durations from journey
+        journey?.instructions?.sumOf { it.durationMinutes } ?: 0
+    }
+
+    val formattedDuration = remember(duration) {
+        // Format duration as "Xhr Ymins" or "Ymins" if less than 1 hour
+        val hours = duration / 60
+        val mins = duration % 60
+        if (hours > 0) "${hours}hr ${mins}mins" else "${mins}mins"
+    }
+
+    val fareTotal = remember(journey?.fareTotal) {
+        // Fare total: Total cost calculated in ViewModel, formatted as currency
+        "R%.2f".format(journey?.fareTotal ?: 0.0)
+    }
+    // ========== END OF DYNAMIC JOURNEY DATA CALCULATIONS ==========
+
+
     // Track coordinates for progress line
     var stepCoordinates by remember { mutableStateOf<List<Offset>>(emptyList()) }
     var boxOffset by remember { mutableStateOf(Offset.Zero) }
@@ -85,17 +127,17 @@ fun JourneySummaryContent(
 
         // Start and End Time with Line
         JourneyTimelineHeader(
-            startTime = "10:20 am",
-            endTime = "11:34 am"
+            startTime = startTime,
+            endTime = endTime
         )
 
         VerticalSpace(24)
 
         // Journey Details Card
         JourneyDetailsCard(
-            date = "2 September 2025",
-            duration = "1hr 4mins",
-            fareTotal = "R50"
+            date = currentDate,
+            duration = formattedDuration,
+            fareTotal = fareTotal
         )
 
         VerticalSpace(32)
