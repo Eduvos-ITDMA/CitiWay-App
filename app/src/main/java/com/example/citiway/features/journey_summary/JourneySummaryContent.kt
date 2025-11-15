@@ -45,7 +45,8 @@ fun JourneySummaryContent(
     startLocation: SelectedLocation?,
     destination: SelectedLocation?,
     navController: NavController,
-    paddingValues: PaddingValues
+    paddingValues: PaddingValues,
+    onDone: () -> Unit
 ) {
     if (journey == null || startLocation == null || destination == null) {
         Column(
@@ -82,10 +83,12 @@ fun JourneySummaryContent(
 
     // Track coordinates for progress line
     val stepsCount = journey.stops.size.times(2).plus(2)
-    var stepCoordinates by remember {
+    var stepCoordinates by remember(journey.startTime) {  // Added a key so that When journey.startTime changes, forget the old state and create fresh state
         mutableStateOf(Array<Offset?>(stepsCount) { null })
     }
-    var boxOffset by remember { mutableStateOf(Offset.Zero) }
+    var boxOffset by remember(journey.startTime) {  // State changing key
+        mutableStateOf(Offset.Zero)
+    }
     val connectorColour = MaterialTheme.colorScheme.secondary
 
     fun updateCoordinate(index: Int, offset: Offset) {
@@ -223,7 +226,7 @@ fun JourneySummaryContent(
         ) {
             Button(
                 // TODO: Go home if just come from progress tracker, otherwise pop backstack
-                onClick = { navController.navigate(Screen.Home.route) },
+                onClick = onDone,
                 modifier = Modifier
                     .fillMaxWidth(0.6f)
                     .height(50.dp),

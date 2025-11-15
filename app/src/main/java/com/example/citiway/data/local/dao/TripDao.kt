@@ -35,6 +35,9 @@ interface TripDao {
     @Query("SELECT * FROM trip")
     fun getAllTrips(): Flow<List<Trip>>
 
+//    @Query("SELECT * FROM trip WHERE trip_id = :tripId LIMIT 1")
+//    suspend fun getTripById(tripId: Int): Trip?
+
     @Query("DELETE FROM trip WHERE trip_id = :tripId")
     suspend fun deleteTripById(tripId: Int)
 

@@ -24,9 +24,11 @@ import com.example.citiway.data.local.entities.*
         MonthlySpend::class,      // Tracks monthly spending per provider
         MyCitiFare::class,        // Stores MyCiti fare prices
         MetrorailFare::class,     // Stores Metrorail fare prices
+        Journey::class,      // New for saving VM to DB
+        JourneyStep::class   // To save steps and read them back in order
 //        SavedPlace::class         // Stores saved places and favorite journeys
     ],
-    version = 7,                  // Database version - increment when schema changes
+    version = 8,                  // Database version - increment when schema changes
     exportSchema = false          // Set to true to export schema for version control
 )
 abstract class CitiWayDatabase : RoomDatabase() {
@@ -42,6 +44,9 @@ abstract class CitiWayDatabase : RoomDatabase() {
     abstract fun monthlySpendDao(): MonthlySpendDao
     abstract fun myCitiFareDao(): MyCitiFareDao
     abstract fun metrorailFareDao(): MetrorailFareDao
+    abstract fun journeyDao(): JourneyDao           // New for the view sumary
+
+    abstract fun journeyStepDao(): JourneyStepDao
 
     companion object {
         // Volatile ensures changes to INSTANCE are immediately visible to all threads

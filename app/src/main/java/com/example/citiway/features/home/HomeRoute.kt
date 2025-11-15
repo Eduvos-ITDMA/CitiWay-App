@@ -4,7 +4,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -12,10 +14,13 @@ import androidx.navigation.NavController
 import com.example.citiway.App
 import com.example.citiway.core.navigation.routes.Screen
 import com.example.citiway.core.utils.ScreenWrapper
+import com.example.citiway.data.local.entities.Trip
+import com.example.citiway.data.remote.SelectedLocation
 import com.example.citiway.di.viewModelFactory
 import com.example.citiway.features.shared.CompletedJourneysViewModel
 import com.example.citiway.features.shared.JourneyViewModel
 import com.example.citiway.features.shared.LocationType
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.model.AutocompletePrediction
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -31,6 +36,8 @@ data class HomeActions(
     val onSelectPrediction: (AutocompletePrediction) -> Unit,
     val onFavouritesTitleClick: () -> Unit,
     val onRecentTitleClick: () -> Unit,
+    val onViewJourneySummary: (Int) -> Unit,
+    val onStartJourney: (String, String) -> Unit
 )
 
 /**
@@ -84,6 +91,54 @@ fun HomeRoute(
     // Lifecycle-aware state collection
     val completedJourneysState by completedJourneysViewModel.screenState.collectAsStateWithLifecycle()
 
+    // Store just the ID
+    var selectedTripId by remember { mutableStateOf<Int?>(null) }
+    var selectedTripStartStop by remember { mutableStateOf<String?>(null) }
+    var selectedTripEndStop by remember { mutableStateOf<String?>(null) }
+
+    // Show dialog
+    if (selectedTripId != null && selectedTripStartStop != null && selectedTripEndStop != null) {
+        JourneyActionDialog(
+            tripId = selectedTripId!!,
+            startStop = selectedTripStartStop!!,
+            endStop = selectedTripEndStop!!,
+            onDismiss = {
+                selectedTripId = null
+                selectedTripStartStop = null
+                selectedTripEndStop = null
+            },
+            onViewSummary = { tripId ->
+                journeyViewModel.viewModelScope.launch {
+                    journeyViewModel.loadJourneyForSummary(tripId)  // Cleanly passing tripId to get summary details
+                }
+                navController.navigate(Screen.JourneySummary.route)
+                selectedTripId = null
+                selectedTripStartStop = null
+                selectedTripEndStop = null
+            },
+            onStartJourney = { startStop, endStop ->
+                val startLocation = SelectedLocation(
+                    latLng = LatLng(0.0, 0.0),
+                    placeId = "",
+                    primaryText = startStop
+                )
+                val destination = SelectedLocation(
+                    latLng = LatLng(0.0, 0.0),
+                    placeId = "",
+                    primaryText = endStop
+                )
+
+                journeyViewModel.setStartLocation(startLocation)
+                journeyViewModel.setDestination(destination)
+                navController.navigate(Screen.JourneySelection.route)
+
+                selectedTripId = null
+                selectedTripStartStop = null
+                selectedTripEndStop = null
+            }
+        )
+    }
+
     // Handle location selection from autocomplete predictions
     val onSelectPrediction: (AutocompletePrediction) -> Unit =
         { prediction ->
@@ -104,7 +159,28 @@ fun HomeRoute(
         { navController.navigate(Screen.DestinationSelection.route) },
         onSelectPrediction,
         onFavouritesTitleClick = { navController.navigate(Screen.Favourites.route) },
-        onRecentTitleClick = { navController.navigate(Screen.JourneyHistory.route) }
+        onRecentTitleClick = { navController.navigate(Screen.JourneyHistory.route) },
+        onViewJourneySummary = { tripId ->
+            journeyViewModel.viewModelScope.launch {
+                journeyViewModel.loadJourneyForSummary(tripId)
+            }
+            navController.navigate(Screen.JourneySummary.route)
+        },
+        onStartJourney = { startStop, endStop ->
+            val startLocation = SelectedLocation(
+                latLng = LatLng(0.0, 0.0),
+                placeId = "",
+                primaryText = startStop
+            )
+            val destination = SelectedLocation(
+                latLng = LatLng(0.0, 0.0),
+                placeId = "",
+                primaryText = endStop
+            )
+            journeyViewModel.setStartLocation(startLocation)
+            journeyViewModel.setDestination(destination)
+            navController.navigate(Screen.JourneySelection.route)
+        }
     )
 
     // Render screen with bottom bar

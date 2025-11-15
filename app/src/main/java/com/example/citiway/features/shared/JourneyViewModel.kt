@@ -13,6 +13,7 @@ import com.example.citiway.core.utils.getNearestHalfHour
 import com.example.citiway.core.utils.toSecondsInt
 import com.example.citiway.data.domain.MetrorailService
 import com.example.citiway.data.domain.MycitiBusService
+import com.example.citiway.data.local.entities.JourneyStep
 import com.example.citiway.data.remote.Route
 import com.example.citiway.data.remote.RoutesManager
 import com.example.citiway.data.remote.SelectedLocation
@@ -36,6 +37,7 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale.getDefault
 import java.util.UUID
 import kotlin.math.ceil
+import com.example.citiway.data.local.entities.Journey as JourneyEntity
 
 class JourneyViewModel(
     private val navController: NavController,
@@ -113,6 +115,113 @@ class JourneyViewModel(
         onSetJourneyOptions = ::setJourneyOptions,
         onSetJourney = ::setJourney,
     )
+
+    /**
+     * Loads a saved journey from the database for viewing in the summary screen
+     */
+    fun loadJourneyForSummary(tripId: Int) {
+        viewModelScope.launch(dispatcher) {
+            try {
+                // Fetch the trip first to get basic info
+                val trip = repository.getTripById(tripId)
+                if (trip == null) {
+                    Log.e("JourneyViewModel", "❌ Trip not found for ID: $tripId")
+                    return@launch
+                }
+
+                // Fetching the journey details
+                val journey = repository.getJourneyByTripId(tripId)
+                if (journey == null) {
+                    Log.e("JourneyViewModel", "❌ Journey not found for trip ID: $tripId")
+                    return@launch
+                }
+
+                val steps = repository.getStepsForJourney(journey.journey_id)
+
+                // Reconstructing the Journey object from database data
+                val reconstructedJourney = reconstructJourneyFromSteps(journey, steps, trip)
+
+                // Reconstruct start and end locations from trip data
+                // Use dummy LatLng since we don't need it for summary display in PlacesManager they are non-nullable fields
+                val startLocation = SelectedLocation(
+                    latLng = LatLng(0.0, 0.0),  // Dummy coordinates - not needed for summary
+                    placeId = "",                                   // Empty placeId - not needed for summary
+                    primaryText = trip.start_stop ?: "Unknown"
+                )
+
+                val destination = SelectedLocation(
+                    latLng = LatLng(0.0, 0.0),  // Dummy coordinates - not needed for summary
+                    placeId = "",                                   // Empty placeId - not needed for summary
+                    primaryText = trip.end_stop ?: "Unknown"
+                )
+
+                // Update state with the loaded journey
+                _state.update {
+                    it.copy(
+                        journey = reconstructedJourney,
+                        startLocation = startLocation,
+                        destination = destination
+                    )
+                }
+
+                Log.d("JourneyViewModel", "✅ Journey loaded for trip ID: $tripId")
+
+            } catch (e: Exception) {
+                Log.e("JourneyViewModel", "❌ Failed to load journey: ${e.message}", e)
+            }
+        }
+    }
+
+    /**
+     * Reconstructs the Journey object from database steps
+     */
+    private fun reconstructJourneyFromSteps(
+        journey: JourneyEntity?,  // Using the the alias
+        steps: List<JourneyStep>?,
+        trip: com.example.citiway.data.local.entities.Trip?
+    ): Journey? {
+        if (journey == null || steps == null) return null
+
+        val stops = steps
+            .filter { it.step_type == "STOP" && it.stop_type in listOf("DEPARTURE", "ARRIVAL") }
+            .map { step ->
+                Stop(
+                    name = step.stop_name ?: "",
+                    stopType = when(step.stop_type) {
+                        "DEPARTURE" -> StopType.DEPARTURE
+                        "ARRIVAL" -> StopType.ARRIVAL
+                        else -> StopType.DEPARTURE
+                    },
+                    latLng = null,  // Not needed for summary display
+                    nextEventIn = null,  // Not needed for past journeys
+                    nextEventInMin = null,
+                    routeName = step.route_name,
+                    travelMode = step.travel_mode,
+                    reached = true,  // All stops reached for completed journey
+                    isTransfer = step.is_transfer
+                )
+            }
+
+        val instructions = steps
+            .filter { it.step_type == "INSTRUCTION" }
+            .map { step ->
+                Instruction(
+                    text = step.instruction_text ?: "",
+                    durationMinutes = step.duration_minutes ?: 0,
+                    travelMode = step.travel_mode ?: "WALK"
+                )
+            }
+
+        return Journey(
+            stops = stops,
+            instructions = instructions,
+            startTime = Instant.parse(journey.start_time),
+            arrivalTime = journey.arrival_time?.let { Instant.parse(it) },
+            distanceMeters = journey.distance_meters,
+            fareTotal = trip?.total_fare ?: 0.0,  // Get fare from Trip table
+            totalStopsCount = journey.total_stops_count
+        )
+    }
 
     fun toggleProgressSpeedUp() {
         // Reduce minutes to 2
@@ -524,7 +633,7 @@ class JourneyViewModel(
 
     /**
      * Saves the completed journey to the database.
-     * Call this when the user reaches their final destination.
+     * Called when the user reaches their final destination.
      */
     suspend fun saveCompletedJourney(userId: Int) {
         val currentJourney = _state.value.journey ?: run {
@@ -544,22 +653,130 @@ class JourneyViewModel(
 
         viewModelScope.launch(dispatcher) {
             try {
-                // 1. Build the trip entity
+                // 1. Build and save Trip
                 val trip = buildTripFromJourney(userId, currentJourney, startLocation, destination)
-
-                // 2. Build the route entities
                 val routes = buildRoutesFromJourney(currentJourney)
+                val tripId = repository.saveCompletedJourney(trip, routes).toInt()
 
-                // 3. Save everything via repository in a single transaction
-                val tripId = repository.saveCompletedJourney(trip, routes)
+                // 2. Build and save Journey
+                val journey = JourneyEntity(  // Use the alias
+                    trip_id = tripId,
+                    start_time = currentJourney.startTime.toString(),
+                    arrival_time = currentJourney.arrivalTime?.toString(),
+                    distance_meters = currentJourney.distanceMeters,
+                    total_stops_count = currentJourney.totalStopsCount
+                )
+                val journeyId = repository.insertJourney(journey).toInt()
 
-                Log.d("JourneyViewModel", "🎉 Journey saved! Trip ID: $tripId with ${routes.size} route(s)")
+                // 3. Build and save JourneySteps (alternating stops and instructions)
+                val steps = buildJourneySteps(journeyId, currentJourney, startLocation, destination)
+                repository.insertJourneySteps(steps)
+
+                Log.d("JourneyViewModel", "✅ Full journey saved with ${steps.size} steps")
 
             } catch (e: Exception) {
-                Log.e("JourneyViewModel", "❌ Failed to save journey: ${e.message}", e)
-                e.printStackTrace()
+                Log.e("JourneyViewModel", "❌ Failed to save journey", e)
             }
         }
+    }
+
+    private fun buildJourneySteps(
+        journeyId: Int,
+        journey: Journey,
+        startLocation: SelectedLocation,
+        destination: SelectedLocation
+    ): List<JourneyStep> {
+        val steps = mutableListOf<JourneyStep>()
+        var order = 0
+
+        // Start location
+        steps.add(
+            JourneyStep(
+                journey_id = journeyId,
+                step_order = order++,
+                step_type = "STOP",
+                stop_name = startLocation.primaryText,
+                stop_type = "START",
+                route_name = null,
+                travel_mode = null,
+                is_transfer = false,
+                instruction_text = null,
+                duration_minutes = null
+            )
+        )
+
+        // Add first instruction
+        journey.instructions.firstOrNull()?.let { instruction ->
+            steps.add(
+                JourneyStep(
+                    journey_id = journeyId,
+                    step_order = order++,
+                    step_type = "INSTRUCTION",
+                    stop_name = null,
+                    stop_type = null,
+                    route_name = null,
+                    travel_mode = instruction.travelMode,
+                    is_transfer = false,
+                    instruction_text = instruction.text,
+                    duration_minutes = instruction.durationMinutes
+                )
+            )
+        }
+
+        // Add alternating stops and instructions
+        journey.stops.forEachIndexed { index, stop ->
+            // Add stop
+            steps.add(
+                JourneyStep(
+                    journey_id = journeyId,
+                    step_order = order++,
+                    step_type = "STOP",
+                    stop_name = stop.name,
+                    stop_type = stop.stopType.name,
+                    route_name = stop.routeName,
+                    travel_mode = stop.travelMode,
+                    is_transfer = stop.isTransfer,
+                    instruction_text = null,
+                    duration_minutes = null
+                )
+            )
+
+            // Add corresponding instruction (skip last one)
+            journey.instructions.getOrNull(index + 1)?.let { instruction ->
+                steps.add(
+                    JourneyStep(
+                        journey_id = journeyId,
+                        step_order = order++,
+                        step_type = "INSTRUCTION",
+                        stop_name = null,
+                        stop_type = null,
+                        route_name = null,
+                        travel_mode = instruction.travelMode,
+                        is_transfer = false,
+                        instruction_text = instruction.text,
+                        duration_minutes = instruction.durationMinutes
+                    )
+                )
+            }
+        }
+
+        // End location
+        steps.add(
+            JourneyStep(
+                journey_id = journeyId,
+                step_order = order++,
+                step_type = "STOP",
+                stop_name = destination.primaryText,
+                stop_type = "END",
+                route_name = null,
+                travel_mode = null,
+                is_transfer = false,
+                instruction_text = null,
+                duration_minutes = null
+            )
+        )
+
+        return steps
     }
 
     /**
@@ -583,6 +800,18 @@ class JourneyViewModel(
                 // Still navigate even if save fails (user experience)
                 navController.navigate(Screen.JourneySummary.route)
             }
+        }
+    }
+
+    fun clearJourneyState() {
+        _state.update {
+            it.copy(
+                journey = null,
+                startLocation = null,
+                destination = null,
+                journeyOptions = null,
+                routesResponse = null
+            )
         }
     }
 

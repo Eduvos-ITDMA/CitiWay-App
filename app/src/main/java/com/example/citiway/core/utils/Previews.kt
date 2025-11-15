@@ -190,7 +190,9 @@ fun HomeScreenPreview() {
         onMapIconClick = {},
         onSelectPrediction = { prediction -> },
         onFavouritesTitleClick = {},
-        onRecentTitleClick = {}
+        onRecentTitleClick = {},
+        onViewJourneySummary = {},
+        onStartJourney = TODO(),
     )
 
     CitiWayTheme {
@@ -275,6 +277,7 @@ fun JourneySummaryScreenPreview() {
             destination = SelectedLocation(LatLng(0.0, 0.0), "mock_id_2", "Century City"),
             paddingValues = PaddingValues(),
             navController = rememberNavController(),
+            onDone = {}
         )
     }
 }

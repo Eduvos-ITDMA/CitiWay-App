@@ -65,7 +65,10 @@ fun HomeContent(
     userName: String = "Commuter",
 ) {
 
-    var selectedJourney by remember { mutableStateOf<CompletedJourney?>(null) }
+    // Storing trip selection state
+    var selectedTripId by remember { mutableStateOf<Int?>(null) }
+    var selectedTripStartStop by remember { mutableStateOf<String?>(null) }
+    var selectedTripEndStop by remember { mutableStateOf<String?>(null) }
 
     Column(
         modifier = Modifier
@@ -90,7 +93,11 @@ fun HomeContent(
             "Recent Trips",
             "No recent trips",
             onTitleClick = homeActions.onRecentTitleClick,
-            onJourneyClick = { journey -> selectedJourney = journey }
+            onJourneyClick = { journey ->  // Extracting the fields we need
+                selectedTripId = journey.tripId
+                selectedTripStartStop = journey.startStop
+                selectedTripEndStop = journey.endStop
+            }
         )
 
         VerticalSpace(24)
@@ -101,7 +108,11 @@ fun HomeContent(
             "Favourite Trips",
             "No trips saved as favourite yet",
             onTitleClick = homeActions.onFavouritesTitleClick,
-            onJourneyClick = { journey -> selectedJourney = journey }
+            onJourneyClick = { journey ->
+                selectedTripId = journey.tripId
+                selectedTripStartStop = journey.startStop
+                selectedTripEndStop = journey.endStop
+            }
         )
 
         VerticalSpace(24)
@@ -112,17 +123,28 @@ fun HomeContent(
     }
 
     // When selected where to go
-    selectedJourney?.let { journey ->
+    // Show dialogbox when trip is selected
+    if (selectedTripId != null && selectedTripStartStop != null && selectedTripEndStop != null) {
         JourneyActionDialog(
-            journey = journey,
-            onDismiss = { selectedJourney = null },
-            onViewSummary = {
-                // TODO: Navigate to summary screen with journey data
-                selectedJourney = null
+            tripId = selectedTripId!!,
+            startStop = selectedTripStartStop!!,
+            endStop = selectedTripEndStop!!,
+            onDismiss = {
+                selectedTripId = null
+                selectedTripStartStop = null
+                selectedTripEndStop = null
             },
-            onStartJourney = {
-                // TODO: Set state and navigate to journey selection
-                selectedJourney = null
+            onViewSummary = { tripId ->
+                homeActions.onViewJourneySummary(tripId)  // Calling the action
+                selectedTripId = null
+                selectedTripStartStop = null
+                selectedTripEndStop = null
+            },
+            onStartJourney = { startStop, endStop ->
+                homeActions.onStartJourney(startStop, endStop)  // Calling the action!
+                selectedTripId = null
+                selectedTripStartStop = null
+                selectedTripEndStop = null
             }
         )
     }
@@ -248,10 +270,12 @@ fun CompletedTripsSection(
 
 @Composable
 fun JourneyActionDialog(
-    journey: CompletedJourney,
+    tripId: Int,  // Simply passing ID for journey retrival
+    startStop: String,
+    endStop: String,
     onDismiss: () -> Unit,
-    onViewSummary: () -> Unit,
-    onStartJourney: () -> Unit
+    onViewSummary: (Int) -> Unit,  // Callback receives ID
+    onStartJourney: (String, String) -> Unit  // Callback receives locations
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -286,15 +310,13 @@ fun JourneyActionDialog(
 
                 VerticalSpace(24)
 
-                // Buttons side by side
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    // View Summary Button (Yellow with black text)
                     Button(
                         onClick = {
-                            onViewSummary()
+                            onViewSummary(tripId)  // Passing TripId hen button clicked
                             onDismiss()
                         },
                         colors = ButtonDefaults.buttonColors(
@@ -315,10 +337,9 @@ fun JourneyActionDialog(
                         )
                     }
 
-                    // Start Journey Button (Blue/Primary)
                     Button(
                         onClick = {
-                            onStartJourney()
+                            onStartJourney(startStop, endStop)  // passing locations
                             onDismiss()
                         },
                         colors = ButtonDefaults.buttonColors(

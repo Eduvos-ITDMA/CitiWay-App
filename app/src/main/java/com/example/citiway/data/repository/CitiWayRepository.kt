@@ -148,6 +148,23 @@ class CitiWayRepository(private val database: CitiWayDatabase) {
         }
     }
 
+    // Journey methods
+    suspend fun insertJourney(journey: Journey): Long {
+        return database.journeyDao().insertJourney(journey)
+    }
+
+    suspend fun getJourneyByTripId(tripId: Int): Journey? {
+        return database.journeyDao().getJourneyByTripId(tripId)
+    }
+
+    suspend fun insertJourneySteps(steps: List<JourneyStep>) {
+        database.journeyStepDao().insertSteps(steps)
+    }
+
+    suspend fun getStepsForJourney(journeyId: Int): List<JourneyStep> {
+        return database.journeyStepDao().getStepsForJourney(journeyId)
+    }
+
 
     // ========== UTILITY OPERATIONS ==========
     suspend fun clearAllData() {

@@ -11,6 +11,7 @@ import com.example.citiway.core.utils.ScreenWrapper
 import com.example.citiway.di.viewModelFactory
 import com.example.citiway.features.shared.JourneyViewModel
 import androidx.compose.runtime.collectAsState
+import com.example.citiway.core.navigation.routes.Screen
 
 @Composable
 fun JourneySummaryRoute(
@@ -35,6 +36,10 @@ fun JourneySummaryRoute(
             destination = destination,
             paddingValues = paddingValues,
             navController = navController,
+            onDone = {  // Clearing the state after a Journey is completed - Saves memory
+                journeyViewModel.clearJourneyState()
+                navController.navigate(Screen.Home.route)
+            }
         )
     })
 }
