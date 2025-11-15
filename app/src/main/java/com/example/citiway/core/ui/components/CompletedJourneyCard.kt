@@ -33,7 +33,7 @@ import java.time.format.DateTimeFormatter
  * @param weight The layout weight of this card within a [RowScope]. Defaults to 1f.
  */
 @Composable
-fun RowScope.CompletedJourneyCard(route: String, date: String, mode: String, durationMin: Int, weight: Float = 1f) {
+fun RowScope.CompletedJourneyCard(route: String, date: String, mode: String, durationMin: Int, weight: Float = 1f, modifier: Modifier = Modifier) {
     val formattedDate = date.format(DateTimeFormatter.ofPattern("MMM dd, yyyy"))
 
     val hours = durationMin / 60
@@ -66,7 +66,8 @@ fun RowScope.CompletedJourneyCard(route: String, date: String, mode: String, dur
     Card(
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary),
-        modifier = Modifier.weight(weight)
+        modifier = modifier
+            .weight(weight)
     ) {
         Row(
             modifier = Modifier

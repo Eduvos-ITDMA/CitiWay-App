@@ -1,5 +1,6 @@
 package com.example.citiway.core.ui.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.runtime.Composable
@@ -21,6 +22,7 @@ import java.time.LocalDate
  *             This lambda receives a [Modifier] that should be applied to the icon content.
  *             and specifies `modifier = Modifier.clickable { /* action */ }`. It is also
  *             intended that the icon define its own `imageVector`.
+ * @param onClick A callback invoked when the journey card is clicked.
  */
 @Composable
 fun CompletedJourneyCardWithButton(
@@ -29,10 +31,12 @@ fun CompletedJourneyCardWithButton(
     durationMin: Int,
     icon: @Composable (Modifier) -> Unit,
     mode: String = "",
-    outlined: Boolean = false
+    outlined: Boolean = false,
+    onClick: () -> Unit = {}  // Added for pop-Up Dialog
+
 ) {
     Row {
-        CompletedJourneyCard(route, date, mode, durationMin)
+        CompletedJourneyCard(route, date, mode, durationMin, modifier = Modifier.clickable { onClick() })
         Spacer(modifier = Modifier.weight(0.05f))
         RoundIconButton(icon, Modifier.align(Alignment.CenterVertically), outlined)
     }

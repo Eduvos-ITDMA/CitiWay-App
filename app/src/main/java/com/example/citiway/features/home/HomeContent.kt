@@ -16,11 +16,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.citiway.R
 import com.example.citiway.core.ui.components.CompletedJourneyCardWithButton
+import com.example.citiway.core.ui.components.ConfirmationDialog
 import com.example.citiway.core.ui.components.LocationSearchField
 import com.example.citiway.core.ui.components.Title
 import com.example.citiway.core.ui.components.VerticalSpace
@@ -40,6 +44,16 @@ import com.example.citiway.data.local.CompletedJourney
 import com.example.citiway.data.remote.PlacesActions
 import com.example.citiway.data.remote.PlacesState
 import com.example.citiway.features.shared.CompletedJourneysState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.height
+
 
 @Composable
 fun HomeContent(
@@ -50,6 +64,9 @@ fun HomeContent(
     paddingValues: PaddingValues,
     userName: String = "Commuter",
 ) {
+
+    var selectedJourney by remember { mutableStateOf<CompletedJourney?>(null) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -72,7 +89,8 @@ fun HomeContent(
             homeActions.onToggleFavourite,
             "Recent Trips",
             "No recent trips",
-            onTitleClick = homeActions.onRecentTitleClick
+            onTitleClick = homeActions.onRecentTitleClick,
+            onJourneyClick = { journey -> selectedJourney = journey }
         )
 
         VerticalSpace(24)
@@ -82,14 +100,33 @@ fun HomeContent(
             homeActions.onToggleFavourite,
             "Favourite Trips",
             "No trips saved as favourite yet",
-            onTitleClick = homeActions.onFavouritesTitleClick
+            onTitleClick = homeActions.onFavouritesTitleClick,
+            onJourneyClick = { journey -> selectedJourney = journey }
         )
+
         VerticalSpace(24)
 
         SchedulesLink(homeActions.onSchedulesLinkClick)
 
         VerticalSpace(18)
     }
+
+    // When selected where to go
+    selectedJourney?.let { journey ->
+        JourneyActionDialog(
+            journey = journey,
+            onDismiss = { selectedJourney = null },
+            onViewSummary = {
+                // TODO: Navigate to summary screen with journey data
+                selectedJourney = null
+            },
+            onStartJourney = {
+                // TODO: Set state and navigate to journey selection
+                selectedJourney = null
+            }
+        )
+    }
+
 }
 
 @Composable
@@ -168,7 +205,8 @@ fun CompletedTripsSection(
     onToggleFavourite: (String) -> Unit,
     title: String,
     noJourneysText: String,
-    onTitleClick: (() -> Unit)? = null
+    onTitleClick: (() -> Unit)? = null,
+    onJourneyClick: (CompletedJourney) -> Unit = {}
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         SectionTitleWithArrow(title = title, onClick = onTitleClick)
@@ -194,6 +232,7 @@ fun CompletedTripsSection(
                     date = journey.date,
                     durationMin = journey.durationMin,
                     mode = journey.mode,
+                    onClick = { onJourneyClick(journey) },
                     icon = { modifier ->
                         Icon(
                             imageVector = if (journey.isFavourite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
@@ -205,6 +244,105 @@ fun CompletedTripsSection(
             }
         }
     }
+}
+
+@Composable
+fun JourneyActionDialog(
+    journey: CompletedJourney,
+    onDismiss: () -> Unit,
+    onViewSummary: () -> Unit,
+    onStartJourney: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        shape = RoundedCornerShape(16.dp),
+        containerColor = MaterialTheme.colorScheme.surface,
+        modifier = Modifier.border(
+            BorderStroke(2.dp, MaterialTheme.colorScheme.primary),
+            shape = RoundedCornerShape(16.dp)
+        ),
+        title = {
+            Text(
+                text = "Journey Options",
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
+        },
+        text = {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "What would you like to do with this journey?",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                VerticalSpace(24)
+
+                // Buttons side by side
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    // View Summary Button (Yellow with black text)
+                    Button(
+                        onClick = {
+                            onViewSummary()
+                            onDismiss()
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.secondary,
+                            contentColor = Color.Black
+                        ),
+                        shape = RoundedCornerShape(8.dp),
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(50.dp)
+                    ) {
+                        Text(
+                            "View\nSummary",
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center,
+                            lineHeight = 18.sp
+                        )
+                    }
+
+                    // Start Journey Button (Blue/Primary)
+                    Button(
+                        onClick = {
+                            onStartJourney()
+                            onDismiss()
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary
+                        ),
+                        shape = RoundedCornerShape(8.dp),
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(50.dp)
+                    ) {
+                        Text(
+                            "Start\nJourney",
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center,
+                            lineHeight = 18.sp
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {},
+        dismissButton = {}
+    )
 }
 
 @Composable
