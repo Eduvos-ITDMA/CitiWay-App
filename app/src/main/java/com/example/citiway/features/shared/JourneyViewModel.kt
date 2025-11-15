@@ -28,7 +28,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalTime
@@ -40,13 +39,21 @@ import kotlin.math.ceil
 class JourneyViewModel(
     private val navController: NavController,
     private val routesManager: RoutesManager = App.appModule.routesManager,
+    private val repository: CitiWayRepository = App.appModule.repository,
     private val dispatcher: CoroutineDispatcher = Dispatchers.Main
 ) : ViewModel() {
     private val _state = MutableStateFlow(JourneyState())
     val state: StateFlow<JourneyState> = _state
 
-    // Using Repo to access Db
-    private val repository: CitiWayRepository = App.appModule.repository
+    val actions = JourneyActions(
+        onSetTime = ::setTime,
+        onSetTimeType = ::setTimeType,
+        onSetDestination = ::setDestination,
+        onSetStartLocation = ::setStartLocation,
+        onGetJourneyOptions = ::getJourneyOptions,
+        onSetJourneyOptions = ::setJourneyOptions,
+        onSetJourney = ::setJourney,
+    )
 
     var recalculateRoutes = false
     var progressCountdownSeconds = 1L
@@ -103,16 +110,6 @@ class JourneyViewModel(
             }
         }
     }
-
-    val actions = JourneySelectionActions(
-        onSetTime = ::setTime,
-        onSetTimeType = ::setTimeType,
-        onSetDestination = ::setDestination,
-        onSetStartLocation = ::setStartLocation,
-        onGetJourneyOptions = ::getJourneyOptions,
-        onSetJourneyOptions = ::setJourneyOptions,
-        onSetJourney = ::setJourney,
-    )
 
     fun toggleProgressSpeedUp() {
         // Reduce minutes to 2
@@ -206,10 +203,13 @@ class JourneyViewModel(
 
     fun setJourney(id: String) {
         val route = _state.value.routesResponse?.get(id)
-        val fareTotal = _state.value.journeyOptions?.find { it.uuid == id }?.fareTotal ?: 0.0
+        val journeyOptions = _state.value.journeyOptions?.find { it.uuid == id }
+        val fareTotal = journeyOptions?.fareTotal ?: 0.0
+        val mycitiFare = journeyOptions?.mycitiFare ?: 0.0
+        val metrorailFare = journeyOptions?.metrorailFare ?: 0.0
 
         if (route != null) {
-            val journey = routeToJourney(route, fareTotal)
+            val journey = routeToJourney(route, fareTotal, mycitiFare, metrorailFare)
             _state.update { it.copy(journey = journey) }
         }
     }
@@ -351,7 +351,9 @@ class JourneyViewModel(
                                 }
                             }
                         }
-                        val fareTotal = mycitiBusService.getFare() + metrorailService.getFare()
+                        val mycitiFare = mycitiBusService.getFare()
+                        val metrorailFare = metrorailService.getFare()
+                        val fareTotal = mycitiFare + metrorailFare
 
                         val details = JourneyDetails(
                             firstWalkMinutes = firstWalkDuration,
@@ -361,6 +363,8 @@ class JourneyViewModel(
                             departureTimeInstant = departureTime,
                             arrivalTime = arrivalTime,
                             fareTotal = fareTotal,
+                            mycitiFare = mycitiFare,
+                            metrorailFare = metrorailFare,
                             totalDurationMinutes = totalDurationMinutes
                         )
 
@@ -393,7 +397,9 @@ class JourneyViewModel(
         return null
     }
 
-    fun routeToJourney(route: Route, fareTotal: Double = 0.0): Journey {
+    fun routeToJourney(
+        route: Route, mycitiFare: Double = 0.0, metrorailFare: Double = 0.0, fareTotal: Double = 0.0
+    ): Journey {
         val instructions: MutableList<Instruction> = mutableListOf()
         val stops: MutableList<Stop> = mutableListOf()
         var distance = 0
@@ -428,8 +434,7 @@ class JourneyViewModel(
                     var stopName = stopDetails?.departureStop?.name ?: "Transport stop"
                     var latLng = stopDetails?.departureStop?.location?.latLng
                     var nextEventIn = Duration.between(
-                        Instant.now(),
-                        Instant.parse(stopDetails?.departureTime)
+                        Instant.now(), Instant.parse(stopDetails?.departureTime)
                     )
                     var nextEventInMin = nextEventIn.toMinutes().toInt()
                     val routeName = if (vehicleType == "BUS") {
@@ -473,8 +478,7 @@ class JourneyViewModel(
                     stopName = stopDetails?.arrivalStop?.name ?: "Transport stop"
                     latLng = stopDetails?.arrivalStop?.location?.latLng
                     nextEventIn = Duration.between(
-                        Instant.now(),
-                        Instant.parse(stopDetails?.arrivalTime)
+                        Instant.now(), Instant.parse(stopDetails?.arrivalTime)
                     )
                     nextEventInMin = nextEventIn.toMinutes().toInt()
 
@@ -505,10 +509,7 @@ class JourneyViewModel(
             val currentStop = stops[i]
             val nextStop = stops[i + 1]
 
-            if (currentStop.stopType == StopType.ARRIVAL &&
-                nextStop.stopType == StopType.DEPARTURE &&
-                currentStop.name == nextStop.name
-            ) {
+            if (currentStop.stopType == StopType.ARRIVAL && nextStop.stopType == StopType.DEPARTURE && currentStop.name == nextStop.name) {
                 // This is a transfer - update the stop
                 stops[i] = currentStop.copy(isTransfer = true)
             }
@@ -519,202 +520,17 @@ class JourneyViewModel(
             instructions.add(Instruction("Walk ${distance}m", duration / 60, "WALK"))
         }
 
-        return Journey(stops, instructions, startTime, arrivalTime, distanceMeters, fareTotal, stopsCount)
-    }
-
-    /**
-     * Saves the completed journey to the database.
-     * Call this when the user reaches their final destination.
-     */
-    suspend fun saveCompletedJourney(userId: Int) {
-        val currentJourney = _state.value.journey ?: run {
-            Log.e("JourneyViewModel", "Cannot save: No journey data")
-            return
-        }
-
-        val startLocation = _state.value.startLocation ?: run {
-            Log.e("JourneyViewModel", "Cannot save: No start location")
-            return
-        }
-
-        val destination = _state.value.destination ?: run {
-            Log.e("JourneyViewModel", "Cannot save: No destination")
-            return
-        }
-
-        viewModelScope.launch(dispatcher) {
-            try {
-                // 1. Build the trip entity
-                val trip = buildTripFromJourney(userId, currentJourney, startLocation, destination)
-
-                // 2. Build the route entities
-                val routes = buildRoutesFromJourney(currentJourney)
-
-                // 3. Save everything via repository in a single transaction
-                val tripId = repository.saveCompletedJourney(trip, routes)
-
-                Log.d("JourneyViewModel", "🎉 Journey saved! Trip ID: $tripId with ${routes.size} route(s)")
-
-            } catch (e: Exception) {
-                Log.e("JourneyViewModel", "❌ Failed to save journey: ${e.message}", e)
-                e.printStackTrace()
-            }
-        }
-    }
-
-    /**
-     * Called when the journey is complete. Saves to database and navigates to summary.
-     */
-    fun onJourneyComplete() {
-        viewModelScope.launch(dispatcher) {
-            try {
-                // TODO: Get actual user ID from system, but its always 1
-                val userId = 1  // Hardcoded for now
-
-                saveCompletedJourney(userId)
-
-                Log.d("JourneyViewModel", "✅ Journey completed and saved!")
-
-                // Navigate to summary screen
-                navController.navigate(Screen.JourneySummary.route)
-
-            } catch (e: Exception) {
-                Log.e("JourneyViewModel", "❌ Failed to complete journey: ${e.message}", e)
-                // Still navigate even if save fails (user experience)
-                navController.navigate(Screen.JourneySummary.route)
-            }
-        }
-    }
-
-    /**
-     * Builds a Trip entity from journey data
-     */
-    private fun buildTripFromJourney(
-        userId: Int,
-        journey: Journey,
-        startLocation: SelectedLocation,
-        destination: SelectedLocation
-    ): com.example.citiway.data.local.entities.Trip {
-        // Determine overall trip mode
-        val modes = journey.instructions
-            .map { it.travelMode }
-            .filter { it != "WALK" }
-            .distinct()
-
-        val tripMode = when {
-            modes.isEmpty() -> "Walk"
-            modes.size == 1 -> when(modes[0]) {
-                "HEAVY_RAIL" -> "Train"
-                "BUS" -> "Bus"
-                else -> "Other"
-            }
-            else -> "Multi"
-        }
-
-        val totalDurationMinutes = journey.instructions.sumOf { it.durationMinutes }
-        val dateString = java.time.LocalDate.now().toString()
-
-        // Get neighborhood from first/last stop names instead
-        val startNeighborhood = journey.stops.firstOrNull()?.name ?: startLocation.primaryText ?: "Unknown"
-        val endNeighborhood = journey.stops.lastOrNull()?.name ?: destination.primaryText ?: "Unknown"
-
-        // Round distance to 2 decimal places
-        val distanceKm = kotlin.math.round(journey.distanceMeters / 1000.0 * 100) / 100
-
-        return com.example.citiway.data.local.entities.Trip(
-            user_id = userId,
-            start_stop = startNeighborhood,
-            end_stop = endNeighborhood,
-            date = dateString,
-            trip_time = "${totalDurationMinutes} min",
-            mode = tripMode,
-            total_distance_km = distanceKm,  // Maybe we use .5 rounds
-            total_fare = journey.fareTotal,
-            is_favourite = false,
-            created_at = System.currentTimeMillis()
+        return Journey(
+            stops,
+            instructions,
+            startTime,
+            arrivalTime,
+            distanceMeters,
+            fareTotal,
+            mycitiFare,
+            metrorailFare,
+            stopsCount
         )
-    }
-
-    /**
-     * Extracts route entities from journey data
-     */
-    private fun buildRoutesFromJourney(journey: Journey): List<com.example.citiway.data.local.entities.Route> {
-        val routes = mutableListOf<com.example.citiway.data.local.entities.Route>()
-
-        val originalRoute = _state.value.routesResponse?.values?.firstOrNull()
-        val steps = originalRoute?.legs?.firstOrNull()?.steps ?: emptyList()
-
-        var currentDepartureStop: Stop? = null
-        var stepIndex = 0
-
-        journey.stops.forEach { stop ->
-            when (stop.stopType) {
-                StopType.DEPARTURE -> {
-                    currentDepartureStop = stop
-                }
-
-                StopType.ARRIVAL -> {
-                    if (currentDepartureStop != null && !stop.isTransfer) {
-                        val transitStep = steps.getOrNull(stepIndex)
-                        val distanceMeters = transitStep?.distanceMeters ?: 0
-
-                        // Rounding distance to 2 decimal places
-                        val distanceKm = kotlin.math.round(journey.distanceMeters / 1000.0 * 100) / 100
-
-                        val providerId = when (stop.travelMode?.uppercase()) {
-                            "BUS" -> 1
-                            "HEAVY_RAIL", "RAIL" -> 2
-                            else -> null
-                        }
-
-                        val modeString = when (stop.travelMode?.uppercase()) {
-                            "BUS" -> "bus"
-                            "HEAVY_RAIL", "RAIL" -> "train"
-                            else -> "other"
-                        }
-
-                        val myCitiFareId: Int?
-                        val metrorailFareId: Int?
-
-                        when (stop.travelMode?.uppercase()) {
-                            "BUS" -> {
-                                val fareData = runBlocking { repository.getMyCitiFare(distanceMeters) }
-                                myCitiFareId = fareData?.myciti_fare_id
-                                metrorailFareId = null
-                            }
-                            "HEAVY_RAIL", "RAIL" -> {
-                                myCitiFareId = null
-                                metrorailFareId = 1  // Default to Zone 1 for now
-                            }
-                            else -> {
-                                myCitiFareId = null
-                                metrorailFareId = null
-                            }
-                        }
-
-                        routes.add(
-                            com.example.citiway.data.local.entities.Route(
-                                trip_id = null,  // Will be set by repository transaction
-                                provider_id = providerId,
-                                start_location = currentDepartureStop.name,
-                                destination = stop.name,
-                                mode = modeString,
-                                distance_km = distanceKm,
-                                fare_contribution = null,
-                                schedule = null,
-                                myciti_fare_id = myCitiFareId,
-                                metrorail_fare_id = metrorailFareId
-                            )
-                        )
-
-                        currentDepartureStop = null
-                        stepIndex++
-                    }
-                }
-            }
-        }
-
-        return routes
     }
 }
 
@@ -738,10 +554,12 @@ data class JourneyDetails(
     val departureTimeInstant: Instant,
     val arrivalTime: Instant?,
     val fareTotal: Double = 0.0,
+    val mycitiFare: Double = 0.0,
+    val metrorailFare: Double = 0.0,
     val totalDurationMinutes: Int? = null
 )
 
-data class JourneySelectionActions(
+data class JourneyActions(
     val onSetTimeType: (TimeType) -> Unit,
     val onSetTime: (String) -> Unit,
     val onSetStartLocation: (SelectedLocation) -> Unit,
@@ -766,6 +584,8 @@ data class Journey(
     val arrivalTime: Instant?,
     val distanceMeters: Int,
     val fareTotal: Double,
+    val mycitiFare: Double = 0.0,
+    val metrorailFare: Double = 0.0,
     val totalStopsCount: Int = 0
 )
 

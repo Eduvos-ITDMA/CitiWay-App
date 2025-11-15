@@ -17,6 +17,7 @@ import com.example.citiway.data.remote.TransitDetailsLocalizedValues
 import com.example.citiway.data.remote.TransitStop
 import com.example.citiway.data.remote.TransitStopDetails
 import com.example.citiway.data.remote.Vehicle
+import com.example.citiway.data.repository.CitiWayRepository
 import com.google.android.gms.maps.model.LatLng
 import com.google.gson.Gson
 import io.mockk.coEvery
@@ -39,6 +40,7 @@ class JourneyViewModelTest {
     private lateinit var mockNavController: NavController
     private lateinit var mockRoutesManager: RoutesManager
     private lateinit var testDispatcher: TestDispatcher
+    private lateinit var mockRepository: CitiWayRepository
 
     // The class we are testing
     private lateinit var viewModel: JourneyViewModel
@@ -53,10 +55,12 @@ class JourneyViewModelTest {
         // Create mock (fake) versions of the dependencies
         mockNavController = mockk(relaxed = true)
         mockRoutesManager = mockk(relaxed = true)
+        mockRepository = mockk(relaxed = true)
 
         testDispatcher = StandardTestDispatcher()
         // Initialize the ViewModel with the mock dependencies
-        viewModel = JourneyViewModel(mockNavController, mockRoutesManager, testDispatcher)
+        viewModel =
+            JourneyViewModel(mockNavController, mockRoutesManager, mockRepository, testDispatcher)
     }
 
     @Test
@@ -116,105 +120,107 @@ class JourneyViewModelTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `getJourneyOptions should update state with journey options when called`() = runTest(testDispatcher) {
-        // ARRANGE
-        val mockLocation = SelectedLocation(
-            placeId = "mock id",
-            primaryText = "Mock Location",
-            latLng = LatLng(0.0, 0.0)
-        )
-        viewModel.setStartLocation(mockLocation)
-        viewModel.setDestination(mockLocation)
-
-        val mockRoutes = loadRoutesFromJson("sample_routes_response.json", this.javaClass.classLoader!!)
-        coEvery {
-            mockRoutesManager.getTransitRoutes(
-                any(),
-                any(),
-                any(),
-                any()
+    fun `getJourneyOptions should update state with journey options when called`() =
+        runTest(testDispatcher) {
+            // ARRANGE
+            val mockLocation = SelectedLocation(
+                placeId = "mock id",
+                primaryText = "Mock Location",
+                latLng = LatLng(0.0, 0.0)
             )
-        } returns mockRoutes
+            viewModel.setStartLocation(mockLocation)
+            viewModel.setDestination(mockLocation)
 
-        // ACT
-        viewModel.getJourneyOptions()
-        advanceUntilIdle()
+            val mockRoutes =
+                loadRoutesFromJson("sample_routes_response.json", this.javaClass.classLoader!!)
+            coEvery {
+                mockRoutesManager.getTransitRoutes(
+                    any(),
+                    any(),
+                    any(),
+                    any()
+                )
+            } returns mockRoutes
 
-        // ASSERT
-        val journeyOptions = viewModel.state.value.journeyOptions
-        assertNotNull(journeyOptions) // Ensure journey options are not null
-        assertEquals(journeyOptions!!.size, 6) // Ensure there are options
+            // ACT
+            viewModel.getJourneyOptions()
+            advanceUntilIdle()
 
-        // First route
-        assertEquals(4, journeyOptions[0].firstWalkMinutes)
-        assertEquals(TravelPoint.STATION, journeyOptions[0].firstNodeType)
-        assertEquals(
-            listOf(
-                "Walk",
-                "Rondebosch Station",
-                "Salt River Station",
-                "Walk",
-                "Salt River Rail North",
-                "Zastron",
-                "Walk",
-                "Zastron",
-                "Sanddrift",
-                "Walk"
-            ), journeyOptions[0].routeSegments
-        )
-        val nextDeparture =
-            Duration.between(Instant.now(), Instant.parse("2025-10-16T15:17:30Z"))
-        assertEquals(nextDeparture, journeyOptions[0].nextDeparture)
-        // Fare calculation is a WIP - mock fare total used for now
-        assertEquals(50f, journeyOptions[0].fareTotal)
-        assertEquals(68, journeyOptions[0].totalDurationMinutes)
+            // ASSERT
+            val journeyOptions = viewModel.state.value.journeyOptions
+            assertNotNull(journeyOptions) // Ensure journey options are not null
+            assertEquals(journeyOptions!!.size, 6) // Ensure there are options
 
-        // Third route
-        assertEquals(4, journeyOptions[2].firstWalkMinutes)
-        assertEquals(TravelPoint.STATION, journeyOptions[2].firstNodeType)
-        assertEquals(
-            listOf(
-                "Walk",
-                "Rondebosch Station",
-                "Woodstock Station",
-                "Walk",
-                "Davison",
-                "Mansfield",
-                "Walk",
-                "Mansfield",
-                "Century City",
-                "Walk"
-            ), journeyOptions[2].routeSegments
-        )
-        val thirdRouteNextDeparture =
-            Duration.between(Instant.now(), Instant.parse("2025-10-16T15:37:30Z"))
-        assertEquals(thirdRouteNextDeparture, journeyOptions[2].nextDeparture)
-        assertEquals(50f, journeyOptions[2].fareTotal)
-        assertEquals(80, journeyOptions[2].totalDurationMinutes)
+            // First route
+            assertEquals(4, journeyOptions[0].firstWalkMinutes)
+            assertEquals(TravelPoint.STATION, journeyOptions[0].firstNodeType)
+            assertEquals(
+                listOf(
+                    "Walk",
+                    "Rondebosch Station",
+                    "Salt River Station",
+                    "Walk",
+                    "Salt River Rail North",
+                    "Zastron",
+                    "Walk",
+                    "Zastron",
+                    "Sanddrift",
+                    "Walk"
+                ), journeyOptions[0].routeSegments
+            )
+            val nextDeparture =
+                Duration.between(Instant.now(), Instant.parse("2025-10-16T15:17:30Z"))
+            assertEquals(nextDeparture, journeyOptions[0].nextDeparture)
+            // Fare calculation is a WIP - mock fare total used for now
+            assertEquals(50f, journeyOptions[0].fareTotal)
+            assertEquals(68, journeyOptions[0].totalDurationMinutes)
 
-        // Fifth route
-        assertEquals(280, journeyOptions[4].firstWalkMinutes)
-        assertEquals(TravelPoint.STATION, journeyOptions[4].firstNodeType)
-        assertEquals(
-            listOf(
-                "Walk",
-                "Belmont",
-                "Mowbray",
-                "Walk",
-                "Mowbray Rail Main",
-                "Civic Centre",
-                "Walk",
-                "Civic Centre",
-                "Sanddrift",
-                "Walk"
-            ), journeyOptions[4].routeSegments
-        )
-        val fifthRouteNextDeparture =
-            Duration.between(Instant.now(), Instant.parse("2025-10-16T15:19:00Z"))
-        assertEquals(fifthRouteNextDeparture, journeyOptions[4].nextDeparture)
-        assertEquals(50f, journeyOptions[4].fareTotal)
-        assertEquals(74, journeyOptions[4].totalDurationMinutes)
-    }
+            // Third route
+            assertEquals(4, journeyOptions[2].firstWalkMinutes)
+            assertEquals(TravelPoint.STATION, journeyOptions[2].firstNodeType)
+            assertEquals(
+                listOf(
+                    "Walk",
+                    "Rondebosch Station",
+                    "Woodstock Station",
+                    "Walk",
+                    "Davison",
+                    "Mansfield",
+                    "Walk",
+                    "Mansfield",
+                    "Century City",
+                    "Walk"
+                ), journeyOptions[2].routeSegments
+            )
+            val thirdRouteNextDeparture =
+                Duration.between(Instant.now(), Instant.parse("2025-10-16T15:37:30Z"))
+            assertEquals(thirdRouteNextDeparture, journeyOptions[2].nextDeparture)
+            assertEquals(50f, journeyOptions[2].fareTotal)
+            assertEquals(80, journeyOptions[2].totalDurationMinutes)
+
+            // Fifth route
+            assertEquals(280, journeyOptions[4].firstWalkMinutes)
+            assertEquals(TravelPoint.STATION, journeyOptions[4].firstNodeType)
+            assertEquals(
+                listOf(
+                    "Walk",
+                    "Belmont",
+                    "Mowbray",
+                    "Walk",
+                    "Mowbray Rail Main",
+                    "Civic Centre",
+                    "Walk",
+                    "Civic Centre",
+                    "Sanddrift",
+                    "Walk"
+                ), journeyOptions[4].routeSegments
+            )
+            val fifthRouteNextDeparture =
+                Duration.between(Instant.now(), Instant.parse("2025-10-16T15:19:00Z"))
+            assertEquals(fifthRouteNextDeparture, journeyOptions[4].nextDeparture)
+            assertEquals(50f, journeyOptions[4].fareTotal)
+            assertEquals(74, journeyOptions[4].totalDurationMinutes)
+        }
 
     private fun loadFirstRouteFromJson(fileName: String): Route {
         val response = loadRoutesFromJson(fileName, this.javaClass.classLoader!!)

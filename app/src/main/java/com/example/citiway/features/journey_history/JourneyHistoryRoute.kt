@@ -43,8 +43,9 @@ fun JourneyHistoryRoute(
     // Render screen with all journey history
     ScreenWrapper(navController, showBottomBar = true, content = { paddingValues ->
         JourneyHistoryContent(
-            journeys = completedJourneysState.allJourneys, // Selecting allJourneys property from ViewModel state to render full trip history for this screen
-            paddingValues = paddingValues
+            journeys = completedJourneysState.allJourneys,
+            paddingValues = paddingValues,
+
         )
     })
 }

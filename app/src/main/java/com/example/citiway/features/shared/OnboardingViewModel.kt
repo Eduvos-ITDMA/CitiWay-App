@@ -3,7 +3,7 @@ package com.example.citiway.features.shared
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.citiway.data.local.DatabaseSeeder
-import com.example.citiway.data.local.entities.User
+import com.example.citiway.data.local.entities.UserEntity
 import com.example.citiway.data.repository.CitiWayRepository
 import kotlinx.coroutines.launch
 
@@ -21,7 +21,7 @@ class OnboardingViewModel(
         viewModelScope.launch {
             try {
                 // 1. Creating and inserting the user with repo
-                val user = User(
+                val user = UserEntity(
                     name = name,
                     email = email,
                     preferred_language = preferredLanguage,

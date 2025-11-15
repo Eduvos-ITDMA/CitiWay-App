@@ -10,11 +10,13 @@ package com.example.citiway.data.repository
  * @Inject constructor() allows Dagger/Hilt to create an instance of this repository.
  */
 
-import androidx.room.withTransaction
 import com.example.citiway.data.local.CitiWayDatabase
+import com.example.citiway.data.local.CompletedJourney
+import com.example.citiway.data.local.JourneyOverviewDTO
 import com.example.citiway.data.local.entities.*
+import com.example.citiway.data.local.toEntity
+import com.example.citiway.features.shared.Journey
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.firstOrNull
 
 /**
  * Repository class that provides a clean API for data access
@@ -24,8 +26,7 @@ class CitiWayRepository(private val database: CitiWayDatabase) {
 
     // DAOs
     private val userDao = database.userDao()
-    private val tripDao = database.tripDao()
-    private val routeDao = database.routeDao()
+    private val journeyDao = database.JourneyDao()
     private val providerDao = database.providerDao()
     private val monthlySpendDao = database.monthlySpendDao()
     private val myCitiFareDao = database.myCitiFareDao()
@@ -37,120 +38,59 @@ class CitiWayRepository(private val database: CitiWayDatabase) {
     }
 
     // ========== USER OPERATIONS ==========
-    suspend fun insertUser(user: User) = userDao.insertUser(user)
+    suspend fun insertUser(user: UserEntity) = userDao.insertUser(user)
     suspend fun getUserById(userId: Int) = userDao.getUserById(userId)
     suspend fun getUserByEmail(email: String) = userDao.getUserByEmail(email)
-    suspend fun getFirstUser(): User? = userDao.getFirstUser()
-    fun getAllUsers(): Flow<List<User>> = userDao.getAllUsers()
+    suspend fun getFirstUser(): UserEntity? = userDao.getFirstUser()
+    fun getAllUsers(): Flow<List<UserEntity>> = userDao.getAllUsers()
 
 
-
-    // ========== TRIP OPERATIONS ==========
-    suspend fun insertTrip(trip: Trip) = tripDao.insertTrip(trip)
-    suspend fun getTripById(tripId: Int) = tripDao.getTripById(tripId)
-    fun getRecentTrips(userId: Int, limit: Int = 10): Flow<List<Trip>> =
-        tripDao.getRecentTrips(userId, limit)
-    fun getFavoriteTrips(userId: Int): Flow<List<Trip>> =
-        tripDao.getFavoriteTrips(userId)
-    suspend fun toggleFavoriteTrip(tripId: Int, isFavorite: Boolean) =
-        tripDao.updateFavoriteStatus(tripId, isFavorite)
-    fun getAllTripsForUser(userId: Int): Flow<List<Trip>> =
-        tripDao.getTripsByUser(userId)
-    suspend fun deleteTrip(tripId: Int) = tripDao.deleteTripById(tripId)
-
-
-
-
-    // ========== ROUTE OPERATIONS ==========
-    suspend fun insertRoute(route: Route) = routeDao.insertRoute(route)
-    suspend fun insertRoutes(routes: List<Route>) = routeDao.insertRoutes(routes)
-    suspend fun getRouteById(routeId: Int) = routeDao.getRouteById(routeId)
-    fun getRoutesByTrip(tripId: Int): Flow<List<Route>> = routeDao.getRoutesByTrip(tripId)
-    fun getRoutesByMode(mode: String): Flow<List<Route>> = routeDao.getRoutesByMode(mode)
-    fun searchRoutes(location: String): Flow<List<Route>> =
-        routeDao.searchRoutesByLocation(location)
-    fun getAllRoutes(): Flow<List<Route>> = routeDao.getAllRoutes()
-    suspend fun deleteRoutesByTrip(tripId: Int) = routeDao.deleteRoutesByTrip(tripId)
-
-
+    // ========== JOURNEY OPERATIONS ==========
+    suspend fun insertCompletedJourney(journey: CompletedJourney) = journeyDao.insertJourney(journey.toEntity())
+    suspend fun getCompletedJourneyById(journeyId: Int) = journeyDao.getJourneyById(journeyId)
+    fun searchCompletedJourneys(location: String): Flow<List<JourneyOverviewDTO>> =
+        journeyDao.searchJourneysByLocation(location)
+    fun getCompletedJourneys(): Flow<List<JourneyOverviewDTO>> = journeyDao.getAllJourneys()
+    suspend fun getJourneyOverviewsByUserId(userId: Int) = journeyDao.getJourneyOverviewsByUserId(userId)
+    suspend fun getJourneyOverviewById(journeyId: Int) = journeyDao.getJourneyOverviewById(journeyId)
+    fun getRecentJourneyOverview(userId: Int, limit: Int = 10): Flow<List<JourneyOverviewDTO>> =
+        journeyDao.getRecentJourneyOverviews(userId, limit)
+    fun getFavouriteJourneyOverview(userId: Int): Flow<List<JourneyOverviewDTO>> =
+        journeyDao.getFavouriteJourneyOverviews(userId)
+    suspend fun toggleFavouriteJourney(journeyId: Int, isFavourite: Boolean) =
+        journeyDao.updateFavouriteStatus(journeyId, isFavourite)
 
 
     // ========== PROVIDER OPERATIONS ==========
-    suspend fun insertProvider(provider: Provider) = providerDao.insertProvider(provider)
-    suspend fun insertProviders(providers: List<Provider>) =
+    suspend fun insertProvider(provider: ProviderEntity) = providerDao.insertProvider(provider)
+    suspend fun insertProviders(providers: List<ProviderEntity>) =
         providerDao.insertProviders(providers)
-    fun getProvidersByType(type: String): Flow<List<Provider>> =
+    fun getProvidersByType(type: String): Flow<List<ProviderEntity>> =
         providerDao.getProvidersByType(type)
-    fun getAllProviders(): Flow<List<Provider>> = providerDao.getAllProviders()
-
-
-
-
-    // ========== SAVED PLACE OPERATIONS ==========
-//    suspend fun insertSavedPlace(place: SavedPlace) = savedPlaceDao.insertPlace(place)
-//    suspend fun toggleFavoritePlace(placeId: Int, isFavorite: Boolean) =
-//        savedPlaceDao.updateFavoriteStatus(placeId, isFavorite)
-//    fun getFavoritePlaces(userId: Int): Flow<List<SavedPlace>> =
-//        savedPlaceDao.getFavoritePlaces(userId)
-//    fun getRecentPlaces(userId: Int, limit: Int = 10): Flow<List<SavedPlace>> =
-//        savedPlaceDao.getRecentPlaces(userId, limit)
-//    suspend fun updatePlaceLastUsed(placeId: Int, timestamp: Long) =
-//        savedPlaceDao.updateLastUsedTimestamp(placeId, timestamp)
-//
+    fun getAllProviders(): Flow<List<ProviderEntity>> = providerDao.getAllProviders()
 
 
     // ========== MONTHLY SPEND OPERATIONS ==========
-    suspend fun insertMonthlySpend(spend: MonthlySpend) =
+    suspend fun insertMonthlySpend(spend: MonthlySpendEntity) =
         monthlySpendDao.insertMonthlySpend(spend)
-    fun getMonthlySpendForUser(userId: Int): Flow<List<MonthlySpend>> =
+    fun getMonthlySpendForUser(userId: Int): Flow<List<MonthlySpendEntity>> =
         monthlySpendDao.getMonthlySpendByUser(userId)
-    suspend fun getSpendForMonth(userId: Int, month: String): MonthlySpend? =
+    suspend fun getSpendForMonth(userId: Int, month: String): MonthlySpendEntity? =
         monthlySpendDao.getMonthlySpendByUserAndMonth(userId, month)
 
 
-
-
     // ========== FARE OPERATIONS ==========
-    suspend fun insertMyCitiFares(fares: List<MyCitiFare>) =
+    suspend fun insertMyCitiFares(fares: List<MyCitiFareEntity>) =
         myCitiFareDao.insertMyCitiFares(fares)
-    suspend fun getMyCitiFare(distanceMeters: Int): MyCitiFare? =
+    suspend fun getMyCitiFare(distanceMeters: Int): MyCitiFareEntity? =
         myCitiFareDao.getFareByDistance(distanceMeters)
-    suspend fun insertMetrorailFares(fares: List<MetrorailFare>) =
+    suspend fun insertMetrorailFares(fares: List<MetrorailFareEntity>) =
         metrorailFareDao.insertMetrorailFares(fares)
-    suspend fun getMetrorailFare(zone: String, ticketType: String): MetrorailFare? =
+    suspend fun getMetrorailFare(zone: String, ticketType: String): MetrorailFareEntity? =
         metrorailFareDao.getFareByZoneAndType(zone, ticketType)
 
-
-    // ========== JOURNEY SAVE OPERATIONS (for completed trips) ==========
-
-    /**
-     * Saves a complete journey (trip + routes) in a single atomic transaction.
-     * This ensures that either both trip and routes are saved, or neither are.
-     *
-     * @param trip The trip entity containing overall journey info
-     * @param routes List of route entities representing each leg of the journey
-     * @return The ID of the newly created trip
-     */
-    suspend fun saveCompletedJourney(trip: Trip, routes: List<Route>): Long {
-        // Use withTransaction to ensure atomicity - all or nothing
-        return database.withTransaction {
-            // 1. Insert trip and get the generated trip_id
-            val tripId = tripDao.insertTrip(trip).toInt()
-
-            // 2. Update all routes with the trip_id
-            val routesWithTripId = routes.map { it.copy(trip_id = tripId) }
-
-            // 3. Insert all routes
-            routeDao.insertRoutes(routesWithTripId)
-
-            // 4. Return the trip ID
-            tripId.toLong()
-        }
-    }
-
-
     // ========== UTILITY OPERATIONS ==========
-    suspend fun clearAllData() {
+    fun clearAllData() {
         database.clearAllTables()
     }
 }

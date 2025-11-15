@@ -28,13 +28,13 @@ import androidx.compose.ui.unit.dp
 import com.example.citiway.core.ui.components.CompletedJourneyCardWithButton
 import com.example.citiway.core.ui.components.Title
 import com.example.citiway.core.ui.components.VerticalSpace
-import com.example.citiway.data.local.CompletedJourney
+import com.example.citiway.data.local.JourneyOverview
 
 @Composable
 fun FavouritesContent(
-    journeys: List<CompletedJourney>,
+    journeys: List<JourneyOverview>,
     paddingValues: PaddingValues,
-    onToggleFavourite: (String) -> Unit
+    onToggleFavourite: (JourneyOverview) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -86,7 +86,7 @@ fun FavouritesContent(
                                 imageVector = if (journey.isFavourite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                                 contentDescription = if (journey.isFavourite) "Remove from favourites" else "Add to favourites",
                                 tint = if (journey.isFavourite) Color.Red else MaterialTheme.colorScheme.onPrimary,
-                                modifier = modifier.clickable { onToggleFavourite(journey.id) }
+                                modifier = modifier.clickable { onToggleFavourite(journey) }
                             )
                         }
                     )

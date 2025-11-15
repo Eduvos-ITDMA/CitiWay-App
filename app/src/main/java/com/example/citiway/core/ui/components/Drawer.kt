@@ -43,7 +43,7 @@ import androidx.compose.ui.text.style.TextAlign
  * - Location permission handling with Android's security model
  * - Theme toggling between dark and light modes
  * - MyCiTi card integration for discounted pricing
- * - Navigation to Journey History and Help sections ** We can add more maybe favorites etc....
+ * - Navigation to Journey History and Help sections ** We can add more maybe favourites etc....
  */
 
 @Composable

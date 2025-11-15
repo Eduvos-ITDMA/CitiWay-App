@@ -2,16 +2,16 @@ package com.example.citiway.data.local.dao
 
 
 import androidx.room.*
-import com.example.citiway.data.local.entities.MyCitiFare
+import com.example.citiway.data.local.entities.MyCitiFareEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface MyCitiFareDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertMyCitiFare(fare: MyCitiFare): Long
+    suspend fun insertMyCitiFare(fare: MyCitiFareEntity): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertMyCitiFares(fares: List<MyCitiFare>)
+    suspend fun insertMyCitiFares(fares: List<MyCitiFareEntity>)
 
     @Query(
         """
@@ -21,10 +21,10 @@ interface MyCitiFareDao {
     LIMIT 1
     """
     )
-    suspend fun getFareByDistance(distanceMetres: Int): MyCitiFare?
+    suspend fun getFareByDistance(distanceMetres: Int): MyCitiFareEntity?
 
     @Query("SELECT * FROM myciti_fare")
-    fun getAllMyCitiFares(): Flow<List<MyCitiFare>>
+    fun getAllMyCitiFares(): Flow<List<MyCitiFareEntity>>
 
     @Query("DELETE FROM myciti_fare")
     suspend fun deleteAllMyCitiFares()

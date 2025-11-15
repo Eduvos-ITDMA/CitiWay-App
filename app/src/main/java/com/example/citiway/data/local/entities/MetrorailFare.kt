@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 
 // ==================== METRORAIL FARE ====================
 @Entity(tableName = "metrorail_fare")
-data class MetrorailFare(
+data class MetrorailFareEntity(
     @PrimaryKey(autoGenerate = true)
     val metrorail_fare_id: Int = 0,
     val zone: String? = null,

@@ -11,7 +11,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -23,10 +22,7 @@ import com.example.citiway.core.ui.theme.CitiWayTheme
 import com.example.citiway.core.utils.NavStackLogger
 import com.example.citiway.features.shared.DrawerViewModel
 import com.google.android.libraries.places.api.Places
-
-import com.example.citiway.data.local.DatabaseSeeder
 import com.example.citiway.data.repository.CitiWayRepository
-import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -4,10 +4,9 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import com.example.citiway.data.local.dao.*
 import com.example.citiway.data.local.entities.*
-
-
 
 /**
  * Main database class for CitiWay app.
@@ -16,19 +15,17 @@ import com.example.citiway.data.local.entities.*
  */
 @Database(
     entities = [
-        User::class,              // Stores user profile information
-        Provider::class,          // Stores transport provider details (MyCiti, Metrorail, etc.)
-        Route::class,             // Stores individual route information
-        Trip::class,              // Stores trip history and details
-        // TripRoute removed - no longer needed
-        MonthlySpend::class,      // Tracks monthly spending per provider
-        MyCitiFare::class,        // Stores MyCiti fare prices
-        MetrorailFare::class,     // Stores Metrorail fare prices
-//        SavedPlace::class         // Stores saved places and favorite journeys
+        UserEntity::class,              // Stores user profile information
+        ProviderEntity::class,          // Stores transport provider details (MyCiti, Metrorail, etc.)
+        CompletedJourneyEntity::class,             // Stores individual journey information
+        MonthlySpendEntity::class,      // Tracks monthly spending per provider
+        MyCitiFareEntity::class,        // Stores MyCiti fare prices
+        MetrorailFareEntity::class,     // Stores Metrorail fare prices
     ],
-    version = 7,                  // Database version - increment when schema changes
+    version = 9,                  // Database version - increment when schema changes
     exportSchema = false          // Set to true to export schema for version control
 )
+@TypeConverters(JourneyConverter::class)
 abstract class CitiWayDatabase : RoomDatabase() {
 
     // DAOs (Data Access Objects) - provide methods to interact with each table
@@ -36,9 +33,7 @@ abstract class CitiWayDatabase : RoomDatabase() {
 
     abstract fun userDao(): UserDao
     abstract fun providerDao(): ProviderDao
-    abstract fun routeDao(): RouteDao
-    abstract fun tripDao(): TripDao
-    //abstract fun tripRouteDao(): TripRouteDao // won't use this anymore (was for offline help.)
+    abstract fun JourneyDao(): JourneyDao
     abstract fun monthlySpendDao(): MonthlySpendDao
     abstract fun myCitiFareDao(): MyCitiFareDao
     abstract fun metrorailFareDao(): MetrorailFareDao

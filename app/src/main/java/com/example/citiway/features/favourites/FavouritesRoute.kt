@@ -18,7 +18,7 @@ import com.example.citiway.features.shared.CompletedJourneysViewModel
  * - Manual Dependency Injection: Constructs Database → Repository → ViewModel chain
  * - ViewModel Factory: Injects Repository into ViewModel for database operations
  * - Lifecycle-aware State: Collects state that pauses when screen is backgrounded
- * - Favorite Toggle: Passes toggle function to allow marking/unmarking favorites
+ * - Favourite Toggle: Passes toggle function to allow marking/unmarking favourites
  *
  * Each screen creates its own ViewModel instance locally, avoiding parameter passing
  * complexity while maintaining proper lifecycle scoping.
@@ -40,9 +40,9 @@ fun FavouritesRoute(
     // Render screen with bottom bar
     ScreenWrapper(navController, showBottomBar = true, content = { paddingValues ->
         FavouritesContent(
-            journeys = completedJourneysState.allFavouriteJourneys, // Passing allFavouriteJourneys property from ViewModel state to display only favorited trips on this screen
+            journeys = completedJourneysState.favouriteJourneys,
             paddingValues = paddingValues,
-            onToggleFavourite = completedJourneysViewModel::toggleFavourite // Pass toggle function to allow unfavoriting
+            onToggleFavourite = completedJourneysViewModel::toggleFavourite
         )
     })
 }

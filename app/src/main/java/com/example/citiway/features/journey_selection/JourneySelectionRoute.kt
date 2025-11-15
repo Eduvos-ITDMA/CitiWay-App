@@ -1,7 +1,6 @@
 package com.example.citiway.features.journey_selection
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
@@ -17,9 +16,8 @@ import com.example.citiway.App
 import com.example.citiway.core.navigation.routes.Screen
 import com.example.citiway.core.utils.ScreenWrapper
 import com.example.citiway.core.utils.getNearestHalfHour
-import com.example.citiway.data.remote.PlacesActions
 import com.example.citiway.di.viewModelFactory
-import com.example.citiway.features.shared.JourneySelectionActions
+import com.example.citiway.features.shared.JourneyActions
 import com.example.citiway.features.shared.JourneyViewModel
 import com.example.citiway.features.shared.LocationType
 import com.google.android.libraries.places.api.model.AutocompletePrediction
@@ -143,7 +141,7 @@ fun JourneySelectionRoute(
 }
 
 data class JourneySelectionScreenActions(
-    val journeySelectionActions: JourneySelectionActions,
+    val journeySelectionActions: JourneyActions,
     val onConfirmJourneySelection: (journeyId: String) -> Unit,
     val startLocationFieldActions: LocationFieldActions,
     val destinationFieldActions: LocationFieldActions,

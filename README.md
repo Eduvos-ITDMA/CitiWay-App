@@ -131,7 +131,7 @@ Refer to the figma design to see how this component will be reused.
 **Last Updated: October 17, 2025**
 
 ### Overview
-Complete Room database architecture implementing ERD v2 design with repository pattern, multi-modal journey support, and trip favorites functionality.
+Complete Room database architecture implementing ERD v2 design with repository pattern, multi-modal journey support, and trip favourites functionality.
 
 ### Database Schema (Version 3)
 - **8 Entity Tables**: User, Provider, Route, Trip, MonthlySpend, MyCitiFare, MetrorailFare, SavedPlace
@@ -147,7 +147,7 @@ data/
 │   │   ├── User.kt
 │   │   ├── Provider.kt
 │   │   ├── Route.kt       # Route legs for journeys
-│   │   ├── Trip.kt        # Complete journeys with mode & favorites
+│   │   ├── Trip.kt        # Complete journeys with mode & favourites
 │   │   ├── MonthlySpend.kt
 │   │   ├── MyCitiFare.kt
 │   │   ├── MetrorailFare.kt
@@ -175,7 +175,7 @@ Trips now include comprehensive journey tracking:
 - **mode**: `String` - Journey type: "Bus", "Train", or "Multi"
 - **total_distance_km**: `Double` - Aggregate distance across all route legs
 - **total_fare**: `Double` - Total cost of the journey
-- **is_favourite**: `Boolean` - User can mark trips as favorites ⭐
+- **is_favourite**: `Boolean` - User can mark trips as favourites ⭐
 - **created_at**: `Long` - Timestamp for sorting and analytics
 
 ### Enhanced Route Entity (Journey Legs)
@@ -210,7 +210,7 @@ User → Trip (mode="Multi", total_fare=18.50, distance=18.2km)
 - ✅ **Consistency**: Uniform data access patterns across the app
 
 ### Key Features
-- **Trip Favorites**: Users can mark trips as favorites with toggle functionality
+- **Trip Favourites**: Users can mark trips as favourites with toggle functionality
 - **Multi-Modal Support**: Seamlessly handles single and multi-mode journeys
 - **Route Leg Tracking**: Individual fare and distance tracking per journey segment
 - **Flow-Based Queries**: Reactive queries for real-time UI updates
@@ -251,7 +251,7 @@ The database seeder creates:
   - 4 Bus-only trips (MyCiTi, Golden Arrow)
   - 3 Train-only trips (Metrorail)
   - 3 Multi-mode trips (Bus+Train, Bus+Bus, Train+Bus)
-  - 5 trips marked as favorites
+  - 5 trips marked as favourites
 - **13 Route Legs**: Demonstrating multi-modal journey architecture
 - **Fare Structures**: 3 MyCiti distance bands, 4 Metrorail zone fares
 - **Cape Town Locations**: Realistic routes (Waterfront, CBD, Airport, Simon's Town, etc.)
@@ -273,15 +273,15 @@ val viewModel: CompletedJourneysViewModel = viewModel(
 // Access trip data
 val tripsState by viewModel.screenState.collectAsState()
 val recentTrips = tripsState.recentJourneys
-val favoriteTrips = tripsState.favouriteJourneys
+val favouriteTrips = tripsState.favouriteJourneys
 ```
 
 ### DAO Method Examples
 
-**TripDao - Favorites Support:**
+**TripDao - Favourites Support:**
 ```kotlin
-fun getFavoriteTrips(userId: Int): Flow<List<Trip>>
-suspend fun updateFavoriteStatus(tripId: Int, isFavorite: Boolean)
+fun getFavouriteTrips(userId: Int): Flow<List<Trip>>
+suspend fun updateFavouriteStatus(tripId: Int, isFavourite: Boolean)
 ```
 
 **RouteDao - Journey Legs:**

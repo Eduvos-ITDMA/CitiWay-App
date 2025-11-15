@@ -36,7 +36,7 @@ import com.example.citiway.core.ui.components.LocationSearchField
 import com.example.citiway.core.ui.components.Title
 import com.example.citiway.core.ui.components.VerticalSpace
 import com.example.citiway.core.utils.HomeScreenPreview
-import com.example.citiway.data.local.CompletedJourney
+import com.example.citiway.data.local.JourneyOverview
 import com.example.citiway.data.remote.PlacesActions
 import com.example.citiway.data.remote.PlacesState
 import com.example.citiway.features.shared.CompletedJourneysState
@@ -164,8 +164,8 @@ fun DestinationSearchBar(
 
 @Composable
 fun CompletedTripsSection(
-    journeys: List<CompletedJourney>,
-    onToggleFavourite: (String) -> Unit,
+    journeys: List<JourneyOverview>,
+    onToggleFavourite: (JourneyOverview) -> Unit,
     title: String,
     noJourneysText: String,
     onTitleClick: (() -> Unit)? = null
@@ -199,7 +199,7 @@ fun CompletedTripsSection(
                             imageVector = if (journey.isFavourite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                             contentDescription = if (journey.isFavourite) "Remove from favourites" else "Add to favourites",
                             tint = if (journey.isFavourite) Color.Red else MaterialTheme.colorScheme.onPrimary,
-                            modifier = modifier.clickable { onToggleFavourite(journey.id) }
+                            modifier = modifier.clickable { onToggleFavourite(journey) }
                         )
                     })
             }

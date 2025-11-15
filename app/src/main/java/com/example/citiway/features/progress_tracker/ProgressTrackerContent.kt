@@ -66,7 +66,9 @@ import com.example.citiway.core.ui.components.VerticalSpace
 import com.example.citiway.core.utils.ProgressTrackerScreenPreview
 import com.example.citiway.core.utils.convertIsoToHhmm
 import com.example.citiway.core.utils.formatMinutesToHoursAndMinutes
+import com.example.citiway.data.remote.SelectedLocation
 import com.example.citiway.features.shared.Instruction
+import com.example.citiway.features.shared.Journey
 import com.example.citiway.features.shared.JourneyState
 import com.example.citiway.features.shared.Stop
 import com.example.citiway.features.shared.StopType
@@ -81,7 +83,7 @@ fun ProgressTrackerContent(
     paddingValues: PaddingValues,
     navController: NavController,
     toggleSpeedUp: () -> Unit,
-    onJourneyComplete: () -> Unit,
+    onJourneyComplete: (SelectedLocation, SelectedLocation, Journey) -> Unit,
 ) {
     // Track coordinates for progress line
     val journey = journeyState.journey
@@ -151,6 +153,9 @@ fun ProgressTrackerContent(
             "${meters}m"
         }
 
+        val startLocationName = journeyState.startLocation?.primaryText ?: "Error: Unknown Location"
+        val destinationName = journeyState.destination?.primaryText ?: "Error: Unknown Location"
+
         ETACard(
             eta = convertIsoToHhmm(journey.arrivalTime.toString()),
             distance = distanceText,
@@ -205,7 +210,7 @@ fun ProgressTrackerContent(
                 // ======================================================
                 JourneyStep(
                     isStart = true,
-                    title = journeyState.startLocation?.primaryText ?: "Error: Unknown Location",
+                    title = startLocationName,
                     hasEditIcon = true,
                 ) { offset ->
                     updateCoordinate(0, offset)
@@ -232,17 +237,18 @@ fun ProgressTrackerContent(
                 // ======================================================
                 JourneyStep(
                     isStart = false,
-                    title = journeyState.destination?.primaryText ?: "Error: Unknown Location",
+                    title = destinationName,
                     hasEditIcon = true,
                 ) { offset ->
                     updateCoordinate(journey.stops.size, offset)
                 }
 
                 // Complete Journey Logic - triggers when last stop is reached
-                LaunchedEffect(journey?.stops?.last()?.reached) {
-                    if (journey.stops.last().reached) {
-                        Log.d("ProgressTracker", "🎉 Last stop reached! Saving journey...")
-                        onJourneyComplete()
+                if (journey.stops.last().reached) {
+                    if (journeyState.startLocation != null && journeyState.destination != null){
+                        onJourneyComplete(journeyState.startLocation, journeyState.destination, journey)
+                    } else {
+                        // TODO: Show error dialogue
                     }
                 }
             }

@@ -83,7 +83,7 @@ import com.example.citiway.core.utils.toDisplayableLocalTime
 import com.example.citiway.data.remote.PlacesActions
 import com.example.citiway.data.remote.PlacesState
 import com.example.citiway.features.shared.JourneyDetails
-import com.example.citiway.features.shared.JourneySelectionActions
+import com.example.citiway.features.shared.JourneyActions
 import com.example.citiway.features.shared.JourneyState
 import com.example.citiway.features.shared.LocationType
 import com.example.citiway.features.shared.TimeSlots
@@ -309,7 +309,7 @@ fun JourneyOptionsSection(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TimeSlotSelector(state: JourneyState, actions: JourneySelectionActions) {
+fun TimeSlotSelector(state: JourneyState, actions: JourneyActions) {
     Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterStart) {
         Row(
             verticalAlignment = Alignment.CenterVertically,

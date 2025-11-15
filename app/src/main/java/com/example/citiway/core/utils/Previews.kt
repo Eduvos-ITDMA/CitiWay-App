@@ -24,7 +24,7 @@ import com.example.citiway.features.schedules.SchedulesContent
 import com.example.citiway.features.shared.CompletedJourneysState
 import com.example.citiway.features.shared.Instruction
 import com.example.citiway.features.shared.Journey
-import com.example.citiway.features.shared.JourneySelectionActions
+import com.example.citiway.features.shared.JourneyActions
 import com.example.citiway.features.shared.JourneyState
 import com.example.citiway.features.shared.MapActions
 import com.example.citiway.features.shared.MapState
@@ -158,14 +158,14 @@ val mockPlacesActions = PlacesActions(
             placeId = "mock_id",
             primaryText = "Mock Address",
 
-        )
+            )
     },
     onClearLocations = {}
 
 )
 
 private val mockJourneySelectionActions = JourneySelectionScreenActions(
-    JourneySelectionActions(
+    JourneyActions(
         { timeType -> },
         { string -> },
         { location -> },
@@ -297,7 +297,7 @@ fun ProgressTrackerScreenPreview() {
             paddingValues = PaddingValues(),
             navController = rememberNavController(), // Or callbacks like onCancelJourney
             {},
-            onJourneyComplete = {}
+            onJourneyComplete = { a, b, c -> }
         )
     }
 }

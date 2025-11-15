@@ -3,7 +3,6 @@ package com.example.citiway.data.local.entities
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import com.example.citiway.data.local.entities.User
 
 
 // ==================== SAVED PLACE ====================
@@ -11,14 +10,14 @@ import com.example.citiway.data.local.entities.User
     tableName = "saved_place",
     foreignKeys = [
         ForeignKey(
-            entity = User::class,
+            entity = UserEntity::class,
             parentColumns = ["user_id"],
             childColumns = ["user_id"],
             onDelete = ForeignKey.CASCADE
         )
     ]
 )
-data class SavedPlace(
+data class SavedPlaceEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val user_id: Int? = null,
@@ -27,6 +26,6 @@ data class SavedPlace(
     val latitude: Double? = null,
     val longitude: Double? = null,
     val place_type: String? = null,
-    val is_favorite: Boolean = false,
+    val is_favourite: Boolean = false,
     val last_used_timestamp: Long? = null
 )

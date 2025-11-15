@@ -12,6 +12,7 @@ import androidx.navigation.NavController
 import com.example.citiway.App
 import com.example.citiway.core.navigation.routes.Screen
 import com.example.citiway.core.utils.ScreenWrapper
+import com.example.citiway.data.local.JourneyOverview
 import com.example.citiway.di.viewModelFactory
 import com.example.citiway.features.shared.CompletedJourneysViewModel
 import com.example.citiway.features.shared.JourneyViewModel
@@ -25,7 +26,7 @@ import kotlinx.coroutines.launch
  * Centralizes all user actions for cleaner code organization
  */
 data class HomeActions(
-    val onToggleFavourite: (String) -> Unit,
+    val onToggleFavourite: (JourneyOverview) -> Unit,
     val onSchedulesLinkClick: () -> Unit,
     val onMapIconClick: () -> Unit,
     val onSelectPrediction: (AutocompletePrediction) -> Unit,
@@ -54,7 +55,7 @@ fun HomeRoute(
 ) {
     val repository = App.appModule.repository
 
-    // ViewModel for trip history and favorites management
+    // ViewModel for trip history and favourites management
     val completedJourneysViewModel: CompletedJourneysViewModel = viewModel(
         factory = viewModelFactory {
             CompletedJourneysViewModel()
@@ -110,7 +111,7 @@ fun HomeRoute(
     // Render screen with bottom bar
     ScreenWrapper(navController, true, { paddingValues ->
         HomeContent(
-            completedJourneysState = completedJourneysState, // Recent and favorite trips from ViewModel
+            completedJourneysState = completedJourneysState,
             homeActions = actions,
             placesState = placesState,
             placesActions = placesActions,
