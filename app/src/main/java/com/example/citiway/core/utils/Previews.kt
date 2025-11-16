@@ -6,6 +6,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
 import com.example.citiway.core.ui.components.ConfirmationDialog
 import com.example.citiway.core.ui.theme.CitiWayTheme
+import com.example.citiway.data.local.CompletedJourney
 import com.example.citiway.data.remote.PlacesActions
 import com.example.citiway.data.remote.PlacesState
 import com.example.citiway.data.remote.SelectedLocation
@@ -21,6 +22,7 @@ import com.example.citiway.features.journey_selection.LocationFieldActions
 import com.example.citiway.features.journey_summary.JourneySummaryContent
 import com.example.citiway.features.progress_tracker.ProgressTrackerContent
 import com.example.citiway.features.schedules.SchedulesContent
+import com.example.citiway.features.shared.CompletedJourneysActions
 import com.example.citiway.features.shared.CompletedJourneysState
 import com.example.citiway.features.shared.Instruction
 import com.example.citiway.features.shared.Journey
@@ -190,7 +192,9 @@ fun HomeScreenPreview() {
         onMapIconClick = {},
         onSelectPrediction = { prediction -> },
         onFavouritesTitleClick = {},
-        onRecentTitleClick = {}
+        onRecentTitleClick = {},
+        onViewJourneySummary = {},
+        onRepeatJourney = { a, b -> },
     )
 
     CitiWayTheme {
@@ -200,6 +204,7 @@ fun HomeScreenPreview() {
             placesState = PlacesState(),
             placesActions = mockPlacesActions,
             paddingValues = PaddingValues(),
+            navController = rememberNavController()
         )
     }
 }
@@ -212,7 +217,12 @@ fun FavouritesScreenPreview() {
         FavouritesContent(
             paddingValues = PaddingValues(),
             journeys = emptyList(),
-            onToggleFavourite = {}
+            onToggleFavourite = {},
+            actions = CompletedJourneysActions(
+                onToggleFavourite = {},
+                onViewJourneySummary = {},
+                onRepeatJourney = { a, b -> },
+            )
         )
     }
 }
@@ -270,9 +280,17 @@ fun JourneySelectionScreenPreview() {
 fun JourneySummaryScreenPreview() {
     CitiWayTheme {
         JourneySummaryContent(
-            journey = mockJourney,
-            startLocation = SelectedLocation(LatLng(0.0, 0.0), "mock_id", "Mowbray"),
-            destination = SelectedLocation(LatLng(0.0, 0.0), "mock_id_2", "Century City"),
+            completedJourney = CompletedJourney(
+                journeyId = 0,
+                userId = 1,
+                startLocationName = "Mowbray",
+                destinationName = "Century City",
+                startLocationLatLng = LatLng(0.0, 0.0),
+                destinationLatLng = LatLng(0.0, 0.0),
+                journey = mockJourney,
+                isFavourite = false,
+                createdAt = System.currentTimeMillis(),
+            ),
             paddingValues = PaddingValues(),
             navController = rememberNavController(),
         )
@@ -311,8 +329,13 @@ fun ProgressTrackerScreenPreview() {
 fun JourneyHistoryScreenPreview() {
     CitiWayTheme {
         JourneyHistoryContent(
-            paddingValues = PaddingValues(),
             journeys = emptyList(),
+            paddingValues = PaddingValues(),
+            actions = CompletedJourneysActions(
+                onToggleFavourite = {},
+                onViewJourneySummary = {},
+                onRepeatJourney = { a, b -> },
+            )
         )
     }
 }

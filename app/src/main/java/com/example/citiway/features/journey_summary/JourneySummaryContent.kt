@@ -33,21 +33,18 @@ import com.example.citiway.core.utils.JourneySummaryScreenPreview
 import com.example.citiway.core.utils.formatMinutesToHoursAndMinutes
 import com.example.citiway.core.utils.toDisplayableLocalTime
 import com.example.citiway.core.utils.toLocalDateTime
-import com.example.citiway.data.remote.SelectedLocation
+import com.example.citiway.data.local.CompletedJourney
 import com.example.citiway.features.shared.Instruction
-import com.example.citiway.features.shared.Journey
 import java.time.Duration
 import java.time.format.DateTimeFormatter
 
 @Composable
 fun JourneySummaryContent(
-    journey: Journey?,
-    startLocation: SelectedLocation?,
-    destination: SelectedLocation?,
+    completedJourney: CompletedJourney?,
     navController: NavController,
     paddingValues: PaddingValues
 ) {
-    if (journey == null || startLocation == null || destination == null) {
+    if (completedJourney == null){
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -69,6 +66,10 @@ fun JourneySummaryContent(
         }
         return
     }
+
+    val startLocation = completedJourney.startLocationName
+    val destination = completedJourney.destinationName
+    val journey = completedJourney.journey
 
     // ========== Journey Data Extraction ==========
     val formatter = DateTimeFormatter.ofPattern("dd MMM yyyy")
@@ -172,7 +173,7 @@ fun JourneySummaryContent(
             Column(modifier = Modifier.fillMaxWidth()) {
                 // Start Location
                 SummaryLocationStep(
-                    name = startLocation.primaryText,
+                    name = startLocation,
                     isStart = true
                 ) { offset ->
                     updateCoordinate(0, offset)
@@ -206,7 +207,7 @@ fun JourneySummaryContent(
                 VerticalSpace(40)
                 // End Location
                 SummaryLocationStep(
-                    name = destination.primaryText,
+                    name = destination,
                     isStart = false
                 ) { offset ->
                     updateCoordinate(stepsCount - 1, offset)
@@ -551,15 +552,3 @@ private fun modeIcon(travelMode: String?): Int {
 fun JourneySummaryPrevious() {
     JourneySummaryScreenPreview()
 }
-
-//// WIP: Waiting on inject, will be called when journey is done for VW code to run and save to DB. Ask caleb
-//fun onJourneyComplete() {
-//    val userId = getCurrentUserId()  // Getting  user from db/auth will be 1
-//
-//    viewModelScope.launch {
-//        saveCompletedJourney(userId)
-//
-//        // Then navigate to home
-//        navController.navigate(Screen.Home.route)
-//    }
-//}

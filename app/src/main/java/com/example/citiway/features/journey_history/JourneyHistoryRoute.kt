@@ -1,41 +1,46 @@
 package com.example.citiway.features.journey_history
 
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.citiway.App
+import com.example.citiway.core.navigation.routes.Screen
 import com.example.citiway.core.utils.ScreenWrapper
+import com.example.citiway.data.remote.PlacesActions
 import com.example.citiway.di.viewModelFactory
 import com.example.citiway.features.shared.CompletedJourneysViewModel
-
-/**
- * Route composable for the Journey History screen
- *
- * Architecture Flow: Route → ViewModel → Repository → DAO → Database
- *
- * This route handles:
- * - Manual Dependency Injection: Constructs Database → Repository → ViewModel chain
- *   (No Hilt/Koin used, keeping dependencies explicit and simple)
- * - ViewModel Factory: Uses viewModelFactory helper to inject Repository into ViewModel
- *   (Required for ViewModels with constructor parameters, survives configuration changes)
- * - Lifecycle-aware State: collectAsStateWithLifecycle stops collection when screen is
- *   backgrounded, saving resources while maintaining reactive UI updates
- *
- * The route acts as a bridge between navigation and UI, managing ViewModel instantiation
- * and state observation lifecycle.
- */
+import com.example.citiway.features.shared.JourneyViewModel
+import com.google.android.gms.maps.model.LatLng
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun JourneyHistoryRoute(
     navController: NavController
 ) {
-    // ViewModel with factory for constructor injection
+    val placesActions = App.appModule.placesManagerFactory.create().actions
+
+    // ViewModels with factory for constructor injection
+    val journeyViewModel: JourneyViewModel = viewModel(
+        viewModelStoreOwner = LocalActivity.current as ComponentActivity,
+        factory = viewModelFactory {
+            JourneyViewModel(navController)
+        })
+
     val completedJourneysViewModel: CompletedJourneysViewModel = viewModel(
         factory = viewModelFactory {
-            CompletedJourneysViewModel()
-        }
-    )
+            CompletedJourneysViewModel(
+                placesActions = placesActions,
+                journeyViewModel = journeyViewModel,
+                navController = navController
+            )
+        })
 
     // Lifecycle-aware state collection (stops when backgrounded)
     val completedJourneysState by completedJourneysViewModel.screenState.collectAsStateWithLifecycle()
@@ -45,7 +50,7 @@ fun JourneyHistoryRoute(
         JourneyHistoryContent(
             journeys = completedJourneysState.allJourneys,
             paddingValues = paddingValues,
-
+            actions = completedJourneysViewModel.actions
         )
     })
 }

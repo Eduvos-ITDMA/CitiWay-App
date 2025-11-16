@@ -1,38 +1,36 @@
 package com.example.citiway.features.journey_summary
 
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.citiway.core.utils.ScreenWrapper
-import com.example.citiway.di.viewModelFactory
-import com.example.citiway.features.shared.JourneyViewModel
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import com.example.citiway.App
+import com.example.citiway.data.local.CompletedJourney
+import com.example.citiway.data.local.entities.CompletedJourneyEntity
 
 @Composable
 fun JourneySummaryRoute(
     navController: NavController,
+    journeyId: Int? = null
 ) {
-    val journeyViewModel: JourneyViewModel = viewModel(
-        viewModelStoreOwner = LocalActivity.current as ComponentActivity,
-        factory = viewModelFactory {
-            JourneyViewModel(navController)
-        }
-    )
+    // Retrieve journey from database
+    val repository = App.appModule.repository
+    var completedJourney by remember { mutableStateOf<CompletedJourney?>(null) }
 
-    val journeyState = journeyViewModel.state.collectAsState().value
-    val journey = journeyState.journey
-    val startLocation = journeyState.startLocation
-    val destination = journeyState.destination
+    LaunchedEffect(journeyId) {
+        if (journeyId != null) {
+            val result = repository.getCompletedJourneyById(journeyId)
+            completedJourney = result
+        }
+    }
 
     ScreenWrapper(navController, true, { paddingValues ->
         JourneySummaryContent(
-            journey = journey,
-            startLocation = startLocation,
-            destination = destination,
+            completedJourney = completedJourney,
             paddingValues = paddingValues,
             navController = navController,
         )

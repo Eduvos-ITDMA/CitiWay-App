@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.example.citiway.data.local.JourneyOverview
 import java.time.LocalDate
 
 /**
@@ -14,9 +15,7 @@ import java.time.LocalDate
  * in a [Row]. It is designed to present journey details with a directly associated action,
  * such as favouriting or linking to the journey's summary.
  *
- * @param route A string representing the journey's route, passed to [CompletedJourneyCard].
- * @param date The [LocalDate] when the journey was completed, passed to [CompletedJourneyCard].
- * @param durationMin The duration of the journey in minutes, passed to [CompletedJourneyCard].
+ * @param journey The JourneyOverview object which contains all journey data for display
  * @param icon A composable lambda that defines the icon and action for the [RoundIconButton].
  *             This lambda receives a [Modifier] that should be applied to the icon content.
  *             and specifies `modifier = Modifier.clickable { /* action */ }`. It is also
@@ -24,15 +23,13 @@ import java.time.LocalDate
  */
 @Composable
 fun CompletedJourneyCardWithButton(
-    route: String,
-    date: String,
-    durationMin: Int,
+    journey: JourneyOverview,
     icon: @Composable (Modifier) -> Unit,
-    mode: String = "",
-    outlined: Boolean = false
+    outlined: Boolean = false,
+    onCardClick: (JourneyOverview) -> Unit,
 ) {
     Row {
-        CompletedJourneyCard(route, date, mode, durationMin)
+        CompletedJourneyCard(journey, onCardClick)
         Spacer(modifier = Modifier.weight(0.05f))
         RoundIconButton(icon, Modifier.align(Alignment.CenterVertically), outlined)
     }

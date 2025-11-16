@@ -2,11 +2,17 @@ package com.example.citiway.features.shared
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
 import com.example.citiway.App
+import com.example.citiway.core.navigation.routes.Screen
 import com.example.citiway.core.utils.toLocalDateTime
 import com.example.citiway.data.repository.CitiWayRepository
 import com.example.citiway.data.local.JourneyOverview
 import com.example.citiway.data.local.JourneyOverviewDTO
+import com.example.citiway.data.remote.PlacesActions
+import com.google.android.gms.maps.model.LatLng
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.time.Duration
@@ -14,19 +20,11 @@ import kotlin.collections.distinct
 import kotlin.collections.filter
 import kotlin.collections.map
 
-/**
- * ViewModel for managing completed journeys and favourites
- *
- * Architecture Flow:
- * ViewModel → Repository → DAO → Room Database
- *
- * This ViewModel follows Clean Architecture principles by maintaining a clear separation
- * of concerns. It communicates exclusively with the Repository layer, which abstracts
- * all database operations through DAOs (Data Access Objects). This architecture ensures:
- * - Testability: Business logic is isolated from data layer implementation
- * - Maintainability: Database changes don't affect UI logic
- * - Scalability: Easy to swap data sources without changing ViewModel code
- */
+data class CompletedJourneysActions(
+    val onToggleFavourite: (JourneyOverview) -> Unit,
+    val onViewJourneySummary: (Int) -> Unit,
+    val onRepeatJourney: (LatLng, LatLng) -> Unit,
+)
 
 data class CompletedJourneysState(
     val recentJourneys: List<JourneyOverview> = emptyList(),
@@ -34,14 +32,27 @@ data class CompletedJourneysState(
     val allJourneys: List<JourneyOverview> = emptyList(),
 )
 
+/**
+ * ViewModel for managing completed journeys and favourites
+ */
+
 class CompletedJourneysViewModel(
+    private val placesActions: PlacesActions,
+    private val journeyViewModel: JourneyViewModel,
+    private val navController: NavController,
+    private val currentUserId: Int = 1,
     private val repository: CitiWayRepository = App.appModule.repository,
-    private val currentUserId: Int = 1
 ) : ViewModel() {
 
     // Single source of truth for all journey-related UI state
     private val _screenState = MutableStateFlow(CompletedJourneysState())
     val screenState: StateFlow<CompletedJourneysState> = _screenState.asStateFlow()
+
+    val actions = CompletedJourneysActions(
+        onToggleFavourite = ::toggleFavourite,
+        onViewJourneySummary = ::viewJourneySummary,
+        onRepeatJourney = ::repeatJourney
+    )
 
     init {
         loadRecentJourneys()
@@ -84,6 +95,28 @@ class CompletedJourneysViewModel(
                         favouriteJourneys = trips.map { it.toJourneyOverview() }
                     )
                 }
+            }
+        }
+    }
+
+    fun viewJourneySummary(id: Int) {
+        navController.navigate(Screen.JourneySummary.createRoute(id))
+    }
+
+    fun repeatJourney(startLatLng: LatLng, destLatLng: LatLng) {
+        viewModelScope.launch {
+            // Use coroutineScope to wait for both async calls to complete
+            coroutineScope {
+                val startLocationDeferred =
+                    async { placesActions.getPlaceFromLatLng(startLatLng) }
+                val destinationDeferred = async { placesActions.getPlaceFromLatLng(destLatLng) }
+
+                val startLocation = startLocationDeferred.await()
+                val destination = destinationDeferred.await()
+
+                journeyViewModel.setStartLocation(startLocation)
+                journeyViewModel.setDestination(destination)
+                navController.navigate(Screen.JourneySelection.route)
             }
         }
     }

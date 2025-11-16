@@ -19,23 +19,33 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.citiway.core.ui.components.CompletedJourneyCardWithButton
+import com.example.citiway.core.ui.components.JourneyActionDialog
 import com.example.citiway.core.ui.components.Title
 import com.example.citiway.core.ui.components.VerticalSpace
 import com.example.citiway.data.local.JourneyOverview
+import com.example.citiway.features.shared.CompletedJourneysActions
 
 @Composable
 fun FavouritesContent(
     journeys: List<JourneyOverview>,
     paddingValues: PaddingValues,
-    onToggleFavourite: (JourneyOverview) -> Unit
+    onToggleFavourite: (JourneyOverview) -> Unit,
+    actions: CompletedJourneysActions
 ) {
+
+    var selectedJourney by remember { mutableStateOf<JourneyOverview?>(null) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -76,10 +86,7 @@ fun FavouritesContent(
                     VerticalSpace(12)
 
                     CompletedJourneyCardWithButton(
-                        route = journey.route,
-                        date = journey.date,
-                        durationMin = journey.durationMin,
-                        mode = journey.mode,
+                        journey = journey,
                         outlined = false,
                         icon = { modifier ->
                             Icon(
@@ -88,10 +95,25 @@ fun FavouritesContent(
                                 tint = if (journey.isFavourite) Color.Red else MaterialTheme.colorScheme.onPrimary,
                                 modifier = modifier.clickable { onToggleFavourite(journey) }
                             )
-                        }
+                        },
+                        onCardClick = { selectedJourney == null }
                     )
                 }
             }
         }
+    }
+
+    selectedJourney?.let { journey ->
+        JourneyActionDialog(
+            onDismiss = { selectedJourney = null },
+            onViewSummary = {
+                actions.onViewJourneySummary(journey.id)
+                selectedJourney = null
+            },
+            onStartJourney = {
+                actions.onRepeatJourney(journey.startLocationLatLng, journey.destinationLatLng)
+                selectedJourney = null
+            }
+        )
     }
 }

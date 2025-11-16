@@ -1,10 +1,8 @@
 package com.example.citiway.data.local.dao
 
 import androidx.room.*
-import com.example.citiway.data.local.CompletedJourney
 import com.example.citiway.data.local.JourneyOverviewDTO
 import com.example.citiway.data.local.entities.CompletedJourneyEntity
-import com.example.citiway.features.shared.Journey
 import kotlinx.coroutines.flow.Flow
 
 @Dao

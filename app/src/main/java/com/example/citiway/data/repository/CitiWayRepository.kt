@@ -14,6 +14,7 @@ import com.example.citiway.data.local.CitiWayDatabase
 import com.example.citiway.data.local.CompletedJourney
 import com.example.citiway.data.local.JourneyOverviewDTO
 import com.example.citiway.data.local.entities.*
+import com.example.citiway.data.local.toDomain
 import com.example.citiway.data.local.toEntity
 import com.example.citiway.features.shared.Journey
 import kotlinx.coroutines.flow.Flow
@@ -47,7 +48,7 @@ class CitiWayRepository(private val database: CitiWayDatabase) {
 
     // ========== JOURNEY OPERATIONS ==========
     suspend fun insertCompletedJourney(journey: CompletedJourney) = journeyDao.insertJourney(journey.toEntity())
-    suspend fun getCompletedJourneyById(journeyId: Int) = journeyDao.getJourneyById(journeyId)
+    suspend fun getCompletedJourneyById(journeyId: Int) = journeyDao.getJourneyById(journeyId)?.toDomain()
     fun searchCompletedJourneys(location: String): Flow<List<JourneyOverviewDTO>> =
         journeyDao.searchJourneysByLocation(location)
     fun getCompletedJourneys(): Flow<List<JourneyOverviewDTO>> = journeyDao.getAllJourneys()

@@ -17,6 +17,7 @@ import com.example.citiway.di.viewModelFactory
 import com.example.citiway.features.shared.CompletedJourneysViewModel
 import com.example.citiway.features.shared.JourneyViewModel
 import com.example.citiway.features.shared.LocationType
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.model.AutocompletePrediction
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -32,6 +33,8 @@ data class HomeActions(
     val onSelectPrediction: (AutocompletePrediction) -> Unit,
     val onFavouritesTitleClick: () -> Unit,
     val onRecentTitleClick: () -> Unit,
+    val onViewJourneySummary: (Int) -> Unit,
+    val onRepeatJourney: (LatLng, LatLng) -> Unit,
 )
 
 /**
@@ -55,13 +58,6 @@ fun HomeRoute(
 ) {
     val repository = App.appModule.repository
 
-    // ViewModel for trip history and favourites management
-    val completedJourneysViewModel: CompletedJourneysViewModel = viewModel(
-        factory = viewModelFactory {
-            CompletedJourneysViewModel()
-        }
-    )
-
     // Get user name from database (first user and only user)
     val userName by remember {
         repository.getAllUsers().map { users ->
@@ -82,8 +78,20 @@ fun HomeRoute(
             JourneyViewModel(navController)
         })
 
+    // ViewModel for trip history and favourites management
+    val completedJourneysViewModel: CompletedJourneysViewModel = viewModel(
+        factory = viewModelFactory {
+            CompletedJourneysViewModel(
+                placesActions = placesActions,
+                journeyViewModel = journeyViewModel,
+                navController = navController
+            )
+        }
+    )
+
     // Lifecycle-aware state collection
     val completedJourneysState by completedJourneysViewModel.screenState.collectAsStateWithLifecycle()
+    val completedJourneysActions = completedJourneysViewModel.actions
 
     // Handle location selection from autocomplete predictions
     val onSelectPrediction: (AutocompletePrediction) -> Unit =
@@ -105,7 +113,9 @@ fun HomeRoute(
         { navController.navigate(Screen.DestinationSelection.route) },
         onSelectPrediction,
         onFavouritesTitleClick = { navController.navigate(Screen.Favourites.route) },
-        onRecentTitleClick = { navController.navigate(Screen.JourneyHistory.route) }
+        onRecentTitleClick = { navController.navigate(Screen.JourneyHistory.route) },
+        onViewJourneySummary = completedJourneysActions.onViewJourneySummary,
+        onRepeatJourney = completedJourneysActions.onRepeatJourney
     )
 
     // Render screen with bottom bar
@@ -117,6 +127,7 @@ fun HomeRoute(
             placesActions = placesActions,
             paddingValues = paddingValues,
             userName = userName,
+            navController = navController
         )
     })
 }

@@ -18,6 +18,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.citiway.data.local.CompletedJourney
+import com.example.citiway.data.local.JourneyOverview
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -27,17 +29,19 @@ import java.time.format.DateTimeFormatter
  * This component is designed to be used within a [RowScope], allowing it to be
  * weighted if multiple composables are displayed in a row.
  *
- * @param route A string representing the journey's route (e.g., "City A to City B").
- * @param date The [LocalDate] when the journey was completed.
- * @param durationMin The duration of the journey in minutes.
+ * @param journey The JourneyOverview object which contains all journey data for display
  * @param weight The layout weight of this card within a [RowScope]. Defaults to 1f.
  */
 @Composable
-fun RowScope.CompletedJourneyCard(route: String, date: String, mode: String, durationMin: Int, weight: Float = 1f) {
-    val formattedDate = date.format(DateTimeFormatter.ofPattern("MMM dd, yyyy"))
+fun RowScope.CompletedJourneyCard(
+    journey: JourneyOverview,
+    onCardClick: (JourneyOverview) -> Unit,
+    weight: Float = 1f
+) {
+    val formattedDate = journey.date.format(DateTimeFormatter.ofPattern("MMM dd, yyyy"))
 
-    val hours = durationMin / 60
-    val minutes = durationMin % 60
+    val hours = journey.durationMin / 60
+    val minutes = journey.durationMin % 60
 
     val durationText = buildString {
         if (hours > 0) {
@@ -46,7 +50,7 @@ fun RowScope.CompletedJourneyCard(route: String, date: String, mode: String, dur
         append("${minutes}min")
     }.trim()
 
-    val normalizedMode = mode.ifEmpty { "Mode" }
+    val normalizedMode = journey.mode.ifEmpty { "Mode" }
 
     // Determine which icon to show based on mode
     val modeIcon = when (normalizedMode.lowercase()) {
@@ -57,7 +61,7 @@ fun RowScope.CompletedJourneyCard(route: String, date: String, mode: String, dur
     }
 
     // Parse route into start and end locations
-    val routeParts = route.split("|")
+    val routeParts = journey.route.split("|")
     val startLocation = routeParts.getOrNull(0) ?: "Start"
     val endLocation = routeParts.getOrNull(1) ?: "End"
 
@@ -66,7 +70,8 @@ fun RowScope.CompletedJourneyCard(route: String, date: String, mode: String, dur
     Card(
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary),
-        modifier = Modifier.weight(weight)
+        modifier = Modifier.weight(weight),
+        onClick = { onCardClick(journey) }
     ) {
         Row(
             modifier = Modifier

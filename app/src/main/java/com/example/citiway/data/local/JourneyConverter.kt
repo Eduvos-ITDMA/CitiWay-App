@@ -77,6 +77,20 @@ fun Journey.toDb(): JourneyDb {
     )
 }
 
+fun JourneyDb.toDomain(): Journey {
+    return Journey(
+        stops = this.stops,
+        instructions = this.instructions,
+        startTime = this.startTime,
+        arrivalTime = this.arrivalTime,
+        distanceMeters = this.distanceMeters,
+        fareTotal = this.fareTotal,
+        mycitiFare = this.mycitiFare,
+        metrorailFare = this.metrorailFare,
+        totalStopsCount = this.totalStopsCount
+    )
+}
+
 /** Converts the composite Domain model to the Entity model */
 fun CompletedJourney.toEntity(): CompletedJourneyEntity {
     return CompletedJourneyEntity(
@@ -89,6 +103,23 @@ fun CompletedJourney.toEntity(): CompletedJourneyEntity {
 
         // Convert the nested Journey to JourneyDb
         journey = this.journey.toDb(),
+
+        isFavourite = this.isFavourite,
+        createdAt = this.createdAt
+    )
+}
+
+fun CompletedJourneyEntity.toDomain(): CompletedJourney {
+    return CompletedJourney(
+        journeyId = this.journeyId,
+        userId = this.userId,
+        startLocationName = this.startLocationName,
+        destinationName = this.destinationName,
+        startLocationLatLng = this.startLocationLatLng,
+        destinationLatLng = this.destinationLatLng,
+
+        // Convert the nested Journey to JourneyDb
+        journey = this.journey.toDomain(),
 
         isFavourite = this.isFavourite,
         createdAt = this.createdAt

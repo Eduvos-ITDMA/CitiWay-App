@@ -20,7 +20,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,8 +34,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.citiway.R
+import com.example.citiway.core.navigation.routes.Screen
 import com.example.citiway.core.ui.components.CompletedJourneyCardWithButton
+import com.example.citiway.core.ui.components.JourneyActionDialog
 import com.example.citiway.core.ui.components.LocationSearchField
 import com.example.citiway.core.ui.components.Title
 import com.example.citiway.core.ui.components.VerticalSpace
@@ -49,7 +56,11 @@ fun HomeContent(
     placesActions: PlacesActions,
     paddingValues: PaddingValues,
     userName: String = "Commuter",
+    navController: NavController
 ) {
+
+    var selectedJourney by remember { mutableStateOf<JourneyOverview?>(null) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -72,6 +83,7 @@ fun HomeContent(
             homeActions.onToggleFavourite,
             "Recent Trips",
             "No recent trips",
+            navController,
             onTitleClick = homeActions.onRecentTitleClick
         )
 
@@ -82,6 +94,7 @@ fun HomeContent(
             homeActions.onToggleFavourite,
             "Favourite Trips",
             "No trips saved as favourite yet",
+            navController,
             onTitleClick = homeActions.onFavouritesTitleClick
         )
         VerticalSpace(24)
@@ -89,6 +102,20 @@ fun HomeContent(
         SchedulesLink(homeActions.onSchedulesLinkClick)
 
         VerticalSpace(18)
+    }
+
+    selectedJourney?.let { journey ->
+        JourneyActionDialog(
+            onDismiss = { selectedJourney = null },
+            onViewSummary = {
+                homeActions.onViewJourneySummary(journey.id)
+                selectedJourney = null
+            },
+            onStartJourney = {
+                homeActions.onRepeatJourney(journey.startLocationLatLng, journey.destinationLatLng)
+                selectedJourney = null
+            }
+        )
     }
 }
 
@@ -168,7 +195,8 @@ fun CompletedTripsSection(
     onToggleFavourite: (JourneyOverview) -> Unit,
     title: String,
     noJourneysText: String,
-    onTitleClick: (() -> Unit)? = null
+    navController: NavController,
+    onTitleClick: (() -> Unit)? = null,
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         SectionTitleWithArrow(title = title, onClick = onTitleClick)
@@ -190,10 +218,7 @@ fun CompletedTripsSection(
                 VerticalSpace(15)
 
                 CompletedJourneyCardWithButton(
-                    route = journey.route,
-                    date = journey.date,
-                    durationMin = journey.durationMin,
-                    mode = journey.mode,
+                    journey = journey,
                     icon = { modifier ->
                         Icon(
                             imageVector = if (journey.isFavourite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
@@ -201,7 +226,11 @@ fun CompletedTripsSection(
                             tint = if (journey.isFavourite) Color.Red else MaterialTheme.colorScheme.onPrimary,
                             modifier = modifier.clickable { onToggleFavourite(journey) }
                         )
-                    })
+                    },
+                    onCardClick = { journey ->
+                        navController.navigate(Screen.JourneySummary.createRoute(journey.id))
+                    }
+                )
             }
         }
     }
