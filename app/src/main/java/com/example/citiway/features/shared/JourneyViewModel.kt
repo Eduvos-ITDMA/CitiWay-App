@@ -138,6 +138,19 @@ class JourneyViewModel(
 
                 val steps = repository.getStepsForJourney(journey.journey_id)
 
+                // Getting the ACTUAL start and end addresses from journey steps (unlike showing the PitStops on Home)
+                val firstStep = steps.minByOrNull { it.step_order }
+                val lastStep = steps.maxByOrNull { it.step_order }
+
+                /*
+                * Extract the actual start and end addresses from journey steps.
+                * - firstStep (step_order = 0): Contains the original walking start address
+                * - lastStep (step_order = max): Contains the final walking destination address
+                * Falls back to trip table if steps are unavailable (e.g., journey started directly at a station).
+                */
+                val startAddress = firstStep?.stop_name ?: trip.start_stop ?: "Unknown"
+                val endAddress = lastStep?.stop_name ?: trip.end_stop ?: "Unknown"
+
                 // Reconstructing the Journey object from database data
                 val reconstructedJourney = reconstructJourneyFromSteps(journey, steps, trip)
 
@@ -146,13 +159,13 @@ class JourneyViewModel(
                 val startLocation = SelectedLocation(
                     latLng = LatLng(0.0, 0.0),  // Dummy coordinates - not needed for summary
                     placeId = "",                                   // Empty placeId - not needed for summary
-                    primaryText = trip.start_stop ?: "Unknown"
+                    primaryText = startAddress                      // From JourneyStep
                 )
 
                 val destination = SelectedLocation(
                     latLng = LatLng(0.0, 0.0),  // Dummy coordinates - not needed for summary
                     placeId = "",                                   // Empty placeId - not needed for summary
-                    primaryText = trip.end_stop ?: "Unknown"
+                    primaryText = endAddress
                 )
 
                 // Update state with the loaded journey
@@ -165,6 +178,7 @@ class JourneyViewModel(
                 }
 
                 Log.d("JourneyViewModel", "✅ Journey loaded for trip ID: $tripId")
+                Log.d("JourneyViewModel", "📍 Start: $startAddress | End: $endAddress")
 
             } catch (e: Exception) {
                 Log.e("JourneyViewModel", "❌ Failed to load journey: ${e.message}", e)
