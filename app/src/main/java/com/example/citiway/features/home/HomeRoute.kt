@@ -1,5 +1,6 @@
 package com.example.citiway.features.home
 
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
@@ -37,7 +38,7 @@ data class HomeActions(
     val onFavouritesTitleClick: () -> Unit,
     val onRecentTitleClick: () -> Unit,
     val onViewJourneySummary: (Int) -> Unit,
-    val onStartJourney: (String, String) -> Unit
+    val onStartJourney: (Int) -> Unit  // Changed from (String, String) to Int
 )
 
 /**
@@ -116,21 +117,37 @@ fun HomeRoute(
                 selectedTripStartStop = null
                 selectedTripEndStop = null
             },
-            onStartJourney = { startStop, endStop ->
-                val startLocation = SelectedLocation(
-                    latLng = LatLng(0.0, 0.0),
-                    placeId = "",
-                    primaryText = startStop
-                )
-                val destination = SelectedLocation(
-                    latLng = LatLng(0.0, 0.0),
-                    placeId = "",
-                    primaryText = endStop
-                )
+            onStartJourney = { tripId ->  // Changed: now takes tripId instead of startStop, endStop
+                journeyViewModel.viewModelScope.launch {
+                    try {
+                        val journey = repository.getJourneyByTripId(tripId)
+                        val steps = journey?.let { repository.getStepsForJourney(it.journey_id) }
 
-                journeyViewModel.setStartLocation(startLocation)
-                journeyViewModel.setDestination(destination)
-                navController.navigate(Screen.JourneySelection.route)
+                        val firstStep = steps?.minByOrNull { it.step_order }
+                        val lastStep = steps?.maxByOrNull { it.step_order }
+
+                        val startAddress = firstStep?.stop_name ?: "Unknown"
+                        val endAddress = lastStep?.stop_name ?: "Unknown"
+
+                        val startLocation = SelectedLocation(
+                            latLng = LatLng(0.0, 0.0),
+                            placeId = "",
+                            primaryText = startAddress  // This gets the  address from JourneyStep
+                        )
+                        val destination = SelectedLocation(
+                            latLng = LatLng(0.0, 0.0),
+                            placeId = "",
+                            primaryText = endAddress
+                        )
+
+                        journeyViewModel.setStartLocation(startLocation)
+                        journeyViewModel.setDestination(destination)
+                        navController.navigate(Screen.JourneySelection.route)
+
+                    } catch (e: Exception) {
+                        android.util.Log.e("HomeRoute", "Failed to start journey: ${e.message}")
+                    }
+                }
 
                 selectedTripId = null
                 selectedTripStartStop = null
@@ -166,20 +183,40 @@ fun HomeRoute(
             }
             navController.navigate(Screen.JourneySummary.route)
         },
-        onStartJourney = { startStop, endStop ->
-            val startLocation = SelectedLocation(
-                latLng = LatLng(0.0, 0.0),
-                placeId = "",
-                primaryText = startStop
-            )
-            val destination = SelectedLocation(
-                latLng = LatLng(0.0, 0.0),
-                placeId = "",
-                primaryText = endStop
-            )
-            journeyViewModel.setStartLocation(startLocation)
-            journeyViewModel.setDestination(destination)
-            navController.navigate(Screen.JourneySelection.route)
+        onStartJourney = { tripId ->
+            journeyViewModel.viewModelScope.launch {
+                try {
+                    // Fetch journey and steps from database
+                    val journey = repository.getJourneyByTripId(tripId)
+                    val steps = journey?.let { repository.getStepsForJourney(it.journey_id) }
+
+                    // Get first and last step addresses (same logic as loadJourneyForSummary) NB: refactor to Vm
+                    val firstStep = steps?.minByOrNull { it.step_order }
+                    val lastStep = steps?.maxByOrNull { it.step_order }
+
+                    val startAddress = firstStep?.stop_name ?: "Unknown"
+                    val endAddress = lastStep?.stop_name ?: "Unknown"
+
+                    // Create locations with actual addresses
+                    val startLocation = SelectedLocation(
+                        latLng = LatLng(0.0, 0.0),
+                        placeId = "",
+                        primaryText = startAddress
+                    )
+                    val destination = SelectedLocation(
+                        latLng = LatLng(0.0, 0.0),
+                        placeId = "",
+                        primaryText = endAddress
+                    )
+
+                    journeyViewModel.setStartLocation(startLocation)
+                    journeyViewModel.setDestination(destination)
+                    navController.navigate(Screen.JourneySelection.route)
+
+                } catch (e: Exception) {
+                    Log.e("HomeRoute", "Failed to start journey: ${e.message}")
+                }
+            }
         }
     )
 

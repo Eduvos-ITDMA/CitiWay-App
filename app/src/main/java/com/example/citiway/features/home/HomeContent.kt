@@ -140,8 +140,8 @@ fun HomeContent(
                 selectedTripStartStop = null
                 selectedTripEndStop = null
             },
-            onStartJourney = { startStop, endStop ->
-                homeActions.onStartJourney(startStop, endStop)  // Calling the action!
+            onStartJourney = { tripId ->
+                homeActions.onStartJourney(tripId)  // Calling the action, by passing tripId not stops.
                 selectedTripId = null
                 selectedTripStartStop = null
                 selectedTripEndStop = null
@@ -275,7 +275,7 @@ fun JourneyActionDialog(
     endStop: String,
     onDismiss: () -> Unit,
     onViewSummary: (Int) -> Unit,  // Callback receives ID
-    onStartJourney: (String, String) -> Unit  // Callback receives locations
+    onStartJourney: (Int) -> Unit  // Callback receives locations
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -339,7 +339,7 @@ fun JourneyActionDialog(
 
                     Button(
                         onClick = {
-                            onStartJourney(startStop, endStop)  // passing locations
+                            onStartJourney(tripId)  // passing locations
                             onDismiss()
                         },
                         colors = ButtonDefaults.buttonColors(
