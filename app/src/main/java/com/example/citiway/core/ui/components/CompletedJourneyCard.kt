@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -33,7 +34,14 @@ import java.time.format.DateTimeFormatter
  * @param weight The layout weight of this card within a [RowScope]. Defaults to 1f.
  */
 @Composable
-fun RowScope.CompletedJourneyCard(route: String, date: String, mode: String, durationMin: Int, weight: Float = 1f, modifier: Modifier = Modifier) {
+fun RowScope.CompletedJourneyCard(
+    route: String,
+    date: String,
+    mode: String,
+    durationMin: Int,
+    weight: Float = 1f,
+    modifier: Modifier = Modifier
+) {
     val formattedDate = date.format(DateTimeFormatter.ofPattern("MMM dd, yyyy"))
 
     val hours = durationMin / 60
@@ -58,9 +66,55 @@ fun RowScope.CompletedJourneyCard(route: String, date: String, mode: String, dur
 
     // Parse route into start and end locations
     val routeParts = route.split("|")
-    val startLocation = routeParts.getOrNull(0) ?: "Start"
-    val endLocation = routeParts.getOrNull(1) ?: "End"
+    val rawStartLocation = routeParts.getOrNull(0)?.trim() ?: "Start"
+    val rawEndLocation = routeParts.getOrNull(1)?.trim() ?: "End"
 
+    // Calculate approximate character space available (accounting for arrow and spacing)
+    // Rough estimate: 45 total chars for both locations combined
+    val totalAvailableChars = 45
+    val totalLength = rawStartLocation.length + rawEndLocation.length
+
+    val startLocation: String
+    val endLocation: String
+
+    if (totalLength <= totalAvailableChars) {
+        // Both fit comfortably - keep both as-is
+        startLocation = rawStartLocation
+        endLocation = rawEndLocation
+    } else {
+        // Need to trim - prioritize start location, try removing "Station" from end first
+        val endWithoutStation = rawEndLocation
+            .replace(" Station", "", ignoreCase = true)
+            .replace("Station", "", ignoreCase = true)
+            .trim()
+
+        val newTotalLength = rawStartLocation.length + endWithoutStation.length
+
+        if (newTotalLength <= totalAvailableChars) {
+            // Removing "Station" is enough
+            startLocation = rawStartLocation
+            endLocation = endWithoutStation
+        } else {
+            // Still too long - need to truncate start location
+            // Give end location ~15 chars, rest to start
+            val endMaxChars = 15
+            val startMaxChars = totalAvailableChars - endMaxChars
+
+            startLocation = if (rawStartLocation.length > startMaxChars) {
+                rawStartLocation.take(startMaxChars - 3) + "..."
+            } else {
+                rawStartLocation
+            }
+
+            // For end location: try without Station first, then truncate if still needed
+            endLocation = if (endWithoutStation.length <= endMaxChars) {
+                endWithoutStation
+            } else {
+                // If even without "Station" it's too long, just truncate (no ellipsis on end)
+                endWithoutStation.take(endMaxChars)
+            }
+        }
+    }
 
     // ========== Component composable ==========
     Card(
@@ -79,14 +133,19 @@ fun RowScope.CompletedJourneyCard(route: String, date: String, mode: String, dur
             Column(modifier = Modifier.weight(1f)) {
 
                 // ========== Route text with arrow icon ==========
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     Text(
                         text = startLocation,
                         color = MaterialTheme.colorScheme.onPrimary,
-                        style = MaterialTheme.typography.titleMedium
+                        style = MaterialTheme.typography.titleMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Visible
                     )
 
-                    Spacer(modifier = Modifier.width(1.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
 
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.TrendingFlat,
@@ -95,12 +154,14 @@ fun RowScope.CompletedJourneyCard(route: String, date: String, mode: String, dur
                         modifier = Modifier.size(22.dp)
                     )
 
-                    Spacer(modifier = Modifier.width(1.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
 
                     Text(
                         text = endLocation,
                         color = MaterialTheme.colorScheme.onPrimary,
-                        style = MaterialTheme.typography.titleMedium
+                        style = MaterialTheme.typography.titleMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Visible
                     )
                 }
                 Spacer(modifier = Modifier.height(8.dp))
@@ -120,7 +181,7 @@ fun RowScope.CompletedJourneyCard(route: String, date: String, mode: String, dur
                         style = MaterialTheme.typography.bodyLarge
                     )
 
-                    Spacer(modifier = Modifier.width(10.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
 
                     // ========== Duration Icon and Text ==========
                     Icon(
@@ -129,6 +190,7 @@ fun RowScope.CompletedJourneyCard(route: String, date: String, mode: String, dur
                         tint = MaterialTheme.colorScheme.secondary,
                         modifier = Modifier.size(18.dp)
                     )
+
                     Spacer(modifier = Modifier.width(4.dp))
 
                     Text(
@@ -137,7 +199,7 @@ fun RowScope.CompletedJourneyCard(route: String, date: String, mode: String, dur
                         style = MaterialTheme.typography.bodyLarge
                     )
 
-                    Spacer(modifier = Modifier.width(10.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
 
                     // ========== Mode of transport (conditional icon) ==========
                     Icon(
@@ -146,6 +208,7 @@ fun RowScope.CompletedJourneyCard(route: String, date: String, mode: String, dur
                         tint = MaterialTheme.colorScheme.secondary,
                         modifier = Modifier.size(20.dp)
                     )
+
                     Spacer(modifier = Modifier.width(4.dp))
 
                     Text(
