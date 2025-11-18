@@ -1,23 +1,18 @@
 package com.example.citiway.data.repository
 
-/**
- * A singleton repository to manage all app data.
- *
- * This class will be responsible for coordinating data operations between
- * remote (network) and local (database) data sources. For now, it uses
- * placeholder data.
- *
- * @Inject constructor() allows Dagger/Hilt to create an instance of this repository.
- */
-
 import com.example.citiway.data.local.CitiWayDatabase
-import com.example.citiway.data.local.CompletedJourney
-import com.example.citiway.data.local.JourneyOverviewDTO
+import com.example.citiway.data.local.JourneyOverview
+import com.example.citiway.data.local.JourneyOverviewDb
 import com.example.citiway.data.local.entities.*
+import com.example.citiway.data.local.toCompletedJourney
+import com.example.citiway.data.local.toCompletedJourneyEntity
 import com.example.citiway.data.local.toDomain
-import com.example.citiway.data.local.toEntity
+import com.example.citiway.data.local.toEntities
+import com.example.citiway.data.local.toJourneyOverview
+import com.example.citiway.data.remote.SelectedLocation
 import com.example.citiway.features.shared.Journey
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 /**
  * Repository class that provides a clean API for data access
@@ -27,8 +22,7 @@ class CitiWayRepository(private val database: CitiWayDatabase) {
 
     // DAOs
     private val userDao = database.userDao()
-    private val journeyDao = database.JourneyDao()
-    private val providerDao = database.providerDao()
+    private val journeyDao = database.completedJourneyDao()
     private val monthlySpendDao = database.monthlySpendDao()
     private val myCitiFareDao = database.myCitiFareDao()
     private val metrorailFareDao = database.metrorailFareDao()
@@ -47,35 +41,49 @@ class CitiWayRepository(private val database: CitiWayDatabase) {
 
 
     // ========== JOURNEY OPERATIONS ==========
-    suspend fun insertCompletedJourney(journey: CompletedJourney) = journeyDao.insertJourney(journey.toEntity())
-    suspend fun getCompletedJourneyById(journeyId: Int) = journeyDao.getJourneyById(journeyId)?.toDomain()
-    fun searchCompletedJourneys(location: String): Flow<List<JourneyOverviewDTO>> =
-        journeyDao.searchJourneysByLocation(location)
-    fun getCompletedJourneys(): Flow<List<JourneyOverviewDTO>> = journeyDao.getAllJourneys()
-    suspend fun getJourneyOverviewsByUserId(userId: Int) = journeyDao.getJourneyOverviewsByUserId(userId)
-    suspend fun getJourneyOverviewById(journeyId: Int) = journeyDao.getJourneyOverviewById(journeyId)
-    fun getRecentJourneyOverview(userId: Int, limit: Int = 10): Flow<List<JourneyOverviewDTO>> =
-        journeyDao.getRecentJourneyOverviews(userId, limit)
-    fun getFavouriteJourneyOverview(userId: Int): Flow<List<JourneyOverviewDTO>> =
-        journeyDao.getFavouriteJourneyOverviews(userId)
+    suspend fun saveCompletedJourney(
+        journey: Journey,
+        startLocation: SelectedLocation,
+        destination: SelectedLocation
+    ) {
+        val journeyEntity = journey.toCompletedJourneyEntity(startLocation, destination)
+
+        journeyDao.insertFullJourney(
+            journeyEntity,
+            journey.stops.toEntities(),
+            journey.instructions.toEntities()
+        )
+    }
+
+    suspend fun getCompletedJourneyById(journeyId: Int) =
+        journeyDao.getCompletedJourneyById(journeyId)?.toCompletedJourney()
+
+    fun getCompletedJourneys(): Flow<List<JourneyOverviewDb>> = journeyDao.getAllJourneyOverviews()
+    suspend fun getJourneyOverviewsByUserId(userId: Int) =
+        journeyDao.getJourneyOverviewsByUserId(userId).toDomain()
+
+    suspend fun getJourneyOverviewById(journeyId: Int) =
+        journeyDao.getJourneyOverviewById(journeyId)?.toJourneyOverview()
+
+    fun getRecentJourneyOverview(userId: Int, limit: Int = 10): Flow<List<JourneyOverview>> {
+        return journeyDao.getRecentJourneyOverviews(userId, limit).map { it.toDomain() }
+    }
+
+    fun getFavouriteJourneyOverview(userId: Int): Flow<List<JourneyOverview>> {
+        return journeyDao.getFavouriteJourneyOverviews(userId).map { it.toDomain() }
+    }
+
     suspend fun toggleFavouriteJourney(journeyId: Int, isFavourite: Boolean) =
         journeyDao.updateFavouriteStatus(journeyId, isFavourite)
-
-
-    // ========== PROVIDER OPERATIONS ==========
-    suspend fun insertProvider(provider: ProviderEntity) = providerDao.insertProvider(provider)
-    suspend fun insertProviders(providers: List<ProviderEntity>) =
-        providerDao.insertProviders(providers)
-    fun getProvidersByType(type: String): Flow<List<ProviderEntity>> =
-        providerDao.getProvidersByType(type)
-    fun getAllProviders(): Flow<List<ProviderEntity>> = providerDao.getAllProviders()
 
 
     // ========== MONTHLY SPEND OPERATIONS ==========
     suspend fun insertMonthlySpend(spend: MonthlySpendEntity) =
         monthlySpendDao.insertMonthlySpend(spend)
+
     fun getMonthlySpendForUser(userId: Int): Flow<List<MonthlySpendEntity>> =
         monthlySpendDao.getMonthlySpendByUser(userId)
+
     suspend fun getSpendForMonth(userId: Int, month: String): MonthlySpendEntity? =
         monthlySpendDao.getMonthlySpendByUserAndMonth(userId, month)
 
@@ -83,10 +91,13 @@ class CitiWayRepository(private val database: CitiWayDatabase) {
     // ========== FARE OPERATIONS ==========
     suspend fun insertMyCitiFares(fares: List<MyCitiFareEntity>) =
         myCitiFareDao.insertMyCitiFares(fares)
+
     suspend fun getMyCitiFare(distanceMeters: Int): MyCitiFareEntity? =
         myCitiFareDao.getFareByDistance(distanceMeters)
+
     suspend fun insertMetrorailFares(fares: List<MetrorailFareEntity>) =
         metrorailFareDao.insertMetrorailFares(fares)
+
     suspend fun getMetrorailFare(zone: String, ticketType: String): MetrorailFareEntity? =
         metrorailFareDao.getFareByZoneAndType(zone, ticketType)
 

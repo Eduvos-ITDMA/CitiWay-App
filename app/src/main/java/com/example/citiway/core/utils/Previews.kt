@@ -291,6 +291,8 @@ fun JourneySummaryScreenPreview() {
                 isFavourite = false,
                 createdAt = System.currentTimeMillis(),
             ),
+            onRepeatJourney = { a, b -> },
+            primaryButtonAction = "home",
             paddingValues = PaddingValues(),
             navController = rememberNavController(),
         )

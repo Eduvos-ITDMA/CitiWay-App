@@ -17,15 +17,17 @@ import com.example.citiway.data.local.entities.*
     entities = [
         UserEntity::class,              // Stores user profile information
         ProviderEntity::class,          // Stores transport provider details (MyCiti, Metrorail, etc.)
+        StopEntity::class,          // Stores transport provider details (MyCiti, Metrorail, etc.)
+        InstructionEntity::class,          // Stores transport provider details (MyCiti, Metrorail, etc.)
         CompletedJourneyEntity::class,             // Stores individual journey information
         MonthlySpendEntity::class,      // Tracks monthly spending per provider
         MyCitiFareEntity::class,        // Stores MyCiti fare prices
         MetrorailFareEntity::class,     // Stores Metrorail fare prices
     ],
-    version = 9,                  // Database version - increment when schema changes
+    version = 11,                  // Database version - increment when schema changes
     exportSchema = false          // Set to true to export schema for version control
 )
-@TypeConverters(JourneyConverter::class)
+@TypeConverters(Converters::class)
 abstract class CitiWayDatabase : RoomDatabase() {
 
     // DAOs (Data Access Objects) - provide methods to interact with each table
@@ -33,7 +35,7 @@ abstract class CitiWayDatabase : RoomDatabase() {
 
     abstract fun userDao(): UserDao
     abstract fun providerDao(): ProviderDao
-    abstract fun JourneyDao(): JourneyDao
+    abstract fun completedJourneyDao(): CompletedJourneyDao
     abstract fun monthlySpendDao(): MonthlySpendDao
     abstract fun myCitiFareDao(): MyCitiFareDao
     abstract fun metrorailFareDao(): MetrorailFareDao

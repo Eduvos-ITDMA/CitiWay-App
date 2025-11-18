@@ -1,18 +1,16 @@
 package com.example.citiway.data.local.entities
 
 import androidx.room.ColumnInfo
-import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
-import com.example.citiway.data.local.JourneyConverter
-import com.example.citiway.data.local.JourneyDb
-import com.example.citiway.data.remote.SelectedLocation
+import com.example.citiway.data.local.Converters
 import com.google.android.gms.maps.model.LatLng
+import java.time.Instant
 
-// ==================== JOURNEY ====================
+// ==================== COMPLETED JOURNEY ====================
 @Entity(tableName = "completed_journey")
-@TypeConverters(JourneyConverter::class)
+@TypeConverters(Converters::class)
 data class CompletedJourneyEntity(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "journey_id")
@@ -27,10 +25,20 @@ data class CompletedJourneyEntity(
     val startLocationLatLng: LatLng,
     @ColumnInfo(name = "destination_latlng")
     val destinationLatLng: LatLng,
-
-    @Embedded
-    val journey: JourneyDb,
-
+    @ColumnInfo(name = "start_time")
+    val startTime: Instant,
+    @ColumnInfo(name = "arrival_time")
+    val arrivalTime: Instant?,
+    @ColumnInfo(name = "distance_meters")
+    val distanceMeters: Int,
+    @ColumnInfo(name = "fare_total")
+    val fareTotal: Double,
+    @ColumnInfo(name = "myciti_fare")
+    val mycitiFare: Double,
+    @ColumnInfo(name = "metrorail_fare")
+    val metrorailFare: Double,
+    @ColumnInfo(name = "total_stops_count")
+    val totalStopsCount: Int = 0,
     @ColumnInfo(name = "is_favourite")
     val isFavourite: Boolean = false,
     @ColumnInfo(name = "created_at")

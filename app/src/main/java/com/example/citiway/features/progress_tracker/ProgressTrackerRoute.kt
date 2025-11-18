@@ -12,7 +12,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.citiway.App
 import com.example.citiway.core.utils.ScreenWrapper
-import com.example.citiway.data.local.CompletedJourney
 import com.example.citiway.data.remote.SelectedLocation
 import com.example.citiway.data.repository.CitiWayRepository
 import com.example.citiway.di.viewModelFactory
@@ -39,22 +38,7 @@ fun ProgressTrackerRoute(
         { startLocation, destination, journey ->
             journeyViewModel.viewModelScope.launch {
                 try {
-                    val completedJourney = CompletedJourney(
-                        userId = 1,
-                        startLocationName = startLocation.primaryText,
-                        destinationName = destination.primaryText,
-                        startLocationLatLng = startLocation.latLng,
-                        destinationLatLng = destination.latLng,
-                        journey = journey,
-                        createdAt = System.currentTimeMillis()
-                    )
-
-                    val journeyId = repository.insertCompletedJourney(completedJourney)
-                    Log.d(
-                        "JourneyViewModel",
-                        "🎉 Journey saved! Trip ID: $journeyId"
-                    )
-
+                    repository.saveCompletedJourney(journey, startLocation, destination)
                 } catch (e: Exception) {
                     Log.e("JourneyViewModel", "❌ Failed to save journey: ${e.message}", e)
                     e.printStackTrace()

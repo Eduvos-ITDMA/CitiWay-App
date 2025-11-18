@@ -5,20 +5,14 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.citiway.App
 import com.example.citiway.core.navigation.routes.Screen
-import com.example.citiway.core.utils.toLocalDateTime
 import com.example.citiway.data.repository.CitiWayRepository
 import com.example.citiway.data.local.JourneyOverview
-import com.example.citiway.data.local.JourneyOverviewDTO
 import com.example.citiway.data.remote.PlacesActions
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import java.time.Duration
-import kotlin.collections.distinct
-import kotlin.collections.filter
-import kotlin.collections.map
 
 data class CompletedJourneysActions(
     val onToggleFavourite: (JourneyOverview) -> Unit,
@@ -66,10 +60,10 @@ class CompletedJourneysViewModel(
     private fun loadRecentJourneys() {
         viewModelScope.launch {
             // Load recent journeys (last 2 trips) (HOME PAGE)
-            repository.getRecentJourneyOverview(currentUserId, limit = 3).collectLatest { trips ->
-                val journeys = trips.map { it.toJourneyOverview() }
-                _screenState.update { it.copy(recentJourneys = journeys) }
-            }
+            repository.getRecentJourneyOverview(currentUserId, limit = 3)
+                .collectLatest { overviews ->
+                    _screenState.update { it.copy(recentJourneys = overviews) }
+                }
         }
     }
 
@@ -78,8 +72,7 @@ class CompletedJourneysViewModel(
      */
     private fun loadAllJourneys() {
         viewModelScope.launch {
-            val journeys =
-                repository.getJourneyOverviewsByUserId(currentUserId).map { it.toJourneyOverview() }
+            val journeys = repository.getJourneyOverviewsByUserId(currentUserId)
             _screenState.update { it.copy(allJourneys = journeys) }
         }
     }
@@ -89,11 +82,9 @@ class CompletedJourneysViewModel(
      */
     private fun loadFavouriteJourneys() {
         viewModelScope.launch {
-            repository.getFavouriteJourneyOverview(currentUserId).collectLatest { trips ->
+            repository.getFavouriteJourneyOverview(currentUserId).collectLatest { overviews ->
                 _screenState.update { currentState ->
-                    currentState.copy(
-                        favouriteJourneys = trips.map { it.toJourneyOverview() }
-                    )
+                    currentState.copy(favouriteJourneys = overviews)
                 }
             }
         }
@@ -137,37 +128,5 @@ class CompletedJourneysViewModel(
                 println("❌ Error toggling favourite: ${e.message}")
             }
         }
-    }
-
-    /**
-     * Extension function to convert database Trip entity to UI model
-     */
-    private fun JourneyOverviewDTO.toJourneyOverview(): JourneyOverview {
-        val modes = this.instructions
-            .map { it.travelMode }
-            .filter { it != "WALK" }
-            .distinct()
-
-        val tripMode = when {
-            modes.isEmpty() -> "Walk"
-            modes.size == 1 -> when (modes[0]) {
-                "HEAVY_RAIL" -> "Train"
-                "BUS" -> "Bus"
-                else -> "Other"
-            }
-
-            else -> "Multi"
-        }
-
-        return JourneyOverview(
-            id = this.journey_id,
-            route = "${this.start_location_name} | ${this.destination_name}",
-            startLocationLatLng = this.start_location_latlng,
-            destinationLatLng = this.destination_latlng,
-            date = this.start_time.toLocalDateTime().toLocalDate().toString(),
-            durationMin = Duration.between(this.arrival_time, this.start_time).toMinutes().toInt(),
-            mode = tripMode,
-            isFavourite = this.is_favourite
-        )
     }
 }

@@ -35,16 +35,19 @@ import com.example.citiway.core.utils.toDisplayableLocalTime
 import com.example.citiway.core.utils.toLocalDateTime
 import com.example.citiway.data.local.CompletedJourney
 import com.example.citiway.features.shared.Instruction
+import com.google.android.gms.maps.model.LatLng
 import java.time.Duration
 import java.time.format.DateTimeFormatter
 
 @Composable
 fun JourneySummaryContent(
     completedJourney: CompletedJourney?,
+    onRepeatJourney: (LatLng, LatLng) -> Unit,
+    primaryButtonAction: String?,
     navController: NavController,
     paddingValues: PaddingValues
 ) {
-    if (completedJourney == null){
+    if (completedJourney == null) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -67,6 +70,7 @@ fun JourneySummaryContent(
         return
     }
 
+    val action = if (primaryButtonAction != "home") "repeat" else "home"
     val startLocation = completedJourney.startLocationName
     val destination = completedJourney.destinationName
     val journey = completedJourney.journey
@@ -118,17 +122,14 @@ fun JourneySummaryContent(
 
         // Start and End Time with Line
         JourneyTimelineHeader(
-            startTime = startTime,
-            arrivalTime = arrivalTime
+            startTime = startTime, arrivalTime = arrivalTime
         )
 
         VerticalSpace(24)
 
         // Journey Details Card
         JourneyDetailsCard(
-            date = journeyDate,
-            duration = journeyDuration,
-            fareTotal = fareTotal
+            date = journeyDate, duration = journeyDuration, fareTotal = fareTotal
         )
 
         VerticalSpace(32)
@@ -139,8 +140,7 @@ fun JourneySummaryContent(
                 .fillMaxWidth()
                 .onGloballyPositioned { coordinates ->
                     boxOffset = coordinates.positionInRoot()
-                }
-        ) {
+                }) {
             // Progress Line Canvas
             Canvas(
                 modifier = Modifier
@@ -173,8 +173,7 @@ fun JourneySummaryContent(
             Column(modifier = Modifier.fillMaxWidth()) {
                 // Start Location
                 SummaryLocationStep(
-                    name = startLocation,
-                    isStart = true
+                    name = startLocation, isStart = true
                 ) { offset ->
                     updateCoordinate(0, offset)
                 }
@@ -207,8 +206,7 @@ fun JourneySummaryContent(
                 VerticalSpace(40)
                 // End Location
                 SummaryLocationStep(
-                    name = destination,
-                    isStart = false
+                    name = destination, isStart = false
                 ) { offset ->
                     updateCoordinate(stepsCount - 1, offset)
                 }
@@ -219,12 +217,17 @@ fun JourneySummaryContent(
 
         // Done Button
         Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center
+            modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center
         ) {
             Button(
-                // TODO: Go home if just come from progress tracker, otherwise pop backstack
-                onClick = { navController.navigate(Screen.Home.route) },
+                onClick = {
+                    when (action) {
+                        "home" -> navController.navigate(Screen.Home.route)
+                        "repeat" -> onRepeatJourney(
+                            completedJourney.startLocationLatLng, completedJourney.destinationLatLng
+                        )
+                    }
+                },
                 modifier = Modifier
                     .fillMaxWidth(0.6f)
                     .height(50.dp),
@@ -234,9 +237,8 @@ fun JourneySummaryContent(
                 shape = RoundedCornerShape(25.dp)
             ) {
                 Text(
-                    text = "Done",
-                    color = Color.White,
-                    style = MaterialTheme.typography.labelLarge
+                    text = if (action == "repeat") "Repeat Journey" else "Back to Home",
+                    color = Color.White, style = MaterialTheme.typography.labelLarge
                 )
             }
         }
@@ -262,8 +264,7 @@ fun JourneyTimelineHeader(startTime: String, arrivalTime: String) {
                 modifier = Modifier
                     .size(32.dp)
                     .background(
-                        MaterialTheme.colorScheme.onBackground,
-                        shape = CircleShape
+                        MaterialTheme.colorScheme.onBackground, shape = CircleShape
                     )
             )
             VerticalSpace(8)
@@ -368,9 +369,7 @@ fun DetailRow(label: String, value: String) {
 
 @Composable
 fun SummaryLocationStep(
-    name: String,
-    isStart: Boolean,
-    onCoordinatesChanged: (Offset) -> Unit
+    name: String, isStart: Boolean, onCoordinatesChanged: (Offset) -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -390,16 +389,14 @@ fun SummaryLocationStep(
                         y = coordinates.positionInRoot().y + coordinates.size.height / 2f
                     )
                     onCoordinatesChanged(center)
-                },
-            contentAlignment = Alignment.Center
+                }, contentAlignment = Alignment.Center
         ) {
             if (isStart) {
                 Box(
                     modifier = Modifier
                         .size(24.dp)
                         .background(
-                            MaterialTheme.colorScheme.primary,
-                            shape = CircleShape
+                            MaterialTheme.colorScheme.primary, shape = CircleShape
                         )
                 )
             } else {
@@ -428,8 +425,7 @@ fun SummaryLocationStep(
 
 @Composable
 fun SummaryInstructionStep(
-    instruction: Instruction,
-    onCoordinatesChanged: (Offset) -> Unit
+    instruction: Instruction, onCoordinatesChanged: (Offset) -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -449,8 +445,7 @@ fun SummaryInstructionStep(
                         y = coordinates.positionInRoot().y + coordinates.size.height / 2f
                     )
                     onCoordinatesChanged(center)
-                },
-            contentAlignment = Alignment.Center
+                }, contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.DirectionsWalk,
@@ -505,8 +500,7 @@ fun SummaryTransitStep(
                         y = coordinates.positionInRoot().y + coordinates.size.height / 2f
                     )
                     onCoordinatesChanged(center)
-                },
-            contentAlignment = Alignment.Center
+                }, contentAlignment = Alignment.Center
         ) {
             Icon(
                 painter = painterResource(modeIcon(travelMode)),
