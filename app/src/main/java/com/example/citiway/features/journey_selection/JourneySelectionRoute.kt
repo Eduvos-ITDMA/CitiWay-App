@@ -36,7 +36,6 @@ fun JourneySelectionRoute(
             JourneyViewModel(navController)
         })
     journeyViewModel.setTime(getNearestHalfHour())
-    journeyViewModel.getJourneyOptions()
 
     val journeyState by journeyViewModel.state.collectAsStateWithLifecycle()
 
@@ -51,14 +50,41 @@ fun JourneySelectionRoute(
     val destPlacesState by destPlacesManager.state.collectAsStateWithLifecycle()
     val destPlacesActions = destPlacesManager.actions
 
-    // Initialize search text
-    LaunchedEffect(Unit) {
-        startPlacesActions.onSetSearchText(
-            journeyState.startLocation?.primaryText ?: "error"
-        )
-        destPlacesActions.onSetSearchText(
-            journeyState.destination?.primaryText ?: "error"
-        )
+    // Created a stable key that only changes when both locations are valid
+    // only including the coordinates, not the entire location object
+    val locationsKey = remember(
+        journeyState.startLocation?.latLng?.latitude,
+        journeyState.startLocation?.latLng?.longitude,
+        journeyState.destination?.latLng?.latitude,
+        journeyState.destination?.latLng?.longitude
+    ) {
+        val startLat = journeyState.startLocation?.latLng?.latitude
+        val startLng = journeyState.startLocation?.latLng?.longitude
+        val destLat = journeyState.destination?.latLng?.latitude
+        val destLng = journeyState.destination?.latLng?.longitude
+
+        "${startLat}_${startLng}_${destLat}_${destLng}"
+    }
+
+    LaunchedEffect(locationsKey) {  // Now Only triggers when coordinates change
+        val startLocation = journeyState.startLocation
+        val destination = journeyState.destination
+
+        if (startLocation != null && destination != null) {
+            // Update search text fields
+            startPlacesActions.onSetSearchText(startLocation.primaryText)
+            destPlacesActions.onSetSearchText(destination.primaryText)
+
+            // Only fetch journey options if we have valid coordinates
+            if (startLocation.latLng.latitude != 0.0 &&
+                startLocation.latLng.longitude != 0.0 &&
+                destination.latLng.latitude != 0.0 &&
+                destination.latLng.longitude != 0.0) {
+
+                Log.d("JourneySelection", "Fetching routes for: ${startLocation.primaryText} → ${destination.primaryText}")
+                journeyViewModel.getJourneyOptions()
+            }
+        }
     }
 
     // Clean up Coroutine Scopes in PlacesManager instances
@@ -91,7 +117,8 @@ fun JourneySelectionRoute(
                     }
 
 
-                    journeyViewModel.getJourneyOptions()
+                    // Note: getJourneyOptions() will be called automatically by LaunchedEffect
+                    // when the state updates, so we don't need to call it here
                 }
             }
         }

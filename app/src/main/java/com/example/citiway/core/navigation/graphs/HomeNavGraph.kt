@@ -9,6 +9,7 @@ import com.example.citiway.core.navigation.routes.Screen
 import com.example.citiway.features.favourites.FavouritesRoute
 import com.example.citiway.features.home.HomeRoute
 import com.example.citiway.features.schedules.SchedulesRoute
+import com.example.citiway.features.stats.StatsRoute
 
 fun NavGraphBuilder.homeNavGraph(
     navController: NavController
@@ -27,6 +28,10 @@ fun NavGraphBuilder.homeNavGraph(
         // Favourites screen
         composable(Screen.Favourites.route) {
             FavouritesRoute(navController)
+        }
+
+        composable(Screen.Stats.route) {
+            StatsRoute(navController)
         }
     }
 }

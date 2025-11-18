@@ -9,6 +9,7 @@ import androidx.room.PrimaryKey
 data class MetrorailFare(
     @PrimaryKey(autoGenerate = true)
     val metrorail_fare_id: Int = 0,
+    val distance_band_lower_limit: Int,  // For distance-based lookup
     val zone: String? = null,
     val ticket_type: String? = null,
     val fare: Double? = null,

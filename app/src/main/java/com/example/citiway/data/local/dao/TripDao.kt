@@ -35,6 +35,17 @@ interface TripDao {
     @Query("SELECT * FROM trip")
     fun getAllTrips(): Flow<List<Trip>>
 
+    /**
+     * Getting all trips for a user in a specific month
+     * @param userId The user ID
+     * @param month Format: "yyyy-MM" (e.g., "2025-11")
+     */
+    @Query("SELECT * FROM trip WHERE user_id = :userId AND date LIKE :month || '%' ORDER BY created_at DESC")
+    suspend fun getTripsByUserAndMonth(userId: Int, month: String): List<Trip>
+
+//    @Query("SELECT * FROM trip WHERE trip_id = :tripId LIMIT 1")
+//    suspend fun getTripById(tripId: Int): Trip?
+
     @Query("DELETE FROM trip WHERE trip_id = :tripId")
     suspend fun deleteTripById(tripId: Int)
 

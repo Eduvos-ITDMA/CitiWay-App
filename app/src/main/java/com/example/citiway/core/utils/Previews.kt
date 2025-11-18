@@ -133,7 +133,6 @@ private val mockJourney = Journey(
     ),
     startTime = Instant.parse("2025-10-21T12:41:00Z"),
     arrivalTime = Instant.parse("2025-10-21T16:06:00Z"),
-    distanceMeters = 5000,
     fareTotal = 13.50,
 )
 
@@ -190,7 +189,9 @@ fun HomeScreenPreview() {
         onMapIconClick = {},
         onSelectPrediction = { prediction -> },
         onFavouritesTitleClick = {},
-        onRecentTitleClick = {}
+        onRecentTitleClick = {},
+        onViewJourneySummary = {},
+        onStartJourney = TODO(),
     )
 
     CitiWayTheme {
@@ -275,6 +276,7 @@ fun JourneySummaryScreenPreview() {
             destination = SelectedLocation(LatLng(0.0, 0.0), "mock_id_2", "Century City"),
             paddingValues = PaddingValues(),
             navController = rememberNavController(),
+            onDone = {}
         )
     }
 }

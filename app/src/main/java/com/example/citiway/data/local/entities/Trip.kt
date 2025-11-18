@@ -31,8 +31,4 @@ data class Trip(
     val is_favourite: Boolean = false,
     val created_at: Long? = null,  //Using system time now, so will have same time and when journey ends.
 
-    // NEW FIELDS for v1. wip
-    val departure_time: String? = null,    // ISO format or HH:mm
-    val arrival_time: String? = null,      // ISO format or HH:mm
-    //val completed_at: Long? = null         // Timestamp when journey ended
 )

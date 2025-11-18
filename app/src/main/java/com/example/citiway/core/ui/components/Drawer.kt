@@ -272,7 +272,7 @@ fun ModernSettingsMenu(
                         subtitle = "Access Journey History",
                         onClick = {
                             onDismiss()
-                            navController.navigate(Screen.JourneySummary.route)
+                            navController.navigate(Screen.JourneyHistory.route)
                         }
                     )
 
@@ -331,6 +331,19 @@ fun ModernSettingsMenu(
                         onClick = {
                             onDismiss()
                             navController.navigate(Screen.Favourites.route)
+                        }
+                    )
+
+                    HorizontalDivider()
+
+                    // Favourites Page
+                    // Clicking navigates to favourites
+                    MenuItemClickable(
+                        title = "Stats????????.",
+                        subtitle = "stats of journeys",
+                        onClick = {
+                            onDismiss()
+                            navController.navigate(Screen.Stats.route)
                         }
                     )
 

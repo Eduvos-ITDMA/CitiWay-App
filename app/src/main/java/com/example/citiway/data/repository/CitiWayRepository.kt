@@ -10,11 +10,14 @@ package com.example.citiway.data.repository
  * @Inject constructor() allows Dagger/Hilt to create an instance of this repository.
  */
 
+import android.util.Log
 import androidx.room.withTransaction
 import com.example.citiway.data.local.CitiWayDatabase
 import com.example.citiway.data.local.entities.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.withContext
 
 /**
  * Repository class that provides a clean API for data access
@@ -117,8 +120,11 @@ class CitiWayRepository(private val database: CitiWayDatabase) {
         myCitiFareDao.getFareByDistance(distanceMeters)
     suspend fun insertMetrorailFares(fares: List<MetrorailFare>) =
         metrorailFareDao.insertMetrorailFares(fares)
-    suspend fun getMetrorailFare(zone: String, ticketType: String): MetrorailFare? =
-        metrorailFareDao.getFareByZoneAndType(zone, ticketType)
+    suspend fun getMetrorailFare(distanceMeters: Int, ticketType: String = "single"): MetrorailFare? {
+        return withContext(Dispatchers.IO) {
+            database.metrorailFareDao().getFareByDistanceAndType(distanceMeters, ticketType)
+        }
+    }
 
 
     // ========== JOURNEY SAVE OPERATIONS (for completed trips) ==========
@@ -145,6 +151,104 @@ class CitiWayRepository(private val database: CitiWayDatabase) {
 
             // 4. Return the trip ID
             tripId.toLong()
+        }
+    }
+
+    // Journey methods
+    suspend fun insertJourney(journey: Journey): Long {
+        return database.journeyDao().insertJourney(journey)
+    }
+
+    suspend fun getJourneyByTripId(tripId: Int): Journey? {
+        return database.journeyDao().getJourneyByTripId(tripId)
+    }
+
+    suspend fun insertJourneySteps(steps: List<JourneyStep>) {
+        database.journeyStepDao().insertSteps(steps)
+    }
+
+    suspend fun getStepsForJourney(journeyId: Int): List<JourneyStep> {
+        return database.journeyStepDao().getStepsForJourney(journeyId)
+    }
+
+    // ========== MoONTHLY STATS OPERATIONS (for completed trips) ==========
+
+    /**
+     * Data class for transport statistics result
+     */
+    data class TransportStats(
+        val totalFare: Double?,
+        val totalDistance: Double?
+    )
+
+    /**
+     * Get transport statistics for a specific provider and month
+     * @param userId The user ID
+     * @param providerId 1 for MyCiti Bus, 2 for Metrorail
+     * @param month Format: "yyyy-MM" (e.g., "2025-11")
+     */
+    suspend fun getTransportStats(
+        userId: Int,
+        providerId: Int,
+        month: String
+    ): TransportStats {
+        return withContext(Dispatchers.IO) {
+            try {
+                // Get all trips for this user in this month
+                val trips = database.tripDao().getTripsByUserAndMonth(userId, month)
+
+                if (trips.isEmpty()) {
+                    return@withContext TransportStats(totalFare = 0.0, totalDistance = 0.0)
+                }
+
+                val tripIds = trips.map { it.trip_id }
+
+                // Get all routes for these trips with the specified provider
+                val routes = database.routeDao().getRoutesByTripIdsAndProvider(tripIds, providerId)
+
+                val totalFare = routes.sumOf { it.fare_contribution ?: 0.0 }
+                val totalDistance = routes.sumOf { it.distance_km ?: 0.0 }
+
+                TransportStats(
+                    totalFare = totalFare,
+                    totalDistance = totalDistance
+                )
+            } catch (e: Exception) {
+                Log.e("Repository", "Error getting transport stats: ${e.message}", e)
+                TransportStats(totalFare = 0.0, totalDistance = 0.0)
+            }
+        }
+    }
+
+    /**
+     * Get total walking distance for a user in a specific month
+     * @param userId The user ID
+     * @param month Format: "yyyy-MM" (e.g., "2025-11")
+     */
+    suspend fun getTotalWalkingDistance(
+        userId: Int,
+        month: String
+    ): Int {
+        return withContext(Dispatchers.IO) {
+            try {
+                // Get all trips for this user in this month
+                val trips = database.tripDao().getTripsByUserAndMonth(userId, month)
+
+                if (trips.isEmpty()) {
+                    return@withContext 0
+                }
+
+                val tripIds = trips.map { it.trip_id }
+
+                // Get all journeys for these trips
+                val journeys = database.journeyDao().getJourneysByTripIds(tripIds)
+
+                // Sum up total walking distance
+                journeys.sumOf { it.total_walk_distance_meters }
+            } catch (e: Exception) {
+                Log.e("Repository", "Error getting walking distance: ${e.message}", e)
+                0
+            }
         }
     }
 

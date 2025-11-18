@@ -44,15 +44,6 @@ data class Route(
     val mode: String? = null,              // "bus", "train"
     val distance_km: Double? = null,
     val fare_contribution: Double? = null,
-    val schedule: String? = null,
     val myciti_fare_id: Int? = null,
     val metrorail_fare_id: Int? = null,
-
-    // NEW FIELDS for v1
-    val vehicle_type: String? = null,      // "BUS", "HEAVY_RAIL", "WALK"
-    val stop_count: Int? = null,           // Number of stops
-    val duration_minutes: Int? = null      // Duration of this leg
-
-    // route_order and route_name - skipping for now, add later when needed will use Journey table.
-    //
 )

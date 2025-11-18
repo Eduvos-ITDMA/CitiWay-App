@@ -1,0 +1,2219 @@
+{
+      "header": {
+        "logLevel": "VERBOSE",
+        "pid": 1023,
+        "tid": 1089,
+        "applicationId": "com.android.systemui",
+        "processName": "com.android.systemui",
+        "tag": "WindowManagerShell",
+        "timestamp": {
+          "seconds": 1763229905,
+          "nanos": 7331200
+        }
+      },
+      "message": " Checking filter Pair{{types\u003d[] flags\u003d0x0] notFlags\u003d0x0 checks\u003d[{atype\u003ddream independent\u003dtrue modes\u003d[OPEN,TO_FRONT] flags\u003dNONE mustBeTask\u003dfalse order\u003dANY topActivity\u003dnull launchCookie\u003dnull windowingMode\u003dundefined},{atype\u003dhome independent\u003dtrue modes\u003d[CLOSE,TO_BACK] flags\u003dNONE mustBeTask\u003dfalse order\u003dANY topActivity\u003dnull launchCookie\u003dnull windowingMode\u003dundefined}]} RemoteTransition { remoteTransition \u003d android.window.IRemoteTransition$Stub$Proxy@6b02a94, appThread \u003d android.app.IApplicationThread$Stub$Proxy@873693d, debugName \u003d LauncherToDream }}"
+    },
+    {
+      "header": {
+        "logLevel": "VERBOSE",
+        "pid": 1023,
+        "tid": 1089,
+        "applicationId": "com.android.systemui",
+        "processName": "com.android.systemui",
+        "tag": "WindowManagerShell",
+        "timestamp": {
+          "seconds": 1763229905,
+          "nanos": 7813700
+        }
+      },
+      "message": " Checking filter Pair{{types\u003d[] flags\u003d0x0] notFlags\u003d0x100 checks\u003d[{atype\u003dhome independent\u003dtrue modes\u003d[OPEN,TO_FRONT] flags\u003dNONE mustBeTask\u003dfalse order\u003dTOP topActivity\u003dComponentInfo{com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity} launchCookie\u003dnull windowingMode\u003dundefined},{atype\u003dstandard independent\u003dtrue modes\u003d[CLOSE,TO_BACK] flags\u003dNONE mustBeTask\u003dfalse order\u003dANY topActivity\u003dnull launchCookie\u003dnull windowingMode\u003dundefined},{NOT atype\u003dundefined independent\u003dtrue modes\u003d[] flags\u003dNONE mustBeTask\u003dtrue order\u003dANY topActivity\u003dnull launchCookie\u003dnull customAnim\u003dtrue windowingMode\u003dundefined}]} RemoteTransition { remoteTransition \u003d android.window.IRemoteTransition$Stub$Proxy@5629532, appThread \u003d android.app.IApplicationThread$Stub$Proxy@b1af283, debugName \u003d QuickstepLaunchHome }}"
+    },
+    {
+      "header": {
+        "logLevel": "VERBOSE",
+        "pid": 1023,
+        "tid": 1089,
+        "applicationId": "com.android.systemui",
+        "processName": "com.android.systemui",
+        "tag": "WindowManagerShell",
+        "timestamp": {
+          "seconds": 1763229905,
+          "nanos": 9294500
+        }
+      },
+      "message": " Delegate animation for (#106) to null"
+    },
+    {
+      "header": {
+        "logLevel": "VERBOSE",
+        "pid": 1023,
+        "tid": 1089,
+        "applicationId": "com.android.systemui",
+        "processName": "com.android.systemui",
+        "tag": "WindowManagerShell",
+        "timestamp": {
+          "seconds": 1763229905,
+          "nanos": 9413200
+        }
+      },
+      "message": "start default transition animation, info \u003d {id\u003d106 t\u003dOPEN f\u003d0x0 trk\u003d0 r\u003d[0@Point(0, 0)] c\u003d[{m\u003dOPEN f\u003dNONE leash\u003dSurface(name\u003dTask\u003d116)/@0xb0497c9 sb\u003dRect(0, 0 - 1440, 3120) eb\u003dRect(0, 0 - 1440, 3120) epz\u003dPoint(1440, 3120) d\u003d0 taskParent\u003d-1},{m\u003dTO_BACK f\u003dSHOW_WALLPAPER leash\u003dSurface(name\u003dTask\u003d1)/@0x5aa0ece sb\u003dRect(0, 0 - 1440, 3120) eb\u003dRect(0, 0 - 1440, 3120) epz\u003dPoint(1440, 3120) d\u003d0 taskParent\u003d-1},{m\u003dTO_BACK f\u003dIS_WALLPAPER leash\u003dSurface(name\u003dWallpaperWindowToken{38ce8ed showWhenLocked\u003dfalse})/@0xb3f41ef sb\u003dRect(0, 0 - 1440, 3120) eb\u003dRect(0, 0 - 1440, 3120) epz\u003dPoint(1440, 3120) d\u003d0}]}"
+    },
+    {
+      "header": {
+        "logLevel": "VERBOSE",
+        "pid": 1023,
+        "tid": 1089,
+        "applicationId": "com.android.systemui",
+        "processName": "com.android.systemui",
+        "tag": "WindowManagerShell",
+        "timestamp": {
+          "seconds": 1763229905,
+          "nanos": 10045000
+        }
+      },
+      "message": "loadAnimation: anim\u003dandroid.view.animation.AnimationSet@dc49da animAttr\u003d0x13 type\u003dOPEN isEntrance\u003dfalse"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 30021,
+        "tid": 30021,
+        "applicationId": "zygote64",
+        "processName": "zygote64",
+        "tag": "example.citiway",
+        "timestamp": {
+          "seconds": 1763229905,
+          "nanos": 13664200
+        }
+      },
+      "message": "Using CollectorTypeCMC GC."
+    },
+    {
+      "header": {
+        "logLevel": "VERBOSE",
+        "pid": 1023,
+        "tid": 1089,
+        "applicationId": "com.android.systemui",
+        "processName": "com.android.systemui",
+        "tag": "WindowManagerShell",
+        "timestamp": {
+          "seconds": 1763229905,
+          "nanos": 17144100
+        }
+      },
+      "message": "loadAnimation: anim\u003dandroid.view.animation.AnimationSet@8727701 animAttr\u003d0x12 type\u003dOPEN isEntrance\u003dtrue"
+    },
+    {
+      "header": {
+        "logLevel": "WARN",
+        "pid": 30021,
+        "tid": 30021,
+        "applicationId": "zygote64",
+        "processName": "zygote64",
+        "tag": "example.citiway",
+        "timestamp": {
+          "seconds": 1763229905,
+          "nanos": 17216900
+        }
+      },
+      "message": "Unexpected CPU variant for x86: x86_64.\nKnown variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, goldmont-without-sha-xsaves, tremont, kabylake, alderlake, default"
+    },
+    {
+      "header": {
+        "logLevel": "VERBOSE",
+        "pid": 1023,
+        "tid": 1089,
+        "applicationId": "com.android.systemui",
+        "processName": "com.android.systemui",
+        "tag": "WindowManagerShell",
+        "timestamp": {
+          "seconds": 1763229905,
+          "nanos": 20775900
+
+    {
+      "header": {
+        "logLevel": "VERBOSE",
+        "pid": 30021,
+        "tid": 30021,
+        "applicationId": "com.example.citiway",
+        "processName": "com.example.citiway",
+        "tag": "GraphicsEnvironment",
+        "timestamp": {
+          "seconds": 1763229905,
+          "nanos": 724606700
+        }
+      },
+      "message": "com.example.citiway is not listed in ANGLE allowlist or settings, returning default"
+    },
+    {
+      "header": {
+        "logLevel": "VERBOSE",
+        "pid": 30021,
+        "tid": 30021,
+        "applicationId": "com.example.citiway",
+        "processName": "com.example.citiway",
+        "tag": "GraphicsEnvironment",
+        "timestamp": {
+          "seconds": 1763229905,
+          "nanos": 724719000
+        }
+      },
+      "message": "Neither updatable production driver nor prerelease driver is supported."
+    },
+    {
+      "header": {
+        "logLevel": "WARN",
+        "pid": 721,
+        "tid": 1075,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "OptProp",
+        "timestamp": {
+          "seconds": 1763229905,
+          "nanos": 907483200
+        }
+      },
+      "message": "Cannot read opt property android.window.PROPERTY_COMPAT_ENABLE_FAKE_FOCUS"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 721,
+        "tid": 977,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "BackgroundInstallControlService",
+        "timestamp": {
+          "seconds": 1763229905,
+          "nanos": 913591000
+        }
+      },
+      "message": "Package event received: 0"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 721,
+        "tid": 977,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "BackgroundInstallControlService",
+        "timestamp": {
+          "seconds": 1763229905,
+          "nanos": 915654500
+        }
+      },
+      "message": "Package event received: 0"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 30021,
+        "tid": 30036,
+        "applicationId": "com.example.citiway",
+        "processName": "com.example.citiway",
+        "tag": "DisplayManager",
+        "timestamp": {
+          "seconds": 1763229905,
+          "nanos": 919152800
+        }
+      },
+      "message": "Choreographer implicitly registered for the refresh rate."
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 30021,
+        "tid": 30021,
+        "applicationId": "com.example.citiway",
+        "processName": "com.example.citiway",
+        "tag": "example.citiway",
+        "timestamp": {
+          "seconds": 1763229905,
+          "nanos": 923912700
+        }
+      },
+      "message": "AssetManager2(0x7545fde21998) locale list changing from [] to [en-US]"
+    },
+    {
+      "header": {
+        "logLevel": "ERROR",
+        "pid": 30021,
+        "tid": 30021,
+        "applicationId": "com.example.citiway",
+        "processName": "com.example.citiway",
+        "tag": "ashmem",
+        "timestamp": {
+          "seconds": 1763229905,
+          "nanos": 987299700
+        }
+      },
+      "message": "Pinning is deprecated since Android Q. Please use trim or other methods."
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 30021,
+        "tid": 30036,
+        "applicationId": "com.example.citiway",
+        "processName": "com.example.citiway",
+        "tag": "EGL_emulation",
+        "timestamp": {
+          "seconds": 1763229905,
+          "nanos": 990113300
+        }
+      },
+      "message": "Opening libGLESv1_CM_emulation.so"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 30021,
+        "tid": 30036,
+        "applicationId": "com.example.citiway",
+        "processName": "com.example.citiway",
+        "tag": "EGL_emulation",
+        "timestamp": {
+          "seconds": 1763229905,
+          "nanos": 993819000
+        }
+      },
+      "message": "Opening libGLESv2_emulation.so"
+    },
+    {
+      "header": {
+        "logLevel": "WARN",
+        "pid": 30021,
+        "tid": 30036,
+        "applicationId": "com.example.citiway",
+        "processName": "com.example.citiway",
+        "tag": "HWUI",
+        "timestamp": {
+          "seconds": 1763229906,
+          "nanos": 10539700
+        }
+      },
+      "message": "Failed to choose config with EGL_SWAP_BEHAVIOR_PRESERVED, retrying without..."
+    },
+    {
+      "header": {
+        "logLevel": "WARN",
+        "pid": 30021,
+        "tid": 30036,
+        "applicationId": "com.example.citiway",
+        "processName": "com.example.citiway",
+        "tag": "HWUI",
+        "timestamp": {
+          "seconds": 1763229906,
+          "nanos": 10794500
+        }
+      },
+      "message": "Failed to initialize 101010-2 format, error \u003d EGL_SUCCESS"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 30021,
+        "tid": 30021,
+        "applicationId": "com.example.citiway",
+        "processName": "com.example.citiway",
+        "tag": "CompatChangeReporter",
+        "timestamp": {
+          "seconds": 1763229906,
+          "nanos": 159368100
+        }
+      },
+      "message": "Compat change id reported: 377864165; UID 10228; state: ENABLED"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 30021,
+        "tid": 30021,
+        "applicationId": "com.example.citiway",
+        "processName": "com.example.citiway",
+        "tag": "DesktopModeFlags",
+        "timestamp": {
+          "seconds": 1763229906,
+          "nanos": 162531000
+        }
+      },
+      "message": "Toggle override initialized to: OVERRIDE_UNSET"
+    },
+    {
+      "header": {
+        "logLevel": "WARN",
+        "pid": 30021,
+        "tid": 30021,
+        "applicationId": "com.example.citiway",
+        "processName": "com.example.citiway",
+        "tag": "HWUI",
+        "timestamp": {
+          "seconds": 1763229906,
+          "nanos": 249778900
+        }
+      },
+      "message": "Unknown dataspace 0"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 721,
+        "tid": 3150,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "CoreBackPreview",
+        "timestamp": {
+          "seconds": 1763229906,
+          "nanos": 266684100
+        }
+      },
+      "message": "Window{a3668ac u0 com.example.citiway/com.example.citiway.MainActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback\u003dandroid.window.IOnBackInvokedCallback$Stub$Proxy@3fc7d0a, mPriority\u003d-1, mIsAnimationCallback\u003dfalse, mOverrideBehavior\u003d0}"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 30021,
+        "tid": 30026,
+        "applicationId": "com.example.citiway",
+        "processName": "com.example.citiway",
+        "tag": "example.citiway",
+        "timestamp": {
+          "seconds": 1763229906,
+          "nanos": 583162600
+        }
+      },
+      "message": "Compiler allocated 5042KB to compile void android.view.ViewRootImpl.performTraversals()"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 30021,
+        "tid": 30021,
+        "applicationId": "com.example.citiway",
+        "processName": "com.example.citiway",
+        "tag": "example.citiway",
+        "timestamp": {
+          "seconds": 1763229906,
+          "nanos": 932104900
+        }
+      },
+      "message": "hiddenapi: Accessing hidden method Landroid/os/SystemProperties;-\u003eaddChangeCallback(Ljava/lang/Runnable;)V (runtime_flags\u003d0, domain\u003dplatform, api\u003dunsupported) from Landroidx/compose/ui/platform/AndroidComposeView$Companion; (domain\u003dapp) using reflection: allowed"
+    },
+    {
+      "header": {
+        "logLevel": "ERROR",
+        "pid": 721,
+        "tid": 1680,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "TaskPersister",
+        "timestamp": {
+          "seconds": 1763229907,
+          "nanos": 245916400
+        }
+      },
+      "message": "File error accessing recents directory (directory doesn\u0027t exist?)."
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 721,
+        "tid": 754,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "ActivityTaskManager",
+        "timestamp": {
+          "seconds": 1763229907,
+          "nanos": 296300000
+        }
+      },
+      "message": "Displayed com.example.citiway/.MainActivity for user 0: +2s488ms"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 30021,
+        "tid": 30033,
+        "applicationId": "com.example.citiway",
+        "processName": "com.example.citiway",
+        "tag": "HWUI",
+        "timestamp": {
+          "seconds": 1763229907,
+          "nanos": 300415500
+        }
+      },
+      "message": "Davey! duration\u003d1007ms; Flags\u003d1, FrameTimelineVsyncId\u003d1140693, IntendedVsync\u003d59943181700050, Vsync\u003d59943181700050, InputEventId\u003d0, HandleInputStart\u003d59943189431000, AnimationStart\u003d59943189508100, PerformTraversalsStart\u003d59943189538400, DrawStart\u003d59944127527900, FrameDeadline\u003d59943198366716, FrameStartTime\u003d59943189417300, FrameInterval\u003d16666666, WorkloadTarget\u003d16666666, SyncQueued\u003d59944128999700, SyncStart\u003d59944155877100, IssueDrawCommandsStart\u003d59944156029200, SwapBuffers\u003d59944157501100, FrameCompleted\u003d59944216066300, DequeueBufferDuration\u003d35400, QueueBufferDuration\u003d456100, GpuCompleted\u003d59944216066300, SwapBuffersCompleted\u003d59944209765900, DisplayPresentTime\u003d0, CommandSubmissionCompleted\u003d59944157501100, "
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 30021,
+        "tid": 30021,
+        "applicationId": "com.example.citiway",
+        "processName": "com.example.citiway",
+        "tag": "Choreographer",
+        "timestamp": {
+          "seconds": 1763229907,
+          "nanos": 324698000
+        }
+      },
+      "message": "Skipped 52 frames!  The application may be doing too much work on its main thread."
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 721,
+        "tid": 888,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "ImeTracker",
+        "timestamp": {
+          "seconds": 1763229907,
+          "nanos": 337915500
+        }
+      },
+      "message": "com.example.citiway:b15aa1bc: onRequestHide at ORIGIN_SERVER reason HIDE_UNSPECIFIED_WINDOW fromUser false"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 30021,
+        "tid": 30021,
+        "applicationId": "com.example.citiway",
+        "processName": "com.example.citiway",
+        "tag": "InsetsController",
+        "timestamp": {
+          "seconds": 1763229907,
+          "nanos": 350739500
+        }
+      },
+      "message": "hide(ime(), fromIme\u003dfalse)"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 30021,
+        "tid": 30021,
+        "applicationId": "com.example.citiway",
+        "processName": "com.example.citiway",
+        "tag": "ImeTracker",
+        "timestamp": {
+          "seconds": 1763229907,
+          "nanos": 350944100
+        }
+      },
+      "message": "com.example.citiway:b15aa1bc: onCancelled at PHASE_CLIENT_ALREADY_HIDDEN"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 1193,
+        "tid": 1193,
+        "applicationId": "com.google.android.apps.nexuslauncher",
+        "processName": "com.google.android.apps.nexuslauncher",
+        "tag": "BaseDepthController",
+        "timestamp": {
+          "seconds": 1763229907,
+          "nanos": 354780700
+        }
+      },
+      "message": "setSurface:\n\tmWaitingOnSurfaceValidity: false\n\tmBaseSurface: null"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 1193,
+        "tid": 1193,
+        "applicationId": "com.google.android.apps.nexuslauncher",
+        "processName": "com.google.android.apps.nexuslauncher",
+        "tag": "BaseDepthController",
+        "timestamp": {
+          "seconds": 1763229907,
+          "nanos": 359986400
+        }
+      },
+      "message": "mSurface is null and mCurrentBlur is: 23"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 1193,
+        "tid": 1193,
+        "applicationId": "com.google.android.apps.nexuslauncher",
+        "processName": "com.google.android.apps.nexuslauncher",
+        "tag": "StatsLog",
+        "timestamp": {
+          "seconds": 1763229907,
+          "nanos": 362584100
+        }
+      },
+      "message": "LAUNCHER_ONSTOP"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 1475,
+        "tid": 1475,
+        "applicationId": "com.google.android.inputmethod.latin",
+        "processName": "com.google.android.inputmethod.latin",
+        "tag": "GoogleInputMethodService",
+        "timestamp": {
+          "seconds": 1763229907,
+          "nanos": 364844900
+        }
+      },
+      "message": "GoogleInputMethodService.onFinishInput():2043 "
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 721,
+        "tid": 1761,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "ImeTracker",
+        "timestamp": {
+          "seconds": 1763229907,
+          "nanos": 365986400
+        }
+      },
+      "message": "system_server:27099381: onRequestHide at ORIGIN_SERVER reason IME_REQUESTED_CHANGED_LISTENER fromUser false"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 1193,
+        "tid": 1959,
+        "applicationId": "com.google.android.apps.nexuslauncher",
+        "processName": "com.google.android.apps.nexuslauncher",
+        "tag": "GmsPlayProvider",
+        "timestamp": {
+          "seconds": 1763229907,
+          "nanos": 366035200
+        }
+      },
+      "message": "Forcefully shut down the binder channel"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 1475,
+        "tid": 1475,
+        "applicationId": "com.google.android.inputmethod.latin",
+        "processName": "com.google.android.inputmethod.latin",
+        "tag": "Module",
+        "timestamp": {
+          "seconds": 1763229907,
+          "nanos": 366678100
+        }
+      },
+      "message": "DeviceLockedStatusModuleProvider$Module.updateDeviceLockedStatus():100 repeatCheckTimes \u003d 0, locked \u003d false"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 1193,
+        "tid": 1193,
+        "applicationId": "com.google.android.apps.nexuslauncher",
+        "processName": "com.google.android.apps.nexuslauncher",
+        "tag": "StatsLog",
+        "timestamp": {
+          "seconds": 1763229907,
+          "nanos": 367430700
+        }
+      },
+      "message": "LAUNCHER_GOOGLE_SEARCH_RESTORE_LIST_SIZE_AFTER_ACTIVITY_RESTART"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 1475,
+        "tid": 1475,
+        "applicationId": "com.google.android.inputmethod.latin",
+        "processName": "com.google.android.inputmethod.latin",
+        "tag": "GoogleInputMethodService",
+        "timestamp": {
+          "seconds": 1763229907,
+          "nanos": 370939800
+        }
+      },
+      "message": "GoogleInputMethodService.onStartInput():1293 onStartInput(EditorInfo{EditorInfo{packageName\u003dcom.example.citiway, inputType\u003d0, inputTypeString\u003dNULL, enableLearning\u003dfalse, autoCorrection\u003dfalse, autoComplete\u003dfalse, imeOptions\u003d0, privateImeOptions\u003dnull, actionName\u003dUNSPECIFIED, actionLabel\u003dnull, initialSelStart\u003d-1, initialSelEnd\u003d-1, initialCapsMode\u003d0, label\u003dnull, fieldId\u003d0, fieldName\u003dnull, extras\u003dnull, hintText\u003dnull, hintLocales\u003d[]}}, false)"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 721,
+        "tid": 757,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "ImeTracker",
+        "timestamp": {
+          "seconds": 1763229907,
+          "nanos": 373959500
+        }
+      },
+      "message": "system_server:27099381: onCancelled at PHASE_SERVER_SHOULD_HIDE"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 1475,
+        "tid": 1475,
+        "applicationId": "com.google.android.inputmethod.latin",
+        "processName": "com.google.android.inputmethod.latin",
+        "tag": "Module",
+        "timestamp": {
+          "seconds": 1763229907,
+          "nanos": 376675600
+        }
+      },
+      "message": "DeviceLockedStatusModuleProvider$Module.updateDeviceLockedStatus():100 repeatCheckTimes \u003d 1, locked \u003d false"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 721,
+        "tid": 977,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "BackgroundInstallControlService",
+        "timestamp": {
+          "seconds": 1763229907,
+          "nanos": 378825200
+        }
+      },
+      "message": "Package event received: 0"
+    },
+    {
+      "header": {
+        "logLevel": "WARN",
+        "pid": 721,
+        "tid": 1890,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "PackageConfigPersister",
+        "timestamp": {
+          "seconds": 1763229907,
+          "nanos": 384619900
+        }
+      },
+      "message": "App-specific configuration not found for packageName: com.example.citiway and userId: 0"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 1449,
+        "tid": 1735,
+        "applicationId": "com.google.android.gms.persistent",
+        "processName": "com.google.android.gms.persistent",
+        "tag": "FontLog",
+        "timestamp": {
+          "seconds": 1763229907,
+          "nanos": 403353500
+        }
+      },
+      "message": "(REDACTED) Received query %s, URI %s"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 1449,
+        "tid": 1735,
+        "applicationId": "com.google.android.gms.persistent",
+        "processName": "com.google.android.gms.persistent",
+        "tag": "FontLog",
+        "timestamp": {
+          "seconds": 1763229907,
+          "nanos": 405014800
+        }
+      },
+      "message": "(REDACTED) Query [%s] resolved to %s"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 1449,
+        "tid": 1735,
+        "applicationId": "com.google.android.gms.persistent",
+        "processName": "com.google.android.gms.persistent",
+        "tag": "FontLog",
+        "timestamp": {
+          "seconds": 1763229907,
+          "nanos": 415337400
+        }
+      },
+      "message": "(REDACTED) Fetch %s end status %s"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 1449,
+        "tid": 1735,
+        "applicationId": "com.google.android.gms.persistent",
+        "processName": "com.google.android.gms.persistent",
+        "tag": "FontLog",
+        "timestamp": {
+          "seconds": 1763229907,
+          "nanos": 422662800
+        }
+      },
+      "message": "(REDACTED) Pulling font file for id \u003d %d, cache size \u003d %d"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 30021,
+        "tid": 30021,
+        "applicationId": "com.example.citiway",
+        "processName": "com.example.citiway",
+        "tag": "BackStackLog",
+        "timestamp": {
+          "seconds": 1763229907,
+          "nanos": 438241500
+        }
+      },
+      "message": "BackStack: "
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 1449,
+        "tid": 1735,
+        "applicationId": "com.google.android.gms.persistent",
+        "processName": "com.google.android.gms.persistent",
+        "tag": "FontLog",
+        "timestamp": {
+          "seconds": 1763229907,
+          "nanos": 438521800
+        }
+      },
+      "message": "(REDACTED) Pulling font file for id \u003d %d, cache size \u003d %d"
+    },
+    {
+      "header": {
+        "logLevel": "WARN",
+        "pid": 615,
+        "tid": 16808,
+        "applicationId": "cameraserver",
+        "processName": "cameraserver",
+        "tag": "IPCThreadState",
+        "timestamp": {
+          "seconds": 1763229907,
+          "nanos": 669676700
+        }
+      },
+      "message": "Sending oneway calls to frozen process."
+    },
+    {
+      "header": {
+        "logLevel": "WARN",
+        "pid": 615,
+        "tid": 16808,
+        "applicationId": "cameraserver",
+        "processName": "cameraserver",
+        "tag": "IPCThreadState",
+        "timestamp": {
+          "seconds": 1763229907,
+          "nanos": 670337900
+        }
+      },
+      "message": "Sending oneway calls to frozen process."
+    },
+    {
+      "header": {
+        "logLevel": "WARN",
+        "pid": 615,
+        "tid": 16808,
+        "applicationId": "cameraserver",
+        "processName": "cameraserver",
+        "tag": "IPCThreadState",
+        "timestamp": {
+          "seconds": 1763229907,
+          "nanos": 670595700
+        }
+      },
+      "message": "Sending oneway calls to frozen process."
+    },
+    {
+      "header": {
+        "logLevel": "WARN",
+        "pid": 1023,
+        "tid": 1031,
+        "applicationId": "com.android.systemui",
+        "processName": "com.android.systemui",
+        "tag": "System",
+        "timestamp": {
+          "seconds": 1763229907,
+          "nanos": 854624000
+        }
+      },
+      "message": "A resource failed to call release. "
+    },
+    {
+      "header": {
+        "logLevel": "WARN",
+        "pid": 1023,
+        "tid": 1031,
+        "applicationId": "com.android.systemui",
+        "processName": "com.android.systemui",
+        "tag": "System",
+        "timestamp": {
+          "seconds": 1763229907,
+          "nanos": 854706900
+        }
+      },
+      "message": "A resource failed to call release. "
+    },
+    {
+      "header": {
+        "logLevel": "WARN",
+        "pid": 1023,
+        "tid": 1031,
+        "applicationId": "com.android.systemui",
+        "processName": "com.android.systemui",
+        "tag": "System",
+        "timestamp": {
+          "seconds": 1763229907,
+          "nanos": 854728900
+        }
+      },
+      "message": "A resource failed to call release. "
+    },
+    {
+      "header": {
+        "logLevel": "WARN",
+        "pid": 1023,
+        "tid": 1031,
+        "applicationId": "com.android.systemui",
+        "processName": "com.android.systemui",
+        "tag": "System",
+        "timestamp": {
+          "seconds": 1763229907,
+          "nanos": 854745400
+        }
+      },
+      "message": "A resource failed to call release. "
+    },
+    {
+      "header": {
+        "logLevel": "WARN",
+        "pid": 1023,
+        "tid": 1031,
+        "applicationId": "com.android.systemui",
+        "processName": "com.android.systemui",
+        "tag": "System",
+        "timestamp": {
+          "seconds": 1763229907,
+          "nanos": 854825700
+        }
+      },
+      "message": "A resource failed to call release. "
+    },
+    {
+      "header": {
+        "logLevel": "WARN",
+        "pid": 1023,
+        "tid": 1031,
+        "applicationId": "com.android.systemui",
+        "processName": "com.android.systemui",
+        "tag": "System",
+        "timestamp": {
+          "seconds": 1763229907,
+          "nanos": 854863200
+        }
+      },
+      "message": "A resource failed to call release. "
+    },
+    {
+      "header": {
+        "logLevel": "WARN",
+        "pid": 1023,
+        "tid": 1031,
+        "applicationId": "com.android.systemui",
+        "processName": "com.android.systemui",
+        "tag": "System",
+        "timestamp": {
+          "seconds": 1763229907,
+          "nanos": 854883200
+        }
+      },
+      "message": "A resource failed to call release. "
+    },
+    {
+      "header": {
+        "logLevel": "WARN",
+        "pid": 1023,
+        "tid": 1031,
+        "applicationId": "com.android.systemui",
+        "processName": "com.android.systemui",
+        "tag": "System",
+        "timestamp": {
+          "seconds": 1763229907,
+          "nanos": 854898800
+        }
+      },
+      "message": "A resource failed to call release. "
+    },
+    {
+      "header": {
+        "logLevel": "WARN",
+        "pid": 1023,
+        "tid": 1031,
+        "applicationId": "com.android.systemui",
+        "processName": "com.android.systemui",
+        "tag": "System",
+        "timestamp": {
+          "seconds": 1763229907,
+          "nanos": 855381700
+        }
+      },
+      "message": "A resource failed to call release. "
+    },
+    {
+      "header": {
+        "logLevel": "WARN",
+        "pid": 1023,
+        "tid": 1031,
+        "applicationId": "com.android.systemui",
+        "processName": "com.android.systemui",
+        "tag": "System",
+        "timestamp": {
+          "seconds": 1763229907,
+          "nanos": 855660100
+        }
+      },
+      "message": "A resource failed to call release. "
+    },
+    {
+      "header": {
+        "logLevel": "WARN",
+        "pid": 1023,
+        "tid": 1031,
+        "applicationId": "com.android.systemui",
+        "processName": "com.android.systemui",
+        "tag": "System",
+        "timestamp": {
+          "seconds": 1763229907,
+          "nanos": 856248700
+        }
+      },
+      "message": "A resource failed to call release. "
+    },
+    {
+      "header": {
+        "logLevel": "WARN",
+        "pid": 1023,
+        "tid": 1031,
+        "applicationId": "com.android.systemui",
+        "processName": "com.android.systemui",
+        "tag": "System",
+        "timestamp": {
+          "seconds": 1763229907,
+          "nanos": 858525300
+        }
+      },
+      "message": "A resource failed to call release. "
+    },
+    {
+      "header": {
+        "logLevel": "WARN",
+        "pid": 1023,
+        "tid": 1031,
+        "applicationId": "com.android.systemui",
+        "processName": "com.android.systemui",
+        "tag": "System",
+        "timestamp": {
+          "seconds": 1763229907,
+          "nanos": 858683100
+        }
+      },
+      "message": "A resource failed to call release. "
+    },
+    {
+      "header": {
+        "logLevel": "WARN",
+        "pid": 1023,
+        "tid": 1031,
+        "applicationId": "com.android.systemui",
+        "processName": "com.android.systemui",
+        "tag": "System",
+        "timestamp": {
+          "seconds": 1763229907,
+          "nanos": 858738200
+        }
+      },
+      "message": "A resource failed to call release. "
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 1011,
+        "tid": 1011,
+        "applicationId": "wpa_supplicant",
+        "processName": "wpa_supplicant",
+        "tag": "wpa_supplicant",
+        "timestamp": {
+          "seconds": 1763229908,
+          "nanos": 5442100
+        }
+      },
+      "message": "wlan0: CTRL-EVENT-BEACON-LOSS "
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 1449,
+        "tid": 1449,
+        "applicationId": "com.google.android.gms.persistent",
+        "processName": "com.google.android.gms.persistent",
+        "tag": "BoundBrokerSvc",
+        "timestamp": {
+          "seconds": 1763229908,
+          "nanos": 301152000
+        }
+      },
+      "message": "onRebind: Intent { act\u003dcom.google.android.gms.common.telemetry.service.START dat\u003dchimera-action:/... xflg\u003d0x4 cmp\u003dcom.google.android.gms/.chimera.PersistentApiService }"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 30021,
+        "tid": 30021,
+        "applicationId": "com.example.citiway",
+        "processName": "com.example.citiway",
+        "tag": "Choreographer",
+        "timestamp": {
+          "seconds": 1763229909,
+          "nanos": 235648300
+        }
+      },
+      "message": "Skipped 49 frames!  The application may be doing too much work on its main thread."
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 30021,
+        "tid": 30021,
+        "applicationId": "com.example.citiway",
+        "processName": "com.example.citiway",
+        "tag": "BackStackLog",
+        "timestamp": {
+          "seconds": 1763229909,
+          "nanos": 241839000
+        }
+      },
+      "message": "BackStack: root, home, home_screen"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 30021,
+        "tid": 30033,
+        "applicationId": "com.example.citiway",
+        "processName": "com.example.citiway",
+        "tag": "HWUI",
+        "timestamp": {
+          "seconds": 1763229909,
+          "nanos": 279077600
+        }
+      },
+      "message": "Davey! duration\u003d1846ms; Flags\u003d0, FrameTimelineVsyncId\u003d1140862, IntendedVsync\u003d59944348366670, Vsync\u003d59944348366670, InputEventId\u003d0, HandleInputStart\u003d59944352223900, AnimationStart\u003d59944352328900, PerformTraversalsStart\u003d59945327255700, DrawStart\u003d59946074929800, FrameDeadline\u003d59944365033336, FrameStartTime\u003d59944352207900, FrameInterval\u003d16666666, WorkloadTarget\u003d16666666, SyncQueued\u003d59946104691500, SyncStart\u003d59946104932100, IssueDrawCommandsStart\u003d59946105392300, SwapBuffers\u003d59946175977900, FrameCompleted\u003d59946194702200, DequeueBufferDuration\u003d21800, QueueBufferDuration\u003d886800, GpuCompleted\u003d59946194702200, SwapBuffersCompleted\u003d59946177374300, DisplayPresentTime\u003d0, CommandSubmissionCompleted\u003d59946175977900, "
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 30021,
+        "tid": 30048,
+        "applicationId": "com.example.citiway",
+        "processName": "com.example.citiway",
+        "tag": "HWUI",
+        "timestamp": {
+          "seconds": 1763229909,
+          "nanos": 313869300
+        }
+      },
+      "message": "Davey! duration\u003d884ms; Flags\u003d0, FrameTimelineVsyncId\u003d1141134, IntendedVsync\u003d59945331699964, Vsync\u003d59946148366598, InputEventId\u003d0, HandleInputStart\u003d59946161758300, AnimationStart\u003d59946162453900, PerformTraversalsStart\u003d59946179970500, DrawStart\u003d59946180052300, FrameDeadline\u003d59946215033262, FrameStartTime\u003d59946159824700, FrameInterval\u003d16666666, WorkloadTarget\u003d16666666, SyncQueued\u003d59946191978400, SyncStart\u003d59946192328900, IssueDrawCommandsStart\u003d59946192451800, SwapBuffers\u003d59946208086400, FrameCompleted\u003d59946216211500, DequeueBufferDuration\u003d61400, QueueBufferDuration\u003d423600, GpuCompleted\u003d59946216211500, SwapBuffersCompleted\u003d59946210089800, DisplayPresentTime\u003d0, CommandSubmissionCompleted\u003d59946208086400, "
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 30021,
+        "tid": 30087,
+        "applicationId": "com.example.citiway",
+        "processName": "com.example.citiway",
+        "tag": "ProfileInstaller",
+        "timestamp": {
+          "seconds": 1763229910,
+          "nanos": 942438800
+        }
+      },
+      "message": "Installing profile for com.example.citiway"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 721,
+        "tid": 1761,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "CoreBackPreview",
+        "timestamp": {
+          "seconds": 1763229911,
+          "nanos": 36881500
+        }
+      },
+      "message": "Window{1aaa01a u0 com.example.citiway/com.example.citiway.MainActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback\u003dandroid.window.IOnBackInvokedCallback$Stub$Proxy@1d5abd4, mPriority\u003d-1, mIsAnimationCallback\u003dfalse, mOverrideBehavior\u003d0}"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 721,
+        "tid": 1761,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "CoreBackPreview",
+        "timestamp": {
+          "seconds": 1763229911,
+          "nanos": 37041700
+        }
+      },
+      "message": "Window{1aaa01a u0 com.example.citiway/com.example.citiway.MainActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback\u003dandroid.window.IOnBackInvokedCallback$Stub$Proxy@c4cf17d, mPriority\u003d0, mIsAnimationCallback\u003dtrue, mOverrideBehavior\u003d0}"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 721,
+        "tid": 888,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "ImeTracker",
+        "timestamp": {
+          "seconds": 1763229911,
+          "nanos": 276803400
+        }
+      },
+      "message": "com.example.citiway:35fff89c: onRequestHide at ORIGIN_SERVER reason HIDE_UNSPECIFIED_WINDOW fromUser false"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 1475,
+        "tid": 1475,
+        "applicationId": "com.google.android.inputmethod.latin",
+        "processName": "com.google.android.inputmethod.latin",
+        "tag": "GoogleInputMethodService",
+        "timestamp": {
+          "seconds": 1763229911,
+          "nanos": 281447100
+        }
+      },
+      "message": "GoogleInputMethodService.onFinishInput():2043 "
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 721,
+        "tid": 1761,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "ImeTracker",
+        "timestamp": {
+          "seconds": 1763229911,
+          "nanos": 283555400
+        }
+      },
+      "message": "system_server:615d0f52: onRequestHide at ORIGIN_SERVER reason IME_REQUESTED_CHANGED_LISTENER fromUser false"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 1475,
+        "tid": 1475,
+        "applicationId": "com.google.android.inputmethod.latin",
+        "processName": "com.google.android.inputmethod.latin",
+        "tag": "Module",
+        "timestamp": {
+          "seconds": 1763229911,
+          "nanos": 285917600
+        }
+      },
+      "message": "DeviceLockedStatusModuleProvider$Module.updateDeviceLockedStatus():100 repeatCheckTimes \u003d 0, locked \u003d false"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 721,
+        "tid": 757,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "ImeTracker",
+        "timestamp": {
+          "seconds": 1763229911,
+          "nanos": 287051700
+        }
+      },
+      "message": "system_server:615d0f52: onCancelled at PHASE_SERVER_SHOULD_HIDE"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 30021,
+        "tid": 30021,
+        "applicationId": "com.example.citiway",
+        "processName": "com.example.citiway",
+        "tag": "InsetsController",
+        "timestamp": {
+          "seconds": 1763229911,
+          "nanos": 289490700
+        }
+      },
+      "message": "hide(ime(), fromIme\u003dfalse)"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 30021,
+        "tid": 30021,
+        "applicationId": "com.example.citiway",
+        "processName": "com.example.citiway",
+        "tag": "ImeTracker",
+        "timestamp": {
+          "seconds": 1763229911,
+          "nanos": 290947300
+        }
+      },
+      "message": "com.example.citiway:35fff89c: onCancelled at PHASE_CLIENT_ALREADY_HIDDEN"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 1475,
+        "tid": 1475,
+        "applicationId": "com.google.android.inputmethod.latin",
+        "processName": "com.google.android.inputmethod.latin",
+        "tag": "GoogleInputMethodService",
+        "timestamp": {
+          "seconds": 1763229911,
+          "nanos": 293602400
+        }
+      },
+      "message": "GoogleInputMethodService.onStartInput():1293 onStartInput(EditorInfo{EditorInfo{packageName\u003dcom.example.citiway, inputType\u003d0, inputTypeString\u003dNULL, enableLearning\u003dfalse, autoCorrection\u003dfalse, autoComplete\u003dfalse, imeOptions\u003d0, privateImeOptions\u003dnull, actionName\u003dUNSPECIFIED, actionLabel\u003dnull, initialSelStart\u003d-1, initialSelEnd\u003d-1, initialCapsMode\u003d0, label\u003dnull, fieldId\u003d0, fieldName\u003dnull, extras\u003dnull, hintText\u003dnull, hintLocales\u003d[]}}, false)"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 1475,
+        "tid": 1475,
+        "applicationId": "com.google.android.inputmethod.latin",
+        "processName": "com.google.android.inputmethod.latin",
+        "tag": "Module",
+        "timestamp": {
+          "seconds": 1763229911,
+          "nanos": 294998100
+        }
+      },
+      "message": "DeviceLockedStatusModuleProvider$Module.updateDeviceLockedStatus():100 repeatCheckTimes \u003d 1, locked \u003d false"
+    },
+    {
+      "header": {
+        "logLevel": "WARN",
+        "pid": 721,
+        "tid": 1761,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "PackageConfigPersister",
+        "timestamp": {
+          "seconds": 1763229911,
+          "nanos": 296360200
+        }
+      },
+      "message": "App-specific configuration not found for packageName: com.example.citiway and userId: 0"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 30021,
+        "tid": 30021,
+        "applicationId": "com.example.citiway",
+        "processName": "com.example.citiway",
+        "tag": "BackStackLog",
+        "timestamp": {
+          "seconds": 1763229912,
+          "nanos": 791525600
+        }
+      },
+      "message": "BackStack: root, home, home_screen, trips, journey_summary_screen"
+    },
+    {
+      "header": {
+        "logLevel": "WARN",
+        "pid": 30021,
+        "tid": 30021,
+        "applicationId": "com.example.citiway",
+        "processName": "com.example.citiway",
+        "tag": "WindowOnBackDispatcher",
+        "timestamp": {
+          "seconds": 1763229912,
+          "nanos": 833569600
+        }
+      },
+      "message": "sendCancelIfRunning: isInProgress\u003dfalse callback\u003dandroidx.activity.OnBackPressedDispatcher$Api34Impl$createOnBackAnimationCallback$1@6b1a3"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 721,
+        "tid": 1075,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "CoreBackPreview",
+        "timestamp": {
+          "seconds": 1763229912,
+          "nanos": 834592000
+        }
+      },
+      "message": "Window{1aaa01a u0 com.example.citiway/com.example.citiway.MainActivity}: Setting back callback null"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 30021,
+        "tid": 30036,
+        "applicationId": "com.example.citiway",
+        "processName": "com.example.citiway",
+        "tag": "HWUI",
+        "timestamp": {
+          "seconds": 1763229912,
+          "nanos": 856713400
+        }
+      },
+      "message": "endAllActiveAnimators on 0x75458de68d70 (UnprojectedRipple) with handle 0x75463de762e0"
+    },
+    {
+      "header": {
+        "logLevel": "VERBOSE",
+        "pid": 721,
+        "tid": 757,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "WindowManager",
+        "timestamp": {
+          "seconds": 1763229912,
+          "nanos": 882443400
+        }
+      },
+      "message": "Unknown focus tokens, dropping reportFocusChanged"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 721,
+        "tid": 1075,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "CoreBackPreview",
+        "timestamp": {
+          "seconds": 1763229912,
+          "nanos": 890300700
+        }
+      },
+      "message": "Window{a3668ac u0 com.example.citiway/com.example.citiway.MainActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback\u003dandroid.window.IOnBackInvokedCallback$Stub$Proxy@6909788, mPriority\u003d0, mIsAnimationCallback\u003dtrue, mOverrideBehavior\u003d0}"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 721,
+        "tid": 758,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "ImeTracker",
+        "timestamp": {
+          "seconds": 1763229913,
+          "nanos": 31504700
+        }
+      },
+      "message": "system_server:88f50308: onRequestHide at ORIGIN_SERVER reason IME_REQUESTED_CHANGED_LISTENER fromUser false"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 721,
+        "tid": 757,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "ImeTracker",
+        "timestamp": {
+          "seconds": 1763229913,
+          "nanos": 35037400
+        }
+      },
+      "message": "system_server:88f50308: onCancelled at PHASE_SERVER_SHOULD_HIDE"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 721,
+        "tid": 888,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "ImeTracker",
+        "timestamp": {
+          "seconds": 1763229913,
+          "nanos": 73549100
+        }
+      },
+      "message": "com.example.citiway:ddd9248c: onRequestHide at ORIGIN_SERVER reason HIDE_UNSPECIFIED_WINDOW fromUser false"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 1475,
+        "tid": 1475,
+        "applicationId": "com.google.android.inputmethod.latin",
+        "processName": "com.google.android.inputmethod.latin",
+        "tag": "GoogleInputMethodService",
+        "timestamp": {
+          "seconds": 1763229913,
+          "nanos": 85484700
+        }
+      },
+      "message": "GoogleInputMethodService.onFinishInput():2043 "
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 721,
+        "tid": 1075,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "ImeTracker",
+        "timestamp": {
+          "seconds": 1763229913,
+          "nanos": 89372900
+        }
+      },
+      "message": "system_server:79d67efd: onRequestHide at ORIGIN_SERVER reason IME_REQUESTED_CHANGED_LISTENER fromUser false"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 1475,
+        "tid": 1475,
+        "applicationId": "com.google.android.inputmethod.latin",
+        "processName": "com.google.android.inputmethod.latin",
+        "tag": "Module",
+        "timestamp": {
+          "seconds": 1763229913,
+          "nanos": 89575400
+        }
+      },
+      "message": "DeviceLockedStatusModuleProvider$Module.updateDeviceLockedStatus():100 repeatCheckTimes \u003d 0, locked \u003d false"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 721,
+        "tid": 757,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "ImeTracker",
+        "timestamp": {
+          "seconds": 1763229913,
+          "nanos": 92854300
+        }
+      },
+      "message": "system_server:79d67efd: onCancelled at PHASE_SERVER_SHOULD_HIDE"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 1475,
+        "tid": 1475,
+        "applicationId": "com.google.android.inputmethod.latin",
+        "processName": "com.google.android.inputmethod.latin",
+        "tag": "GoogleInputMethodService",
+        "timestamp": {
+          "seconds": 1763229913,
+          "nanos": 99288900
+        }
+      },
+      "message": "GoogleInputMethodService.onStartInput():1293 onStartInput(EditorInfo{EditorInfo{packageName\u003dcom.example.citiway, inputType\u003d0, inputTypeString\u003dNULL, enableLearning\u003dfalse, autoCorrection\u003dfalse, autoComplete\u003dfalse, imeOptions\u003d0, privateImeOptions\u003dnull, actionName\u003dUNSPECIFIED, actionLabel\u003dnull, initialSelStart\u003d-1, initialSelEnd\u003d-1, initialCapsMode\u003d0, label\u003dnull, fieldId\u003d0, fieldName\u003dnull, extras\u003dnull, hintText\u003dnull, hintLocales\u003d[]}}, false)"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 1475,
+        "tid": 1475,
+        "applicationId": "com.google.android.inputmethod.latin",
+        "processName": "com.google.android.inputmethod.latin",
+        "tag": "Module",
+        "timestamp": {
+          "seconds": 1763229913,
+          "nanos": 101969600
+        }
+      },
+      "message": "DeviceLockedStatusModuleProvider$Module.updateDeviceLockedStatus():100 repeatCheckTimes \u003d 1, locked \u003d false"
+    },
+    {
+      "header": {
+        "logLevel": "WARN",
+        "pid": 721,
+        "tid": 1075,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "PackageConfigPersister",
+        "timestamp": {
+          "seconds": 1763229913,
+          "nanos": 104891300
+        }
+      },
+      "message": "App-specific configuration not found for packageName: com.example.citiway and userId: 0"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 30021,
+        "tid": 30021,
+        "applicationId": "com.example.citiway",
+        "processName": "com.example.citiway",
+        "tag": "InsetsController",
+        "timestamp": {
+          "seconds": 1763229913,
+          "nanos": 151596100
+        }
+      },
+      "message": "hide(ime(), fromIme\u003dfalse)"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 30021,
+        "tid": 30021,
+        "applicationId": "com.example.citiway",
+        "processName": "com.example.citiway",
+        "tag": "ImeTracker",
+        "timestamp": {
+          "seconds": 1763229913,
+          "nanos": 152165200
+        }
+      },
+      "message": "com.example.citiway:ddd9248c: onCancelled at PHASE_CLIENT_ALREADY_HIDDEN"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 30021,
+        "tid": 30021,
+        "applicationId": "com.example.citiway",
+        "processName": "com.example.citiway",
+        "tag": "JourneyViewModel",
+        "timestamp": {
+          "seconds": 1763229913,
+          "nanos": 164068700
+        }
+      },
+      "message": "✅ Journey loaded for trip ID: 14"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 1449,
+        "tid": 1449,
+        "applicationId": "com.google.android.gms.persistent",
+        "processName": "com.google.android.gms.persistent",
+        "tag": "BoundBrokerSvc",
+        "timestamp": {
+          "seconds": 1763229913,
+          "nanos": 334668700
+        }
+      },
+      "message": "onUnbind: Intent { act\u003dcom.google.android.gms.common.telemetry.service.START dat\u003dchimera-action:/... xflg\u003d0x4 cmp\u003dcom.google.android.gms/.chimera.PersistentApiService }"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 1191,
+        "tid": 1392,
+        "applicationId": "com.android.phone",
+        "processName": "com.android.phone",
+        "tag": "SatelliteController",
+        "timestamp": {
+          "seconds": 1763229914,
+          "nanos": 262857200
+        }
+      },
+      "message": "iisInCarrierRoamingNbIotNtn: satellite is disabled"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 1023,
+        "tid": 1089,
+        "applicationId": "com.android.systemui",
+        "processName": "com.android.systemui",
+        "tag": "ShellBackPreview",
+        "timestamp": {
+          "seconds": 1763229914,
+          "nanos": 996656000
+        }
+      },
+      "message": "Finishing gesture with event action: 1"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 1023,
+        "tid": 1089,
+        "applicationId": "com.android.systemui",
+        "processName": "com.android.systemui",
+        "tag": "ShellBackPreview",
+        "timestamp": {
+          "seconds": 1763229914,
+          "nanos": 996691800
+        }
+      },
+      "message": "onGestureFinished called while no gesture is started"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 30021,
+        "tid": 30021,
+        "applicationId": "com.example.citiway",
+        "processName": "com.example.citiway",
+        "tag": "BackStackLog",
+        "timestamp": {
+          "seconds": 1763229915,
+          "nanos": 10781300
+        }
+      },
+      "message": "BackStack: root, home, home_screen"
+    },
+    {
+      "header": {
+        "logLevel": "WARN",
+        "pid": 30021,
+        "tid": 30021,
+        "applicationId": "com.example.citiway",
+        "processName": "com.example.citiway",
+        "tag": "WindowOnBackDispatcher",
+        "timestamp": {
+          "seconds": 1763229915,
+          "nanos": 52045600
+        }
+      },
+      "message": "sendCancelIfRunning: isInProgress\u003dfalse callback\u003dandroidx.activity.OnBackPressedDispatcher$Api34Impl$createOnBackAnimationCallback$1@92ac94d"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 721,
+        "tid": 1890,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "CoreBackPreview",
+        "timestamp": {
+          "seconds": 1763229915,
+          "nanos": 54262900
+        }
+      },
+      "message": "Window{a3668ac u0 com.example.citiway/com.example.citiway.MainActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback\u003dandroid.window.IOnBackInvokedCallback$Stub$Proxy@f691015, mPriority\u003d-1, mIsAnimationCallback\u003dfalse, mOverrideBehavior\u003d0}"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 30021,
+        "tid": 30021,
+        "applicationId": "com.example.citiway",
+        "processName": "com.example.citiway",
+        "tag": "Choreographer",
+        "timestamp": {
+          "seconds": 1763229915,
+          "nanos": 769904900
+        }
+      },
+      "message": "Skipped 41 frames!  The application may be doing too much work on its main thread."
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 1011,
+        "tid": 1011,
+        "applicationId": "wpa_supplicant",
+        "processName": "wpa_supplicant",
+        "tag": "wpa_supplicant",
+        "timestamp": {
+          "seconds": 1763229915,
+          "nanos": 943074600
+        }
+      },
+      "message": "wlan0: CTRL-EVENT-BEACON-LOSS "
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 721,
+        "tid": 1761,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "CoreBackPreview",
+        "timestamp": {
+          "seconds": 1763229916,
+          "nanos": 665613200
+        }
+      },
+      "message": "Window{ea511b u0 com.example.citiway/com.example.citiway.MainActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback\u003dandroid.window.IOnBackInvokedCallback$Stub$Proxy@bcc2ccd, mPriority\u003d-1, mIsAnimationCallback\u003dfalse, mOverrideBehavior\u003d0}"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 721,
+        "tid": 1761,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "CoreBackPreview",
+        "timestamp": {
+          "seconds": 1763229916,
+          "nanos": 665997100
+        }
+      },
+      "message": "Window{ea511b u0 com.example.citiway/com.example.citiway.MainActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback\u003dandroid.window.IOnBackInvokedCallback$Stub$Proxy@f23b982, mPriority\u003d0, mIsAnimationCallback\u003dtrue, mOverrideBehavior\u003d0}"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 721,
+        "tid": 888,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "ImeTracker",
+        "timestamp": {
+          "seconds": 1763229916,
+          "nanos": 818647300
+        }
+      },
+      "message": "com.example.citiway:df4116c9: onRequestHide at ORIGIN_SERVER reason HIDE_UNSPECIFIED_WINDOW fromUser false"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 30021,
+        "tid": 30021,
+        "applicationId": "com.example.citiway",
+        "processName": "com.example.citiway",
+        "tag": "InsetsController",
+        "timestamp": {
+          "seconds": 1763229916,
+          "nanos": 820947800
+        }
+      },
+      "message": "hide(ime(), fromIme\u003dfalse)"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 30021,
+        "tid": 30021,
+        "applicationId": "com.example.citiway",
+        "processName": "com.example.citiway",
+        "tag": "ImeTracker",
+        "timestamp": {
+          "seconds": 1763229916,
+          "nanos": 821247300
+        }
+      },
+      "message": "com.example.citiway:df4116c9: onCancelled at PHASE_CLIENT_ALREADY_HIDDEN"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 1475,
+        "tid": 1475,
+        "applicationId": "com.google.android.inputmethod.latin",
+        "processName": "com.google.android.inputmethod.latin",
+        "tag": "GoogleInputMethodService",
+        "timestamp": {
+          "seconds": 1763229916,
+          "nanos": 824173700
+        }
+      },
+      "message": "GoogleInputMethodService.onFinishInput():2043 "
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 1475,
+        "tid": 1475,
+        "applicationId": "com.google.android.inputmethod.latin",
+        "processName": "com.google.android.inputmethod.latin",
+        "tag": "Module",
+        "timestamp": {
+          "seconds": 1763229916,
+          "nanos": 825352100
+        }
+      },
+      "message": "DeviceLockedStatusModuleProvider$Module.updateDeviceLockedStatus():100 repeatCheckTimes \u003d 0, locked \u003d false"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 721,
+        "tid": 1075,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "ImeTracker",
+        "timestamp": {
+          "seconds": 1763229916,
+          "nanos": 826046100
+        }
+      },
+      "message": "system_server:68cd0835: onRequestHide at ORIGIN_SERVER reason IME_REQUESTED_CHANGED_LISTENER fromUser false"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 721,
+        "tid": 757,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "ImeTracker",
+        "timestamp": {
+          "seconds": 1763229916,
+          "nanos": 827237100
+        }
+      },
+      "message": "system_server:68cd0835: onCancelled at PHASE_SERVER_SHOULD_HIDE"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 1475,
+        "tid": 1475,
+        "applicationId": "com.google.android.inputmethod.latin",
+        "processName": "com.google.android.inputmethod.latin",
+        "tag": "GoogleInputMethodService",
+        "timestamp": {
+          "seconds": 1763229916,
+          "nanos": 829022000
+        }
+      },
+      "message": "GoogleInputMethodService.onStartInput():1293 onStartInput(EditorInfo{EditorInfo{packageName\u003dcom.example.citiway, inputType\u003d0, inputTypeString\u003dNULL, enableLearning\u003dfalse, autoCorrection\u003dfalse, autoComplete\u003dfalse, imeOptions\u003d0, privateImeOptions\u003dnull, actionName\u003dUNSPECIFIED, actionLabel\u003dnull, initialSelStart\u003d-1, initialSelEnd\u003d-1, initialCapsMode\u003d0, label\u003dnull, fieldId\u003d0, fieldName\u003dnull, extras\u003dnull, hintText\u003dnull, hintLocales\u003d[]}}, false)"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 1475,
+        "tid": 1475,
+        "applicationId": "com.google.android.inputmethod.latin",
+        "processName": "com.google.android.inputmethod.latin",
+        "tag": "Module",
+        "timestamp": {
+          "seconds": 1763229916,
+          "nanos": 833297800
+        }
+      },
+      "message": "DeviceLockedStatusModuleProvider$Module.updateDeviceLockedStatus():100 repeatCheckTimes \u003d 1, locked \u003d false"
+    },
+    {
+      "header": {
+        "logLevel": "WARN",
+        "pid": 721,
+        "tid": 1075,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "PackageConfigPersister",
+        "timestamp": {
+          "seconds": 1763229916,
+          "nanos": 835442100
+        }
+      },
+      "message": "App-specific configuration not found for packageName: com.example.citiway and userId: 0"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 30021,
+        "tid": 30021,
+        "applicationId": "com.example.citiway",
+        "processName": "com.example.citiway",
+        "tag": "BackStackLog",
+        "timestamp": {
+          "seconds": 1763229917,
+          "nanos": 390642000
+        }
+      },
+      "message": "BackStack: root, home, home_screen, trips, journey_summary_screen"
+    },
+    {
+      "header": {
+        "logLevel": "WARN",
+        "pid": 30021,
+        "tid": 30021,
+        "applicationId": "com.example.citiway",
+        "processName": "com.example.citiway",
+        "tag": "WindowOnBackDispatcher",
+        "timestamp": {
+          "seconds": 1763229917,
+          "nanos": 401646600
+        }
+      },
+      "message": "sendCancelIfRunning: isInProgress\u003dfalse callback\u003dandroidx.activity.OnBackPressedDispatcher$Api34Impl$createOnBackAnimationCallback$1@aa0c7c1"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 721,
+        "tid": 1075,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "CoreBackPreview",
+        "timestamp": {
+          "seconds": 1763229917,
+          "nanos": 402018800
+        }
+      },
+      "message": "Window{ea511b u0 com.example.citiway/com.example.citiway.MainActivity}: Setting back callback null"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 30021,
+        "tid": 30036,
+        "applicationId": "com.example.citiway",
+        "processName": "com.example.citiway",
+        "tag": "HWUI",
+        "timestamp": {
+          "seconds": 1763229917,
+          "nanos": 429644700
+        }
+      },
+      "message": "endAllActiveAnimators on 0x75458de89070 (UnprojectedRipple) with handle 0x75463de7a3f0"
+    },
+    {
+      "header": {
+        "logLevel": "VERBOSE",
+        "pid": 721,
+        "tid": 757,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "WindowManager",
+        "timestamp": {
+          "seconds": 1763229917,
+          "nanos": 446212100
+        }
+      },
+      "message": "Unknown focus tokens, dropping reportFocusChanged"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 721,
+        "tid": 1075,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "CoreBackPreview",
+        "timestamp": {
+          "seconds": 1763229917,
+          "nanos": 454033400
+        }
+      },
+      "message": "Window{a3668ac u0 com.example.citiway/com.example.citiway.MainActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback\u003dandroid.window.IOnBackInvokedCallback$Stub$Proxy@bc3fc83, mPriority\u003d0, mIsAnimationCallback\u003dtrue, mOverrideBehavior\u003d0}"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 721,
+        "tid": 758,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "ImeTracker",
+        "timestamp": {
+          "seconds": 1763229917,
+          "nanos": 599399900
+        }
+      },
+      "message": "system_server:b76e6ca6: onRequestHide at ORIGIN_SERVER reason IME_REQUESTED_CHANGED_LISTENER fromUser false"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 721,
+        "tid": 757,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "ImeTracker",
+        "timestamp": {
+          "seconds": 1763229917,
+          "nanos": 602296000
+        }
+      },
+      "message": "system_server:b76e6ca6: onCancelled at PHASE_SERVER_SHOULD_HIDE"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 721,
+        "tid": 888,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "ImeTracker",
+        "timestamp": {
+          "seconds": 1763229917,
+          "nanos": 746268800
+        }
+      },
+      "message": "com.example.citiway:d9361077: onRequestHide at ORIGIN_SERVER reason HIDE_UNSPECIFIED_WINDOW fromUser false"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 1475,
+        "tid": 1475,
+        "applicationId": "com.google.android.inputmethod.latin",
+        "processName": "com.google.android.inputmethod.latin",
+        "tag": "GoogleInputMethodService",
+        "timestamp": {
+          "seconds": 1763229917,
+          "nanos": 756691100
+        }
+      },
+      "message": "GoogleInputMethodService.onFinishInput():2043 "
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 721,
+        "tid": 1761,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "ImeTracker",
+        "timestamp": {
+          "seconds": 1763229917,
+          "nanos": 760397200
+        }
+      },
+      "message": "system_server:b35d345: onRequestHide at ORIGIN_SERVER reason IME_REQUESTED_CHANGED_LISTENER fromUser false"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 1475,
+        "tid": 1475,
+        "applicationId": "com.google.android.inputmethod.latin",
+        "processName": "com.google.android.inputmethod.latin",
+        "tag": "Module",
+        "timestamp": {
+          "seconds": 1763229917,
+          "nanos": 761844800
+        }
+      },
+      "message": "DeviceLockedStatusModuleProvider$Module.updateDeviceLockedStatus():100 repeatCheckTimes \u003d 0, locked \u003d false"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 721,
+        "tid": 757,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "ImeTracker",
+        "timestamp": {
+          "seconds": 1763229917,
+          "nanos": 765262200
+        }
+      },
+      "message": "system_server:b35d345: onCancelled at PHASE_SERVER_SHOULD_HIDE"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 1475,
+        "tid": 1475,
+        "applicationId": "com.google.android.inputmethod.latin",
+        "processName": "com.google.android.inputmethod.latin",
+        "tag": "GoogleInputMethodService",
+        "timestamp": {
+          "seconds": 1763229917,
+          "nanos": 768071700
+        }
+      },
+      "message": "GoogleInputMethodService.onStartInput():1293 onStartInput(EditorInfo{EditorInfo{packageName\u003dcom.example.citiway, inputType\u003d0, inputTypeString\u003dNULL, enableLearning\u003dfalse, autoCorrection\u003dfalse, autoComplete\u003dfalse, imeOptions\u003d0, privateImeOptions\u003dnull, actionName\u003dUNSPECIFIED, actionLabel\u003dnull, initialSelStart\u003d-1, initialSelEnd\u003d-1, initialCapsMode\u003d0, label\u003dnull, fieldId\u003d0, fieldName\u003dnull, extras\u003dnull, hintText\u003dnull, hintLocales\u003d[]}}, false)"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 1475,
+        "tid": 1475,
+        "applicationId": "com.google.android.inputmethod.latin",
+        "processName": "com.google.android.inputmethod.latin",
+        "tag": "Module",
+        "timestamp": {
+          "seconds": 1763229917,
+          "nanos": 771022500
+        }
+      },
+      "message": "DeviceLockedStatusModuleProvider$Module.updateDeviceLockedStatus():100 repeatCheckTimes \u003d 1, locked \u003d false"
+    },
+    {
+      "header": {
+        "logLevel": "WARN",
+        "pid": 721,
+        "tid": 1761,
+        "applicationId": "system_server",
+        "processName": "system_server",
+        "tag": "PackageConfigPersister",
+        "timestamp": {
+          "seconds": 1763229917,
+          "nanos": 773165700
+        }
+      },
+      "message": "App-specific configuration not found for packageName: com.example.citiway and userId: 0"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 30021,
+        "tid": 30021,
+        "applicationId": "com.example.citiway",
+        "processName": "com.example.citiway",
+        "tag": "InsetsController",
+        "timestamp": {
+          "seconds": 1763229917,
+          "nanos": 783041800
+        }
+      },
+      "message": "hide(ime(), fromIme\u003dfalse)"
+    },
+    {
+      "header": {
+        "logLevel": "INFO",
+        "pid": 30021,
+        "tid": 30021,
+        "applicationId": "com.example.citiway",
+        "processName": "com.example.citiway",
+        "tag": "ImeTracker",
+        "timestamp": {
+          "seconds": 1763229917,
+          "nanos": 783122100
+        }
+      },
+      "message": "com.example.citiway:d9361077: onCancelled at PHASE_CLIENT_ALREADY_HIDDEN"
+    },
+    {
+      "header": {
+        "logLevel": "DEBUG",
+        "pid": 30021,
+        "tid": 30021,
+        "applicationId": "com.example.citiway",
+        "processName": "com.example.citiway",
+        "tag": "JourneyViewModel",
+        "timestamp": {
+          "seconds": 1763229917,
+          "nanos": 783443300
+        }
+      },
+      "message": "✅ Journey loaded for trip ID: 13"
+    }
+  ]
+}
