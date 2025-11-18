@@ -334,6 +334,19 @@ fun ModernSettingsMenu(
                         }
                     )
 
+                    HorizontalDivider()
+
+                    // Favourites Page
+                    // Clicking navigates to favourites
+                    MenuItemClickable(
+                        title = "Stats????????.",
+                        subtitle = "stats of journeys",
+                        onClick = {
+                            onDismiss()
+                            navController.navigate(Screen.Stats.route)
+                        }
+                    )
+
 
                     HorizontalDivider()
 

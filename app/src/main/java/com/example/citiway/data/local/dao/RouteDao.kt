@@ -41,4 +41,15 @@ interface RouteDao {
 
     @Query("DELETE FROM route")
     suspend fun deleteAllRoutes()
+
+    /**
+     * Get routes by trip IDs and provider
+     * This is used for calculating transport statistics
+     */
+    @Query("""
+        SELECT * FROM route 
+        WHERE trip_id IN (:tripIds) 
+        AND provider_id = :providerId
+    """)
+    suspend fun getRoutesByTripIdsAndProvider(tripIds: List<Int>, providerId: Int): List<Route>
 }

@@ -285,7 +285,8 @@ class JourneyViewModel(
             arrivalTime = journey.arrival_time?.let { Instant.parse(it) },
             distanceMeters = journey.distance_meters,
             fareTotal = trip?.total_fare ?: 0.0,  // Get fare from Trip table
-            totalStopsCount = journey.total_stops_count
+            totalStopsCount = journey.total_stops_count,
+            totalWalkDistanceMeters = journey.total_walk_distance_meters
         )
     }
 
@@ -577,11 +578,13 @@ class JourneyViewModel(
         val startTime = Instant.now()
         val arrivalTime = calculateArrivalTime(steps)
         var stopsCount = 0
+        var totalWalkDistanceMeters = 0
 
         steps.forEachIndexed { index, step ->
             when (step.travelMode) {
                 "WALK" -> {
                     distance += step.distanceMeters
+                    totalWalkDistanceMeters += step.distanceMeters
                     duration += step.staticDuration.toSecondsInt()
                     fromMode = "WALK"
                 }
@@ -692,7 +695,7 @@ class JourneyViewModel(
             instructions.add(Instruction("Walk ${distance}m", duration / 60, "WALK"))
         }
 
-        return Journey(stops, instructions, startTime, arrivalTime, distanceMeters, fareTotal, stopsCount)
+        return Journey(stops, instructions, startTime, arrivalTime, distanceMeters, fareTotal, stopsCount, totalWalkDistanceMeters)
     }
 
     /**
@@ -729,6 +732,7 @@ class JourneyViewModel(
                     arrival_time = currentJourney.arrivalTime?.toString(),
                     distance_meters = currentJourney.distanceMeters,
                     total_stops_count = currentJourney.totalStopsCount,
+                    total_walk_distance_meters = currentJourney.totalWalkDistanceMeters,
                     // Saving co-ords
                     start_lat = startLocation.latLng.latitude,
                     start_lng = startLocation.latLng.longitude,
@@ -1078,7 +1082,8 @@ data class Journey(
     val arrivalTime: Instant?,
     val distanceMeters: Int,
     val fareTotal: Double,
-    val totalStopsCount: Int = 0
+    val totalStopsCount: Int = 0,
+    val totalWalkDistanceMeters: Int = 0
 )
 
 data class Stop(

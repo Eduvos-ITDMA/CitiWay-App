@@ -16,6 +16,7 @@ sealed class Screen(val route: String) {
     object JourneySummary : Screen(route = "journey_summary_screen")
     object Help : Screen(route = "help_screen")
     object JourneyHistory : Screen(route = "journey_history_screen")
+    object Stats : Screen(route = "stats_screen")
     object Splash : Screen(route = "splash_screen")
     object Onboarding : Screen(route = "onboarding_screen") // New screen for onboarding
 }
@@ -44,6 +45,7 @@ val ScreenToGraphMap: Map<String, String> = mapOf(
     Screen.Favourites.route to HOME_ROUTE,
     Screen.Help.route to HOME_ROUTE,
     Screen.JourneyHistory.route to HOME_ROUTE,
+    Screen.Stats.route to HOME_ROUTE,
 
     // JOURNEY_SELECTION_ROUTE graph
     Screen.DestinationSelection.route to JOURNEY_SELECTION_ROUTE,

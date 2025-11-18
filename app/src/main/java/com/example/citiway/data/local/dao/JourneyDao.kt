@@ -15,4 +15,15 @@ interface JourneyDao {
 
     @Query("DELETE FROM journeys WHERE journey_id = :journeyId")
     suspend fun deleteJourney(journeyId: Int)
+
+    /**
+     * Get all journeys for specific trip IDs
+     * @param tripIds List of trip IDs
+     */
+    @Query("""
+        SELECT * FROM journeys 
+        WHERE trip_id IN (:tripIds)
+    """)
+    suspend fun getJourneysByTripIds(tripIds: List<Int>): List<Journey>
+
 }
