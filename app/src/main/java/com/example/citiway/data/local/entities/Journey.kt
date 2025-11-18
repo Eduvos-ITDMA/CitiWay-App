@@ -15,5 +15,11 @@ data class Journey(
     val distance_meters: Int,
     val total_stops_count: Int,
 
+    // Store the actual coordinates used for routing - satisfies JourneyOptions
+    val start_lat: Double,
+    val start_lng: Double,
+    val dest_lat: Double,
+    val dest_lng: Double,
+
     val created_at: Long = System.currentTimeMillis()
 )

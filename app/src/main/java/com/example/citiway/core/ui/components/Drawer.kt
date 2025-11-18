@@ -272,7 +272,7 @@ fun ModernSettingsMenu(
                         subtitle = "Access Journey History",
                         onClick = {
                             onDismiss()
-                            navController.navigate(Screen.JourneySummary.route)
+                            navController.navigate(Screen.JourneyHistory.route)
                         }
                     )
 

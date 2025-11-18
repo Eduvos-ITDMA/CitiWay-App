@@ -71,16 +71,16 @@ class DatabaseSeeder(private val repository: CitiWayRepository) {
         ))
         println("✅ Created 8 MyCiti fare bands")
 
-        // 4. Create Metrorail fare structure
+        // 4. Create Metrorail fare structure (DISTANCE-BASED but keeping zone info)
         repository.insertMetrorailFares(listOf(
-            MetrorailFare(zone = "Zone 1", ticket_type = "single", fare = 10.00, includes_return = false),
-            MetrorailFare(zone = "Zone 1", ticket_type = "return", fare = 20.00, includes_return = true),
-            MetrorailFare(zone = "Zone 2", ticket_type = "single", fare = 12.00, includes_return = false),
-            MetrorailFare(zone = "Zone 2", ticket_type = "return", fare = 20.00, includes_return = true),
-            MetrorailFare(zone = "Zone 3", ticket_type = "single", fare = 14.00, includes_return = false),
-            MetrorailFare(zone = "Zone 3", ticket_type = "return", fare = 20.00, includes_return = true),
-            MetrorailFare(zone = "Zone 4", ticket_type = "single", fare = 16.00, includes_return = false),
-            MetrorailFare(zone = "Zone 4", ticket_type = "return", fare = 30.00, includes_return = true)
+            MetrorailFare(distance_band_lower_limit = 0, zone = "Zone 1", ticket_type = "single", fare = 10.00, includes_return = false),
+            MetrorailFare(distance_band_lower_limit = 0, zone = "Zone 1", ticket_type = "return", fare = 20.00, includes_return = true),
+            MetrorailFare(distance_band_lower_limit = 15000, zone = "Zone 2", ticket_type = "single", fare = 12.00, includes_return = false),
+            MetrorailFare(distance_band_lower_limit = 15000, zone = "Zone 2", ticket_type = "return", fare = 24.00, includes_return = true),
+            MetrorailFare(distance_band_lower_limit = 40000, zone = "Zone 3", ticket_type = "single", fare = 14.00, includes_return = false),
+            MetrorailFare(distance_band_lower_limit = 40000, zone = "Zone 3", ticket_type = "return", fare = 28.00, includes_return = true),
+            MetrorailFare(distance_band_lower_limit = 60000, zone = "Zone 4", ticket_type = "single", fare = 16.00, includes_return = false),
+            MetrorailFare(distance_band_lower_limit = 60000, zone = "Zone 4", ticket_type = "return", fare = 32.00, includes_return = true)
         ))
         println("✅ Created 8 Metrorail fares (4 zones x 2 ticket types)")
 

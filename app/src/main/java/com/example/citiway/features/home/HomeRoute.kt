@@ -117,41 +117,16 @@ fun HomeRoute(
                 selectedTripStartStop = null
                 selectedTripEndStop = null
             },
-            onStartJourney = { tripId ->  // Changed: now takes tripId instead of startStop, endStop
+            onStartJourney = { tripId ->
                 journeyViewModel.viewModelScope.launch {
-                    try {
-                        val journey = repository.getJourneyByTripId(tripId)
-                        val steps = journey?.let { repository.getStepsForJourney(it.journey_id) }
+                    journeyViewModel.loadJourneyForNavigation(tripId)
+                    //navController.navigate(Screen.JourneySelection.route)
 
-                        val firstStep = steps?.minByOrNull { it.step_order }
-                        val lastStep = steps?.maxByOrNull { it.step_order }
-
-                        val startAddress = firstStep?.stop_name ?: "Unknown"
-                        val endAddress = lastStep?.stop_name ?: "Unknown"
-
-                        val startLocation = SelectedLocation(
-                            latLng = LatLng(0.0, 0.0),
-                            placeId = "",
-                            primaryText = startAddress  // This gets the  address from JourneyStep
-                        )
-                        val destination = SelectedLocation(
-                            latLng = LatLng(0.0, 0.0),
-                            placeId = "",
-                            primaryText = endAddress
-                        )
-
-                        journeyViewModel.setStartLocation(startLocation)
-                        journeyViewModel.setDestination(destination)
-                        navController.navigate(Screen.JourneySelection.route)
-
-                    } catch (e: Exception) {
-                        android.util.Log.e("HomeRoute", "Failed to start journey: ${e.message}")
-                    }
+                    // Clearing state AFTER navigation (inside coroutine)
+                    selectedTripId = null
+                    selectedTripStartStop = null
+                    selectedTripEndStop = null
                 }
-
-                selectedTripId = null
-                selectedTripStartStop = null
-                selectedTripEndStop = null
             }
         )
     }
@@ -185,37 +160,8 @@ fun HomeRoute(
         },
         onStartJourney = { tripId ->
             journeyViewModel.viewModelScope.launch {
-                try {
-                    // Fetch journey and steps from database
-                    val journey = repository.getJourneyByTripId(tripId)
-                    val steps = journey?.let { repository.getStepsForJourney(it.journey_id) }
-
-                    // Get first and last step addresses (same logic as loadJourneyForSummary) NB: refactor to Vm
-                    val firstStep = steps?.minByOrNull { it.step_order }
-                    val lastStep = steps?.maxByOrNull { it.step_order }
-
-                    val startAddress = firstStep?.stop_name ?: "Unknown"
-                    val endAddress = lastStep?.stop_name ?: "Unknown"
-
-                    // Create locations with actual addresses
-                    val startLocation = SelectedLocation(
-                        latLng = LatLng(0.0, 0.0),
-                        placeId = "",
-                        primaryText = startAddress
-                    )
-                    val destination = SelectedLocation(
-                        latLng = LatLng(0.0, 0.0),
-                        placeId = "",
-                        primaryText = endAddress
-                    )
-
-                    journeyViewModel.setStartLocation(startLocation)
-                    journeyViewModel.setDestination(destination)
-                    navController.navigate(Screen.JourneySelection.route)
-
-                } catch (e: Exception) {
-                    Log.e("HomeRoute", "Failed to start journey: ${e.message}")
-                }
+                journeyViewModel.loadJourneyForNavigation(tripId)
+                navController.navigate(Screen.JourneySelection.route)
             }
         }
     )

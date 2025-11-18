@@ -30,6 +30,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalTime
@@ -157,13 +158,13 @@ class JourneyViewModel(
                 // Reconstruct start and end locations from trip data
                 // Use dummy LatLng since we don't need it for summary display in PlacesManager they are non-nullable fields
                 val startLocation = SelectedLocation(
-                    latLng = LatLng(0.0, 0.0),  // Dummy coordinates - not needed for summary
+                    latLng = LatLng(journey.start_lat, journey.start_lng),  // Saved coordinates - not needed for summary
                     placeId = "",                                   // Empty placeId - not needed for summary
                     primaryText = startAddress                      // From JourneyStep
                 )
 
                 val destination = SelectedLocation(
-                    latLng = LatLng(0.0, 0.0),  // Dummy coordinates - not needed for summary
+                    latLng = LatLng(journey.dest_lat, journey.dest_lng),  // Savedd coordinates - not needed for summary
                     placeId = "",                                   // Empty placeId - not needed for summary
                     primaryText = endAddress
                 )
@@ -182,6 +183,57 @@ class JourneyViewModel(
 
             } catch (e: Exception) {
                 Log.e("JourneyViewModel", "❌ Failed to load journey: ${e.message}", e)
+            }
+        }
+    }
+
+    /**
+     * Loads a saved journey's addresses for navigation (restarting a journey)
+     */
+    suspend fun loadJourneyForNavigation(tripId: Int) {
+        withContext(Dispatchers.IO) {  // Doing database work on IO thread
+            try {
+                val journey = repository.getJourneyByTripId(tripId)
+                if (journey == null) {
+                    Log.e("JourneyViewModel", "❌ Journey not found for trip ID: $tripId")
+                    return@withContext
+                }
+
+                val steps = repository.getStepsForJourney(journey.journey_id)
+
+                val firstStep = steps.minByOrNull { it.step_order }
+                val lastStep = steps.maxByOrNull { it.step_order }
+
+                val startAddress = firstStep?.stop_name ?: "Unknown"
+                val endAddress = lastStep?.stop_name ?: "Unknown"
+
+                val startLocation = SelectedLocation(
+                    latLng = LatLng(journey.start_lat, journey.start_lng),
+                    placeId = "",
+                    primaryText = startAddress
+                )
+                val destination = SelectedLocation(
+                    latLng = LatLng(journey.dest_lat, journey.dest_lng),
+                    placeId = "",
+                    primaryText = endAddress
+                )
+
+                withContext(Dispatchers.Main) {  // Updates state on Main thread
+                    setStartLocation(startLocation)
+                    setDestination(destination)
+                }
+
+                Log.d(
+                    "JourneyViewModel",
+                    "✅ Journey loaded for navigation: $startAddress → $endAddress"
+                )
+
+            } catch (e: Exception) {
+                Log.e(
+                    "JourneyViewModel",
+                    "❌ Failed to load journey for navigation: ${e.message}",
+                    e
+                )
             }
         }
     }
@@ -317,14 +369,12 @@ class JourneyViewModel(
         _state.update {
             it.copy(journeyOptions = options, routesResponse = routesResponse)
         }
-        recalculateRoutes = true
     }
 
     private fun clearJourneyOptions() {
         _state.update {
             it.copy(journeyOptions = null, routesResponse = null)
         }
-        recalculateRoutes = true
     }
 
     fun setJourney(id: String) {
@@ -672,13 +722,18 @@ class JourneyViewModel(
                 val routes = buildRoutesFromJourney(currentJourney)
                 val tripId = repository.saveCompletedJourney(trip, routes).toInt()
 
-                // 2. Build and save Journey
-                val journey = JourneyEntity(  // Use the alias
+                // 2. Building and saving Journey with COORDINATES
+                val journey = JourneyEntity(
                     trip_id = tripId,
                     start_time = currentJourney.startTime.toString(),
                     arrival_time = currentJourney.arrivalTime?.toString(),
                     distance_meters = currentJourney.distanceMeters,
-                    total_stops_count = currentJourney.totalStopsCount
+                    total_stops_count = currentJourney.totalStopsCount,
+                    // Saving co-ords
+                    start_lat = startLocation.latLng.latitude,
+                    start_lng = startLocation.latLng.longitude,
+                    dest_lat = destination.latLng.latitude,
+                    dest_lng = destination.latLng.longitude
                 )
                 val journeyId = repository.insertJourney(journey).toInt()
 
@@ -887,8 +942,11 @@ class JourneyViewModel(
         val originalRoute = _state.value.routesResponse?.values?.firstOrNull()
         val steps = originalRoute?.legs?.firstOrNull()?.steps ?: emptyList()
 
+        // Getting only TRANSIT steps, skipping walking to get mode specific distances
+        val transitSteps = steps.filter { it.travelMode == "TRANSIT" }
+        var transitStepIndex = 0
+
         var currentDepartureStop: Stop? = null
-        var stepIndex = 0
 
         journey.stops.forEach { stop ->
             when (stop.stopType) {
@@ -898,11 +956,12 @@ class JourneyViewModel(
 
                 StopType.ARRIVAL -> {
                     if (currentDepartureStop != null && !stop.isTransfer) {
-                        val transitStep = steps.getOrNull(stepIndex)
+                        // Getting correct TRANSIT step (bus,train)
+                        val transitStep = transitSteps.getOrNull(transitStepIndex)
                         val distanceMeters = transitStep?.distanceMeters ?: 0
 
                         // Rounding distance to 2 decimal places
-                        val distanceKm = kotlin.math.round(journey.distanceMeters / 1000.0 * 100) / 100
+                        val distanceKm = kotlin.math.round(distanceMeters / 1000.0 * 100) / 100
 
                         val providerId = when (stop.travelMode?.uppercase()) {
                             "BUS" -> 1
@@ -918,20 +977,30 @@ class JourneyViewModel(
 
                         val myCitiFareId: Int?
                         val metrorailFareId: Int?
+                        val fareContribution: Double?
 
                         when (stop.travelMode?.uppercase()) {
                             "BUS" -> {
                                 val fareData = runBlocking { repository.getMyCitiFare(distanceMeters) }
                                 myCitiFareId = fareData?.myciti_fare_id
+                                fareContribution = fareData?.offpeak_fare
                                 metrorailFareId = null
                             }
                             "HEAVY_RAIL", "RAIL" -> {
+                                val fareData = runBlocking {
+                                    repository.getMetrorailFare(
+                                        distanceMeters = distanceMeters,
+                                        ticketType = "single"  // Can make this dynamic later
+                                    )
+                                }
                                 myCitiFareId = null
-                                metrorailFareId = 1  // Default to Zone 1 for now
+                                metrorailFareId = fareData?.metrorail_fare_id
+                                fareContribution = fareData?.fare
                             }
                             else -> {
                                 myCitiFareId = null
                                 metrorailFareId = null
+                                fareContribution = null
                             }
                         }
 
@@ -943,7 +1012,7 @@ class JourneyViewModel(
                                 destination = stop.name,
                                 mode = modeString,
                                 distance_km = distanceKm,
-                                fare_contribution = null,
+                                fare_contribution = fareContribution,
                                 schedule = null,
                                 myciti_fare_id = myCitiFareId,
                                 metrorail_fare_id = metrorailFareId
@@ -951,7 +1020,7 @@ class JourneyViewModel(
                         )
 
                         currentDepartureStop = null
-                        stepIndex++
+                        transitStepIndex++  // Moving to next transit step
                     }
                 }
             }

@@ -13,6 +13,15 @@ interface MetrorailFareDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMetrorailFares(fares: List<MetrorailFare>)
 
+    // In MetrorailFareDao.kt
+    @Query("""SELECT * FROM metrorail_fare
+    WHERE distance_band_lower_limit <= :distanceMeters 
+    AND ticket_type = :ticketType
+    ORDER BY distance_band_lower_limit DESC 
+    LIMIT 1
+    """)
+    suspend fun getFareByDistanceAndType(distanceMeters: Int, ticketType: String): MetrorailFare?
+
     @Query("SELECT * FROM metrorail_fare WHERE zone = :zone AND ticket_type = :ticketType LIMIT 1")
     suspend fun getFareByZoneAndType(zone: String, ticketType: String): MetrorailFare?
 

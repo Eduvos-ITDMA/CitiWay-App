@@ -13,8 +13,10 @@ package com.example.citiway.data.repository
 import androidx.room.withTransaction
 import com.example.citiway.data.local.CitiWayDatabase
 import com.example.citiway.data.local.entities.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.withContext
 
 /**
  * Repository class that provides a clean API for data access
@@ -117,8 +119,11 @@ class CitiWayRepository(private val database: CitiWayDatabase) {
         myCitiFareDao.getFareByDistance(distanceMeters)
     suspend fun insertMetrorailFares(fares: List<MetrorailFare>) =
         metrorailFareDao.insertMetrorailFares(fares)
-    suspend fun getMetrorailFare(zone: String, ticketType: String): MetrorailFare? =
-        metrorailFareDao.getFareByZoneAndType(zone, ticketType)
+    suspend fun getMetrorailFare(distanceMeters: Int, ticketType: String = "single"): MetrorailFare? {
+        return withContext(Dispatchers.IO) {
+            database.metrorailFareDao().getFareByDistanceAndType(distanceMeters, ticketType)
+        }
+    }
 
 
     // ========== JOURNEY SAVE OPERATIONS (for completed trips) ==========
