@@ -14,6 +14,7 @@ import com.example.citiway.core.utils.toSecondsInt
 import com.example.citiway.data.domain.MetrorailService
 import com.example.citiway.data.domain.MycitiBusService
 import com.example.citiway.data.local.entities.JourneyStep
+import com.example.citiway.data.remote.Location
 import com.example.citiway.data.remote.Route
 import com.example.citiway.data.remote.RoutesManager
 import com.example.citiway.data.remote.SelectedLocation
@@ -39,6 +40,7 @@ import java.util.Locale.getDefault
 import java.util.UUID
 import kotlin.math.ceil
 import com.example.citiway.data.local.entities.Journey as JourneyEntity
+import android.location.Location as AndroidLocation
 
 class JourneyViewModel(
     private val navController: NavController,
@@ -115,6 +117,7 @@ class JourneyViewModel(
         onGetJourneyOptions = ::getJourneyOptions,
         onSetJourneyOptions = ::setJourneyOptions,
         onSetJourney = ::setJourney,
+        onSetLocationsTooClose = ::setLocationsTooClose
     )
 
     /**
@@ -391,26 +394,53 @@ class JourneyViewModel(
         return step?.transitDetails?.transitLine?.vehicle
     }
 
+    fun setLocationsTooClose(tooClose: Boolean) {
+        Log.d("JourneyViewModel", "Too Close?: $tooClose")
+        _state.update { it.copy(locationsTooClose = tooClose) }
+    }
+
+    fun metersBetween(l1: SelectedLocation?, l2: SelectedLocation?): Float {
+        if (l1 == null || l2 == null) return 0f
+
+        val results = floatArrayOf(0f)
+        AndroidLocation.distanceBetween(
+            l1.latLng.latitude,
+            l1.latLng.longitude,
+            l2.latLng.latitude,
+            l2.latLng.longitude,
+            results
+        )
+
+        return results[0]
+    }
+
     fun confirmLocationSelection(
-        selectedLocation: SelectedLocation, locationType: LocationType, clearSearch: () -> Unit
+        selectedLocation: SelectedLocation,
+        locationType: LocationType,
+        clearSearch: () -> Unit
     ) {
+        var navRoute = Screen.JourneySelection.route
+
         when (locationType) {
             LocationType.START -> {
                 setStartLocation(selectedLocation)
                 clearSearch()
-                navController.navigate(Screen.JourneySelection.route)
             }
 
             LocationType.END -> {
                 setDestination(selectedLocation)
                 clearSearch()
-                if (_state.value.startLocation != null) {
-                    navController.navigate(Screen.JourneySelection.route)
-                } else {
-                    navController.navigate(Screen.StartLocationSelection.route)
+                if (_state.value.startLocation == null) {
+                    navRoute = Screen.StartLocationSelection.route
                 }
             }
         }
+
+        val state = _state.value
+        val tooClose = metersBetween(state.startLocation, state.destination) < 1000
+        setLocationsTooClose(tooClose)
+
+        navController.navigate(navRoute)
     }
 
     fun getJourneyOptions() {
@@ -1040,7 +1070,8 @@ data class JourneyState(
     val journey: Journey? = null,
     val routesResponse: Map<String, Route>? = null,
     val selectedTimeString: String = "now",
-    val filter: JourneyFilter = JourneyFilter()
+    val filter: JourneyFilter = JourneyFilter(),
+    val locationsTooClose: Boolean = false
 )
 
 data class JourneyDetails(
@@ -1063,6 +1094,7 @@ data class JourneySelectionActions(
     val onGetJourneyOptions: () -> Unit,
     val onSetJourneyOptions: (List<JourneyDetails>, Map<String, Route>) -> Unit,
     val onSetJourney: (id: String) -> Unit,
+    val onSetLocationsTooClose: (Boolean) -> Unit
 )
 
 data class JourneyFilter(

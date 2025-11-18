@@ -294,7 +294,11 @@ fun JourneyOptionsSection(
         VerticalSpace(12)
 
         Log.d("JourneyOptionsSection", "Recomp")
-        if (state.journeyOptions == null) {
+
+        // Checking locationsTooClose before checking journeyOptions
+        if (state.locationsTooClose) {
+            LocationTooClose()
+        } else if (state.journeyOptions == null) {
             JourneyLoadingIndicator()
         } else if (state.journeyOptions.isEmpty()) {
             NoJourneyOptionsAvailable()
@@ -703,6 +707,32 @@ fun NoJourneyOptionsAvailable() {
         VerticalSpace(16)
         Text(
             text = "No transit options were found for the selected locations and time.",
+            style = MaterialTheme.typography.bodyLarge,
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(horizontal = 32.dp)
+        )
+    }
+}
+
+@Composable
+fun LocationTooClose() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 48.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Icon(
+            painter = painterResource(R.drawable.ic_locations_too_close),
+            contentDescription = "Locations are too close to each other",
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.size(120.dp)
+        )
+        VerticalSpace(16)
+        Text(
+            text = "The locations you selected are too close to each other for transit routes",
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
