@@ -283,7 +283,6 @@ class JourneyViewModel(
             instructions = instructions,
             startTime = Instant.parse(journey.start_time),
             arrivalTime = journey.arrival_time?.let { Instant.parse(it) },
-            distanceMeters = journey.distance_meters,
             fareTotal = trip?.total_fare ?: 0.0,  // Get fare from Trip table
             totalStopsCount = journey.total_stops_count,
             totalWalkDistanceMeters = journey.total_walk_distance_meters
@@ -695,7 +694,7 @@ class JourneyViewModel(
             instructions.add(Instruction("Walk ${distance}m", duration / 60, "WALK"))
         }
 
-        return Journey(stops, instructions, startTime, arrivalTime, distanceMeters, fareTotal, stopsCount, totalWalkDistanceMeters)
+        return Journey(stops, instructions, startTime, arrivalTime, fareTotal, stopsCount, totalWalkDistanceMeters)
     }
 
     /**
@@ -730,7 +729,6 @@ class JourneyViewModel(
                     trip_id = tripId,
                     start_time = currentJourney.startTime.toString(),
                     arrival_time = currentJourney.arrivalTime?.toString(),
-                    distance_meters = currentJourney.distanceMeters,
                     total_stops_count = currentJourney.totalStopsCount,
                     total_walk_distance_meters = currentJourney.totalWalkDistanceMeters,
                     // Saving co-ords
@@ -920,8 +918,9 @@ class JourneyViewModel(
         val startNeighborhood = journey.stops.firstOrNull()?.name ?: startLocation.primaryText ?: "Unknown"
         val endNeighborhood = journey.stops.lastOrNull()?.name ?: destination.primaryText ?: "Unknown"
 
-        // Round distance to 2 decimal places
-        val distanceKm = kotlin.math.round(journey.distanceMeters / 1000.0 * 100) / 100
+        // Get distance from the original route response
+        val distanceMeters = _state.value.routesResponse?.values?.firstOrNull()?.distanceMeters ?: 0
+        val distanceKm = kotlin.math.round(distanceMeters / 1000.0 * 100) / 100
 
         return com.example.citiway.data.local.entities.Trip(
             user_id = userId,
@@ -1017,7 +1016,6 @@ class JourneyViewModel(
                                 mode = modeString,
                                 distance_km = distanceKm,
                                 fare_contribution = fareContribution,
-                                schedule = null,
                                 myciti_fare_id = myCitiFareId,
                                 metrorail_fare_id = metrorailFareId
                             )
@@ -1080,7 +1078,6 @@ data class Journey(
     val instructions: List<Instruction>,
     val startTime: Instant,
     val arrivalTime: Instant?,
-    val distanceMeters: Int,
     val fareTotal: Double,
     val totalStopsCount: Int = 0,
     val totalWalkDistanceMeters: Int = 0

@@ -28,7 +28,7 @@ import com.example.citiway.data.local.entities.*
         JourneyStep::class   // To save steps and read them back in order
 //        SavedPlace::class         // Stores saved places and favorite journeys
     ],
-    version = 14,                  // Database version - increment when schema changes
+    version = 16,                  // Database version - increment when schema changes
     exportSchema = false          // Set to true to export schema for version control
 )
 abstract class CitiWayDatabase : RoomDatabase() {

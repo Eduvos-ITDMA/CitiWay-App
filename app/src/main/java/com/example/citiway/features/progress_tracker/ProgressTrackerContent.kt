@@ -143,19 +143,12 @@ fun ProgressTrackerContent(
             InitialJourneyStatus.ACTIVE -> {}
         }
 
-        // ETA and Distance Card
-        val meters = journey!!.distanceMeters
-        val distanceText = if (meters >= 1000) {
-            "${DecimalFormat("0.0").format(meters / 1000.0)}km"
-        } else {
-            "${meters}m"
-        }
-
+        // ETA Card
         ETACard(
-            eta = convertIsoToHhmm(journey.arrivalTime.toString()),
-            distance = distanceText,
+            eta = convertIsoToHhmm(journey!!.arrivalTime.toString()),
             toggleSpeedUp
         )
+
         VerticalSpace(24)
 
         // Container for all progress tracker data, including connector lines
@@ -296,7 +289,7 @@ fun ProgressTrackerContent(
 }
 
 @Composable
-fun ETACard(eta: String, distance: String, toggleSpeedUp: () -> Unit) {
+fun ETACard(eta: String, toggleSpeedUp: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
@@ -320,22 +313,6 @@ fun ETACard(eta: String, distance: String, toggleSpeedUp: () -> Unit) {
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
-                )
-            }
-
-            VerticalDivider(
-                modifier = Modifier
-                    .height(40.dp)
-                    .width(2.dp),
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f)
-            )
-
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = distance,
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onBackground
                 )
             }
         }

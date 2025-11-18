@@ -97,7 +97,7 @@ data class StatsState(
     val isLoading: Boolean = true,
     val error: String? = null,
     val totalSpent: Double = 0.0,
-    val monthlyBudget: Double = 800.0,
+    val monthlyBudget: Double = 400.0,
     val busSpent: Double = 0.0,
     val busDistance: Double = 0.0,
     val trainSpent: Double = 0.0,

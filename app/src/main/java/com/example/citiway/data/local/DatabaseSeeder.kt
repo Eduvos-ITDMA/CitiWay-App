@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.firstOrNull
  * IMPORTANT: This should be called AFTER onboarding completes
  * It will use the existing user created during onboarding
  */
-
 class DatabaseSeeder(private val repository: CitiWayRepository) {
 
     suspend fun seedDatabase() {
@@ -71,7 +70,7 @@ class DatabaseSeeder(private val repository: CitiWayRepository) {
         ))
         println("✅ Created 8 MyCiti fare bands")
 
-        // 4. Create Metrorail fare structure (DISTANCE-BASED but keeping zone info)
+        // 4. Create Metrorail fare structure
         repository.insertMetrorailFares(listOf(
             MetrorailFare(distance_band_lower_limit = 0, zone = "Zone 1", ticket_type = "single", fare = 10.00, includes_return = false),
             MetrorailFare(distance_band_lower_limit = 0, zone = "Zone 1", ticket_type = "return", fare = 20.00, includes_return = true),
@@ -84,7 +83,7 @@ class DatabaseSeeder(private val repository: CitiWayRepository) {
         ))
         println("✅ Created 8 Metrorail fares (4 zones x 2 ticket types)")
 
-        // 5. Creating 10 TRIPS - Mix of Bus, Train, and Multi
+        // 5. Creating 10 TRIPS
 
         // TRIP 1: Bus only - Civic Centre → Table View
         val trip1Id = repository.insertTrip(
@@ -110,7 +109,6 @@ class DatabaseSeeder(private val repository: CitiWayRepository) {
                 mode = "bus",
                 distance_km = 12.5,
                 fare_contribution = 15.50,
-                schedule = "Every 15 minutes",
                 myciti_fare_id = 2
             )
         )
@@ -140,7 +138,6 @@ class DatabaseSeeder(private val repository: CitiWayRepository) {
                 mode = "train",
                 distance_km = 45.0,
                 fare_contribution = 18.00,
-                schedule = "Hourly",
                 metrorail_fare_id = 2
             )
         )
@@ -170,7 +167,6 @@ class DatabaseSeeder(private val repository: CitiWayRepository) {
                 mode = "bus",
                 distance_km = 7.5,
                 fare_contribution = 8.50,
-                schedule = "Every 20 minutes",
                 myciti_fare_id = 1
             )
         )
@@ -183,7 +179,6 @@ class DatabaseSeeder(private val repository: CitiWayRepository) {
                 mode = "train",
                 distance_km = 10.7,
                 fare_contribution = 10.00,
-                schedule = "Every 30 minutes",
                 metrorail_fare_id = 1
             )
         )
@@ -213,7 +208,6 @@ class DatabaseSeeder(private val repository: CitiWayRepository) {
                 mode = "bus",
                 distance_km = 22.0,
                 fare_contribution = 22.00,
-                schedule = "Every 20 minutes",
                 myciti_fare_id = 3
             )
         )
@@ -243,7 +237,6 @@ class DatabaseSeeder(private val repository: CitiWayRepository) {
                 mode = "train",
                 distance_km = 8.5,
                 fare_contribution = 10.50,
-                schedule = "Every 40 minutes",
                 metrorail_fare_id = 1
             )
         )
@@ -273,7 +266,6 @@ class DatabaseSeeder(private val repository: CitiWayRepository) {
                 mode = "bus",
                 distance_km = 8.0,
                 fare_contribution = 10.00,
-                schedule = "Every 25 minutes",
                 myciti_fare_id = 1
             )
         )
@@ -285,8 +277,7 @@ class DatabaseSeeder(private val repository: CitiWayRepository) {
                 destination = "CBD",
                 mode = "bus",
                 distance_km = 7.3,
-                fare_contribution = 10.00,
-                schedule = "Every 15 minutes"
+                fare_contribution = 10.00
             )
         )
         println("✅ Trip 6: Century City → CBD (Multi: Bus + Bus)")
@@ -314,8 +305,7 @@ class DatabaseSeeder(private val repository: CitiWayRepository) {
                 destination = "Tygervalley",
                 mode = "bus",
                 distance_km = 6.0,
-                fare_contribution = 12.50,
-                schedule = "Every 30 minutes"
+                fare_contribution = 12.50
             )
         )
         println("✅ Trip 7: Bellville → Tygervalley (Bus)")
@@ -344,7 +334,6 @@ class DatabaseSeeder(private val repository: CitiWayRepository) {
                 mode = "train",
                 distance_km = 9.5,
                 fare_contribution = 10.50,
-                schedule = "Every 35 minutes",
                 metrorail_fare_id = 1
             )
         )
@@ -357,7 +346,6 @@ class DatabaseSeeder(private val repository: CitiWayRepository) {
                 mode = "bus",
                 distance_km = 7.3,
                 fare_contribution = 9.00,
-                schedule = "Every 12 minutes",
                 myciti_fare_id = 1
             )
         )
@@ -387,7 +375,6 @@ class DatabaseSeeder(private val repository: CitiWayRepository) {
                 mode = "train",
                 distance_km = 5.2,
                 fare_contribution = 10.50,
-                schedule = "Every 45 minutes",
                 metrorail_fare_id = 1
             )
         )
@@ -417,7 +404,6 @@ class DatabaseSeeder(private val repository: CitiWayRepository) {
                 mode = "bus",
                 distance_km = 4.5,
                 fare_contribution = 8.00,
-                schedule = "Every 10 minutes",
                 myciti_fare_id = 1
             )
         )
