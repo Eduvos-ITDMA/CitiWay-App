@@ -339,8 +339,8 @@ fun ModernSettingsMenu(
                     // Favourites Page
                     // Clicking navigates to favourites
                     MenuItemClickable(
-                        title = "Stats????????.",
-                        subtitle = "stats of journeys",
+                        title = "My Travel Stats",
+                        subtitle = "Track spending and journey insights",
                         onClick = {
                             onDismiss()
                             navController.navigate(Screen.Stats.route)
