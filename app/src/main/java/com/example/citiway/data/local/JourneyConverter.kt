@@ -189,7 +189,7 @@ fun JourneyOverviewDb.toJourneyOverview(): JourneyOverview {
         startLocationLatLng = this.startLocationLatLng,
         destinationLatLng = this.destinationLatLng,
         date = this.startTime.toLocalDateTime().toLocalDate().toString(),
-        durationMin = Duration.between(this.arrivalTime, this.startTime).toMinutes().toInt(),
+        durationMin = Duration.between(this.startTime, this.arrivalTime).toMinutes().toInt(),
         mode = tripMode,
         isFavourite = this.isFavourite
     )

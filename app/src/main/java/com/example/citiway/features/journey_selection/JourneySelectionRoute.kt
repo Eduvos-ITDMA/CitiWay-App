@@ -33,8 +33,9 @@ fun JourneySelectionRoute(
         factory = viewModelFactory {
             JourneyViewModel(navController)
         })
-    journeyViewModel.setTime(getNearestHalfHour())
-    journeyViewModel.getJourneyOptions()
+    val journeyActions = journeyViewModel.actions
+    journeyActions.onSetTime(getNearestHalfHour())
+    journeyActions.onGetJourneyOptions()
 
     val journeyState by journeyViewModel.state.collectAsStateWithLifecycle()
 
@@ -79,25 +80,32 @@ fun JourneySelectionRoute(
                 if (selectedLocation != null) {
                     placesActions.onSetSearchText(selectedLocation.primaryText)
                     when (locationType) {
-                        LocationType.START -> journeyViewModel.actions.onSetStartLocation(
+                        LocationType.START -> journeyActions.onSetStartLocation(
                             selectedLocation
                         )
 
-                        LocationType.END -> journeyViewModel.actions.onSetDestination(
+                        LocationType.END -> journeyActions.onSetDestination(
                             selectedLocation
                         )
                     }
 
+                    val currentState = journeyViewModel.state.value
 
-                    journeyViewModel.getJourneyOptions()
+                    val tooClose = journeyViewModel.metersBetween(
+                        currentState.startLocation,
+                        currentState.destination
+                    ) < 1000
+                    journeyActions.onSetLocationsTooClose(tooClose)
+
+                    journeyActions.onGetJourneyOptions()
                 }
             }
         }
 
     val journeySelectionActions = JourneySelectionScreenActions(
-        journeyViewModel.actions,
+        journeyActions,
         { id ->
-            journeyViewModel.actions.onSetJourney(id)
+            journeyActions.onSetJourney(id)
             navController.navigate(Screen.ProgressTracker.route)
         },
         LocationFieldActions(onFieldIconClick = {

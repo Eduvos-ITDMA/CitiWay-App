@@ -11,6 +11,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.citiway.App
+import com.example.citiway.core.navigation.routes.Screen
 import com.example.citiway.core.utils.ScreenWrapper
 import com.example.citiway.data.remote.SelectedLocation
 import com.example.citiway.data.repository.CitiWayRepository
@@ -28,8 +29,7 @@ fun ProgressTrackerRoute(
         viewModelStoreOwner = LocalActivity.current as ComponentActivity,
         factory = viewModelFactory {
             JourneyViewModel(navController)
-        }
-    )
+        })
     val journeyState by journeyViewModel.state.collectAsStateWithLifecycle()
 
     val repository: CitiWayRepository = App.appModule.repository
@@ -38,7 +38,9 @@ fun ProgressTrackerRoute(
         { startLocation, destination, journey ->
             journeyViewModel.viewModelScope.launch {
                 try {
-                    repository.saveCompletedJourney(journey, startLocation, destination)
+                    Log.d("Saving journey", "${journey.fareTotal}")
+                    val id = repository.saveCompletedJourney(journey, startLocation, destination)
+                    navController.navigate(Screen.JourneySummary.createRoute(id, "home"))
                 } catch (e: Exception) {
                     Log.e("JourneyViewModel", "❌ Failed to save journey: ${e.message}", e)
                     e.printStackTrace()

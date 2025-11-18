@@ -1,5 +1,6 @@
 package com.example.citiway.features.shared
 
+import android.location.Location
 import android.util.Log
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
@@ -18,7 +19,6 @@ import com.example.citiway.data.remote.RoutesManager
 import com.example.citiway.data.remote.SelectedLocation
 import com.example.citiway.data.remote.Step
 import com.example.citiway.data.remote.Vehicle
-import com.example.citiway.data.repository.CitiWayRepository
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -39,7 +39,6 @@ import kotlin.math.ceil
 class JourneyViewModel(
     private val navController: NavController,
     private val routesManager: RoutesManager = App.appModule.routesManager,
-    private val repository: CitiWayRepository = App.appModule.repository,
     private val dispatcher: CoroutineDispatcher = Dispatchers.Main
 ) : ViewModel() {
     private val _state = MutableStateFlow(JourneyState())
@@ -53,6 +52,7 @@ class JourneyViewModel(
         onGetJourneyOptions = ::getJourneyOptions,
         onSetJourneyOptions = ::setJourneyOptions,
         onSetJourney = ::setJourney,
+        onSetLocationsTooClose = ::setLocationsTooClose
     )
 
     var recalculateRoutes = false
@@ -214,6 +214,11 @@ class JourneyViewModel(
         }
     }
 
+    fun setLocationsTooClose(tooClose: Boolean){
+        Log.d("journeyviewmodel", "Too Close?: $tooClose")
+        _state.update { it.copy(locationsTooClose = tooClose) }
+    }
+
     fun getVehicle(step: Step?): Vehicle? {
         return step?.transitDetails?.transitLine?.vehicle
     }
@@ -221,23 +226,28 @@ class JourneyViewModel(
     fun confirmLocationSelection(
         selectedLocation: SelectedLocation, locationType: LocationType, clearSearch: () -> Unit
     ) {
+        var navRoute = Screen.JourneySelection.route
+
         when (locationType) {
             LocationType.START -> {
                 setStartLocation(selectedLocation)
                 clearSearch()
-                navController.navigate(Screen.JourneySelection.route)
             }
 
             LocationType.END -> {
                 setDestination(selectedLocation)
                 clearSearch()
-                if (_state.value.startLocation != null) {
-                    navController.navigate(Screen.JourneySelection.route)
-                } else {
-                    navController.navigate(Screen.StartLocationSelection.route)
+                if (_state.value.startLocation == null) {
+                    navRoute = Screen.StartLocationSelection.route
                 }
             }
         }
+
+        val state = _state.value
+        val tooClose = metersBetween(state.startLocation, state.destination) < 1000
+        setLocationsTooClose(tooClose)
+
+        navController.navigate(navRoute)
     }
 
     fun getJourneyOptions() {
@@ -397,8 +407,23 @@ class JourneyViewModel(
         return null
     }
 
+    fun metersBetween(l1: SelectedLocation?, l2: SelectedLocation?): Float {
+        if (l1 == null || l2 == null) return 0f
+
+        val results = floatArrayOf(0f)
+        Location.distanceBetween(
+            l1.latLng.latitude,
+            l1.latLng.longitude,
+            l2.latLng.latitude,
+            l2.latLng.longitude,
+            results
+        )
+
+        return results[0]
+    }
+
     fun routeToJourney(
-        route: Route, mycitiFare: Double = 0.0, metrorailFare: Double = 0.0, fareTotal: Double = 0.0
+        route: Route, fareTotal: Double = 0.0, mycitiFare: Double = 0.0, metrorailFare: Double = 0.0
     ): Journey {
         val instructions: MutableList<Instruction> = mutableListOf()
         val stops: MutableList<Stop> = mutableListOf()
@@ -542,7 +567,8 @@ data class JourneyState(
     val journey: Journey? = null,
     val routesResponse: Map<String, Route>? = null,
     val selectedTimeString: String = "now",
-    val filter: JourneyFilter = JourneyFilter()
+    val filter: JourneyFilter = JourneyFilter(),
+    val locationsTooClose: Boolean = false,
 )
 
 data class JourneyDetails(
@@ -567,6 +593,7 @@ data class JourneyActions(
     val onGetJourneyOptions: () -> Unit,
     val onSetJourneyOptions: (List<JourneyDetails>, Map<String, Route>) -> Unit,
     val onSetJourney: (id: String) -> Unit,
+    val onSetLocationsTooClose: (Boolean) -> Unit,
 )
 
 data class JourneyFilter(

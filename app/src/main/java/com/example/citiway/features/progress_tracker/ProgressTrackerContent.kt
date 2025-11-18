@@ -1,7 +1,6 @@
 package com.example.citiway.features.progress_tracker
 
 import android.icu.text.DecimalFormat
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -592,7 +591,6 @@ fun TransitStopCard(
 
                         // "Next bus in 11min" with orange color for time
                         val stopNotReached = stop.nextEventInMin != null && stop.nextEventInMin > 0
-                        Log.d("Journey progress", "Stop reached in ${stop.nextEventInMin}")
                         val annotatedString = buildAnnotatedString {
                             withStyle(
                                 style = SpanStyle(

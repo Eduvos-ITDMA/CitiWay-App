@@ -1,6 +1,5 @@
 package com.example.citiway.features.journey_selection
 
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -128,9 +127,8 @@ fun JourneySelectionContent(
 
         VerticalSpace(8)
 
-        // "Choose your Journey:" title after location fields
         Text(
-            text = "Choose your Journey:",
+            text = "Choose your Journey",
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onBackground,
@@ -293,13 +291,14 @@ fun JourneyOptionsSection(
         TimeSlotSelector(state, actions.journeySelectionActions)
         VerticalSpace(12)
 
-        Log.d("JourneyOptionsSection", "Recomp")
         if (state.journeyOptions == null) {
             JourneyLoadingIndicator()
+        } else if (state.locationsTooClose){
+            LocationTooClose()
         } else if (state.journeyOptions.isEmpty()) {
             NoJourneyOptionsAvailable()
         } else {
-            state.journeyOptions.forEach { journey ->
+            state.journeyOptions?.forEach { journey ->
                 JourneyCard(journey, actions)
                 VerticalSpace(24)
             }
@@ -703,6 +702,32 @@ fun NoJourneyOptionsAvailable() {
         VerticalSpace(16)
         Text(
             text = "No transit options were found for the selected locations and time.",
+            style = MaterialTheme.typography.bodyLarge,
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(horizontal = 32.dp)
+        )
+    }
+}
+
+@Composable
+fun LocationTooClose() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 48.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Icon(
+            painter = painterResource(R.drawable.ic_locations_too_close),
+            contentDescription = "Locations are too close to each other",
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.size(120.dp)
+        )
+        VerticalSpace(16)
+        Text(
+            text = "The locations you selected are too close to each other for transit routes",
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant,

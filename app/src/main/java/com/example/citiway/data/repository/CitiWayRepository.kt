@@ -45,10 +45,10 @@ class CitiWayRepository(private val database: CitiWayDatabase) {
         journey: Journey,
         startLocation: SelectedLocation,
         destination: SelectedLocation
-    ) {
+    ): Int {
         val journeyEntity = journey.toCompletedJourneyEntity(startLocation, destination)
 
-        journeyDao.insertFullJourney(
+        return journeyDao.insertFullJourney(
             journeyEntity,
             journey.stops.toEntities(),
             journey.instructions.toEntities()

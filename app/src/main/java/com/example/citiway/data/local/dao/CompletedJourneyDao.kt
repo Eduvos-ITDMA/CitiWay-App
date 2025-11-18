@@ -20,7 +20,7 @@ interface CompletedJourneyDao {
     suspend fun insertStops(stops: List<StopEntity>)
 
     @Transaction
-    suspend fun insertFullJourney(journey: CompletedJourneyEntity, stops: List<StopEntity>, instructions: List<InstructionEntity>) {
+    suspend fun insertFullJourney(journey: CompletedJourneyEntity, stops: List<StopEntity>, instructions: List<InstructionEntity>): Int {
         val journeyId = insertJourney(journey).toInt() // Get the generated primary key (journey_id)
 
         // Map the generated parent ID to the child entities
@@ -29,6 +29,8 @@ interface CompletedJourneyDao {
 
         insertStops(stopsWithFk)
         insertInstructions(instructionsWithFk)
+
+        return journeyId
     }
 
     @Update

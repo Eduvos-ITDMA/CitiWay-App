@@ -96,7 +96,7 @@ fun FavouritesContent(
                                 modifier = modifier.clickable { onToggleFavourite(journey) }
                             )
                         },
-                        onCardClick = { selectedJourney == null }
+                        onCardClick = { selectedJourney == journey }
                     )
                 }
             }

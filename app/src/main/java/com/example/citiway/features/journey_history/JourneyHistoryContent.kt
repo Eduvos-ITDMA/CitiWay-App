@@ -59,10 +59,10 @@ fun JourneyHistoryContent(
                             imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                             contentDescription = "View journey details",
                             tint = MaterialTheme.colorScheme.onBackground,
-                            modifier = modifier.clickable { selectedJourney = null }
+                            modifier = modifier.clickable { selectedJourney = journey }
                         )
                     },
-                    onCardClick = { selectedJourney = null }
+                    onCardClick = { selectedJourney = journey }
                 )
             }
         }

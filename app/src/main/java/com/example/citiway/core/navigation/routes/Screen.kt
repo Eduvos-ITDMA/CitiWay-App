@@ -13,8 +13,9 @@ sealed class Screen(val route: String) {
     object Favourites : Screen(route = "favourites_screen")
     object JourneySelection : Screen(route = "journey_selection_screen")
     object ProgressTracker : Screen(route = "progress_tracker_screen")
-    object JourneySummary : Screen(route = "journey_summary_screen/{journeyId}") {
-        fun createRoute(journeyId: Int) = "journey_summary_screen/$journeyId"
+    object JourneySummary : Screen(route = "journey_summary_screen/{journeyId}?primaryButtonAction={primaryButtonAction}") {
+        fun createRoute(journeyId: Int, primaryButtonAction: String = "repeat") =
+            "journey_summary_screen/$journeyId?primaryButtonAction=$primaryButtonAction"
     }
     object Help : Screen(route = "help_screen")
     object JourneyHistory : Screen(route = "journey_history_screen")
