@@ -155,8 +155,8 @@ class CitiWayRepository(private val database: CitiWayDatabase) {
     }
 
     // Journey methods
-    suspend fun insertJourney(journey: Journey): Long {
-        return database.journeyDao().insertJourney(journey)
+    suspend fun insertJourney(journey: Journey): Int {
+        return database.journeyDao().insertJourney(journey).toInt()
     }
 
     suspend fun getJourneyByTripId(tripId: Int): Journey? {
@@ -171,7 +171,7 @@ class CitiWayRepository(private val database: CitiWayDatabase) {
         return database.journeyStepDao().getStepsForJourney(journeyId)
     }
 
-    // ========== MoONTHLY STATS OPERATIONS (for completed trips) ==========
+    // ========== MONTHLY STATS OPERATIONS (for completed trips) ==========
 
     /**
      * Data class for transport statistics result

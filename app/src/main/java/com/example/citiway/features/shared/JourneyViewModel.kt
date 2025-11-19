@@ -123,70 +123,63 @@ class JourneyViewModel(
     /**
      * Loads a saved journey from the database for viewing in the summary screen
      */
-    fun loadJourneyForSummary(tripId: Int) {
-        viewModelScope.launch(dispatcher) {
-            try {
-                // Fetch the trip first to get basic info
-                val trip = repository.getTripById(tripId)
-                if (trip == null) {
-                    Log.e("JourneyViewModel", "❌ Trip not found for ID: $tripId")
-                    return@launch
-                }
+    suspend fun loadJourneyForSummary(tripId: Int): CompletedJourney? {
+        try {
+            // Fetch the trip first to get basic info
+            val trip = repository.getTripById(tripId)
+            if (trip == null) {
+                Log.e("JourneyViewModel", "❌ Trip not found for ID: $tripId")
+                return null
+            }
 
-                // Fetching the journey details
-                val journey = repository.getJourneyByTripId(tripId)
-                if (journey == null) {
-                    Log.e("JourneyViewModel", "❌ Journey not found for trip ID: $tripId")
-                    return@launch
-                }
+            // Fetching the journey details
+            val journey = repository.getJourneyByTripId(tripId)
+            if (journey == null) {
+                Log.e("JourneyViewModel", "❌ Journey not found for trip ID: $tripId")
+                return null
+            }
 
-                val steps = repository.getStepsForJourney(journey.journey_id)
+            val steps = repository.getStepsForJourney(journey.journey_id)
 
-                // Getting the ACTUAL start and end addresses from journey steps (unlike showing the PitStops on Home)
-                val firstStep = steps.minByOrNull { it.step_order }
-                val lastStep = steps.maxByOrNull { it.step_order }
+            // Getting the ACTUAL start and end addresses from journey steps (unlike showing the PitStops on Home)
+            val firstStep = steps.minByOrNull { it.step_order }
+            val lastStep = steps.maxByOrNull { it.step_order }
 
-                /*
+            /*
                 * Extract the actual start and end addresses from journey steps.
                 * - firstStep (step_order = 0): Contains the original walking start address
                 * - lastStep (step_order = max): Contains the final walking destination address
                 * Falls back to trip table if steps are unavailable (e.g., journey started directly at a station).
                 */
-                val startAddress = firstStep?.stop_name ?: trip.start_stop ?: "Unknown"
-                val endAddress = lastStep?.stop_name ?: trip.end_stop ?: "Unknown"
+            val startAddress = firstStep?.stop_name ?: trip.start_stop ?: "Unknown"
+            val endAddress = lastStep?.stop_name ?: trip.end_stop ?: "Unknown"
 
-                // Reconstructing the Journey object from database data
-                val reconstructedJourney = reconstructJourneyFromSteps(journey, steps, trip)
-
-                // Reconstruct start and end locations from trip data
-                // Use dummy LatLng since we don't need it for summary display in PlacesManager they are non-nullable fields
-                val startLocation = SelectedLocation(
-                    latLng = LatLng(journey.start_lat, journey.start_lng),  // Saved coordinates - not needed for summary
-                    placeId = "",                                   // Empty placeId - not needed for summary
-                    primaryText = startAddress                      // From JourneyStep
-                )
-
-                val destination = SelectedLocation(
-                    latLng = LatLng(journey.dest_lat, journey.dest_lng),  // Savedd coordinates - not needed for summary
-                    placeId = "",                                   // Empty placeId - not needed for summary
-                    primaryText = endAddress
-                )
-
-                // Update state with the loaded journey
-                _state.update {
-                    it.copy(
-                        journey = reconstructedJourney,
-                        startLocation = startLocation,
-                        destination = destination
-                    )
-                }
-
-                Log.d("JourneyViewModel", "✅ Journey loaded for trip ID: $tripId")
-                Log.d("JourneyViewModel", "📍 Start: $startAddress | End: $endAddress")
-
-            } catch (e: Exception) {
-                Log.e("JourneyViewModel", "❌ Failed to load journey: ${e.message}", e)
+            // Reconstructing the Journey object from database data
+            val reconstructedJourney = reconstructJourneyFromSteps(journey, steps, trip)
+            if (reconstructedJourney == null) {
+                return null
             }
+
+            Log.d("JourneyViewModel", "✅ Journey loaded for trip ID: $tripId")
+            Log.d("JourneyViewModel", "📍 Start: $startAddress | End: $endAddress")
+
+            return CompletedJourney(
+                startAddress,
+                endAddress,
+                LatLng(
+                    journey.start_lat,
+                    journey.start_lng
+                ),
+                LatLng(
+                    journey.dest_lat,
+                    journey.dest_lng
+                ),
+                reconstructedJourney
+            )
+
+        } catch (e: Exception) {
+            Log.e("JourneyViewModel", "❌ Failed to load journey: ${e.message}", e)
+            return null
         }
     }
 
@@ -256,7 +249,7 @@ class JourneyViewModel(
             .map { step ->
                 Stop(
                     name = step.stop_name ?: "",
-                    stopType = when(step.stop_type) {
+                    stopType = when (step.stop_type) {
                         "DEPARTURE" -> StopType.DEPARTURE
                         "ARRIVAL" -> StopType.ARRIVAL
                         else -> StopType.DEPARTURE
@@ -724,61 +717,61 @@ class JourneyViewModel(
             instructions.add(Instruction("Walk ${distance}m", duration / 60, "WALK"))
         }
 
-        return Journey(stops, instructions, startTime, arrivalTime, fareTotal, stopsCount, totalWalkDistanceMeters)
+        return Journey(
+            stops,
+            instructions,
+            startTime,
+            arrivalTime,
+            fareTotal,
+            stopsCount,
+            totalWalkDistanceMeters
+        )
     }
 
     /**
      * Saves the completed journey to the database.
      * Called when the user reaches their final destination.
      */
-    suspend fun saveCompletedJourney(userId: Int) {
+    suspend fun saveCompletedJourney(userId: Int): Int {
         val currentJourney = _state.value.journey ?: run {
-            Log.e("JourneyViewModel", "Cannot save: No journey data")
-            return
+            throw Exception("Failed to save journey - no Journey in JourneyState")
         }
 
         val startLocation = _state.value.startLocation ?: run {
-            Log.e("JourneyViewModel", "Cannot save: No start location")
-            return
+            throw Exception("Failed to save journey - no start location in JourneyState")
         }
 
         val destination = _state.value.destination ?: run {
-            Log.e("JourneyViewModel", "Cannot save: No destination")
-            return
+            throw Exception("Failed to save journey - no destination in JourneyState")
         }
 
-        viewModelScope.launch(dispatcher) {
-            try {
-                // 1. Build and save Trip
-                val trip = buildTripFromJourney(userId, currentJourney, startLocation, destination)
-                val routes = buildRoutesFromJourney(currentJourney)
-                val tripId = repository.saveCompletedJourney(trip, routes).toInt()
+        // 1. Build and save Trip
+        val trip = buildTripFromJourney(userId, currentJourney, startLocation, destination)
+        val routes = buildRoutesFromJourney(currentJourney)
+        val tripId = repository.saveCompletedJourney(trip, routes).toInt()
 
-                // 2. Building and saving Journey with COORDINATES
-                val journey = JourneyEntity(
-                    trip_id = tripId,
-                    start_time = currentJourney.startTime.toString(),
-                    arrival_time = currentJourney.arrivalTime?.toString(),
-                    total_stops_count = currentJourney.totalStopsCount,
-                    total_walk_distance_meters = currentJourney.totalWalkDistanceMeters,
-                    // Saving co-ords
-                    start_lat = startLocation.latLng.latitude,
-                    start_lng = startLocation.latLng.longitude,
-                    dest_lat = destination.latLng.latitude,
-                    dest_lng = destination.latLng.longitude
-                )
-                val journeyId = repository.insertJourney(journey).toInt()
+        // 2. Building and saving Journey with COORDINATES
+        val journey = JourneyEntity(
+            trip_id = tripId,
+            start_time = currentJourney.startTime.toString(),
+            arrival_time = currentJourney.arrivalTime?.toString(),
+            total_stops_count = currentJourney.totalStopsCount,
+            total_walk_distance_meters = currentJourney.totalWalkDistanceMeters,
+            // Saving co-ords
+            start_lat = startLocation.latLng.latitude,
+            start_lng = startLocation.latLng.longitude,
+            dest_lat = destination.latLng.latitude,
+            dest_lng = destination.latLng.longitude
+        )
+        val journeyId = repository.insertJourney(journey)
 
-                // 3. Build and save JourneySteps (alternating stops and instructions)
-                val steps = buildJourneySteps(journeyId, currentJourney, startLocation, destination)
-                repository.insertJourneySteps(steps)
+        // 3. Build and save JourneySteps (alternating stops and instructions)
+        val steps = buildJourneySteps(journeyId, currentJourney, startLocation, destination)
+        repository.insertJourneySteps(steps)
 
-                Log.d("JourneyViewModel", "✅ Full journey saved with ${steps.size} steps")
+        Log.d("JourneyViewModel", "✅ Full journey saved with ${steps.size} steps")
 
-            } catch (e: Exception) {
-                Log.e("JourneyViewModel", "❌ Failed to save journey", e)
-            }
-        }
+        return tripId
     }
 
     private fun buildJourneySteps(
@@ -883,24 +876,14 @@ class JourneyViewModel(
     /**
      * Called when the journey is complete. Saves to database and navigates to summary.
      */
-    fun onJourneyComplete() {
-        viewModelScope.launch(dispatcher) {
-            try {
-                // TODO: Get actual user ID from system, but its always 1
-                val userId = 1  // Hardcoded for now
-
-                saveCompletedJourney(userId)
-
-                Log.d("JourneyViewModel", "✅ Journey completed and saved!")
-
-                // Navigate to summary screen
-                navController.navigate(Screen.JourneySummary.route)
-
-            } catch (e: Exception) {
-                Log.e("JourneyViewModel", "❌ Failed to complete journey: ${e.message}", e)
-                // Still navigate even if save fails (user experience)
-                navController.navigate(Screen.JourneySummary.route)
-            }
+    suspend fun onJourneyComplete(): Int? {
+        try {
+            // TODO: Get actual user ID from system, but its always 1
+            val userId = 1  // Hardcoded for now
+            return saveCompletedJourney(userId)
+        } catch (e: Exception) {
+            Log.e("JourneyViewModel", "❌ Failed to complete journey: ${e.message}", e)
+            return null
         }
     }
 
@@ -933,11 +916,12 @@ class JourneyViewModel(
 
         val tripMode = when {
             modes.isEmpty() -> "Walk"
-            modes.size == 1 -> when(modes[0]) {
+            modes.size == 1 -> when (modes[0]) {
                 "HEAVY_RAIL" -> "Train"
                 "BUS" -> "Bus"
                 else -> "Other"
             }
+
             else -> "Multi"
         }
 
@@ -945,8 +929,10 @@ class JourneyViewModel(
         val dateString = java.time.LocalDate.now().toString()
 
         // Get neighborhood from first/last stop names instead
-        val startNeighborhood = journey.stops.firstOrNull()?.name ?: startLocation.primaryText ?: "Unknown"
-        val endNeighborhood = journey.stops.lastOrNull()?.name ?: destination.primaryText ?: "Unknown"
+        val startNeighborhood =
+            journey.stops.firstOrNull()?.name ?: startLocation.primaryText ?: "Unknown"
+        val endNeighborhood =
+            journey.stops.lastOrNull()?.name ?: destination.primaryText ?: "Unknown"
 
         // Get distance from the original route response
         val distanceMeters = _state.value.routesResponse?.values?.firstOrNull()?.distanceMeters ?: 0
@@ -1014,11 +1000,13 @@ class JourneyViewModel(
 
                         when (stop.travelMode?.uppercase()) {
                             "BUS" -> {
-                                val fareData = runBlocking { repository.getMyCitiFare(distanceMeters) }
+                                val fareData =
+                                    runBlocking { repository.getMyCitiFare(distanceMeters) }
                                 myCitiFareId = fareData?.myciti_fare_id
                                 fareContribution = fareData?.offpeak_fare
                                 metrorailFareId = null
                             }
+
                             "HEAVY_RAIL", "RAIL" -> {
                                 val fareData = runBlocking {
                                     repository.getMetrorailFare(
@@ -1030,6 +1018,7 @@ class JourneyViewModel(
                                 metrorailFareId = fareData?.metrorail_fare_id
                                 fareContribution = fareData?.fare
                             }
+
                             else -> {
                                 myCitiFareId = null
                                 metrorailFareId = null
@@ -1131,6 +1120,14 @@ data class Instruction(
     var text: String,
     val durationMinutes: Int,
     val travelMode: String = "WALK",
+)
+
+data class CompletedJourney(
+    val startLocationName: String,
+    val destinationName: String,
+    val startLocationLatLng: LatLng,
+    val destinationLatLng: LatLng,
+    val journey: Journey,
 )
 
 /**

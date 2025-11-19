@@ -1,13 +1,17 @@
 package com.example.citiway.features.journey_history
 
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.citiway.App
 import com.example.citiway.core.utils.ScreenWrapper
 import com.example.citiway.di.viewModelFactory
 import com.example.citiway.features.shared.CompletedJourneysViewModel
+import com.example.citiway.features.shared.JourneyViewModel
 
 /**
  * Route composable for the Journey History screen
@@ -30,10 +34,23 @@ import com.example.citiway.features.shared.CompletedJourneysViewModel
 fun JourneyHistoryRoute(
     navController: NavController
 ) {
+    val placesActions = App.appModule.placesManager.actions
+
+    // JourneyViewModel scoped to Activity for shared navigation state
+    val journeyViewModel: JourneyViewModel = viewModel(
+        viewModelStoreOwner = LocalActivity.current as ComponentActivity,
+        factory = viewModelFactory {
+            JourneyViewModel(navController)
+        })
+
     // ViewModel with factory for constructor injection
     val completedJourneysViewModel: CompletedJourneysViewModel = viewModel(
         factory = viewModelFactory {
-            CompletedJourneysViewModel()
+            CompletedJourneysViewModel(
+                placesActions = placesActions,
+                journeyViewModel = journeyViewModel,
+                navController = navController
+            )
         }
     )
 

@@ -1,13 +1,17 @@
 package com.example.citiway.features.favourites
 
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.citiway.App
 import com.example.citiway.core.utils.ScreenWrapper
 import com.example.citiway.di.viewModelFactory
 import com.example.citiway.features.shared.CompletedJourneysViewModel
+import com.example.citiway.features.shared.JourneyViewModel
 
 /**
  * Route composable for the Favourites screen
@@ -28,21 +32,37 @@ fun FavouritesRoute(
     navController: NavController
 ) {
     // ViewModel with factory for constructor injection
+
+    val placesActions = App.appModule.placesManager.actions
+
+    // JourneyViewModel scoped to Activity for shared navigation state
+    val journeyViewModel: JourneyViewModel = viewModel(
+        viewModelStoreOwner = LocalActivity.current as ComponentActivity,
+        factory = viewModelFactory {
+            JourneyViewModel(navController)
+        })
+
     val completedJourneysViewModel: CompletedJourneysViewModel = viewModel(
         factory = viewModelFactory {
-            CompletedJourneysViewModel()
+            CompletedJourneysViewModel(
+                placesActions = placesActions,
+                journeyViewModel = journeyViewModel,
+                navController = navController
+            )
         }
     )
 
     // Lifecycle-aware state collection
     val completedJourneysState by completedJourneysViewModel.screenState.collectAsStateWithLifecycle()
+    val completedJourneysActions = completedJourneysViewModel.actions
 
     // Render screen with bottom bar
     ScreenWrapper(navController, showBottomBar = true, content = { paddingValues ->
         FavouritesContent(
-            journeys = completedJourneysState.allFavouriteJourneys, // Passing allFavouriteJourneys property from ViewModel state to display only favorited trips on this screen
+            journeys = completedJourneysState.favouriteJourneys,
             paddingValues = paddingValues,
-            onToggleFavourite = completedJourneysViewModel::toggleFavourite // Pass toggle function to allow unfavoriting
+            onToggleFavourite = completedJourneysViewModel::toggleFavourite,
+            actions = completedJourneysActions
         )
     })
 }

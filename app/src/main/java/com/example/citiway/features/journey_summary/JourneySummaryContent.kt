@@ -34,21 +34,22 @@ import com.example.citiway.core.utils.formatMinutesToHoursAndMinutes
 import com.example.citiway.core.utils.toDisplayableLocalTime
 import com.example.citiway.core.utils.toLocalDateTime
 import com.example.citiway.data.remote.SelectedLocation
+import com.example.citiway.features.shared.CompletedJourney
 import com.example.citiway.features.shared.Instruction
 import com.example.citiway.features.shared.Journey
+import com.google.android.gms.maps.model.LatLng
 import java.time.Duration
 import java.time.format.DateTimeFormatter
 
 @Composable
 fun JourneySummaryContent(
-    journey: Journey?,
-    startLocation: SelectedLocation?,
-    destination: SelectedLocation?,
+    completedJourney: CompletedJourney?,
+    onRepeatJourney: (LatLng, LatLng) -> Unit,
+    primaryButtonAction: String?,
     navController: NavController,
     paddingValues: PaddingValues,
-    onDone: () -> Unit
 ) {
-    if (journey == null || startLocation == null || destination == null) {
+    if (completedJourney == null) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -71,7 +72,11 @@ fun JourneySummaryContent(
         return
     }
 
-    // ========== Journey Data Extraction ==========
+    val action = if (primaryButtonAction != "home") "repeat" else "home"
+    val journey = completedJourney.journey
+    val startLocation = completedJourney.startLocationName
+    val destination = completedJourney.destinationName
+// ========== Journey Data Extraction ==========
     val formatter = DateTimeFormatter.ofPattern("dd MMM yyyy")
     val startTime = journey.startTime.toDisplayableLocalTime()
     val arrivalTime = journey.arrivalTime?.toDisplayableLocalTime() ?: startTime
@@ -81,7 +86,7 @@ fun JourneySummaryContent(
             .toInt()
     val fareTotal = journey.fareTotal
 
-    // Track coordinates for progress line
+// Track coordinates for progress line
     val stepsCount = journey.stops.size.times(2).plus(2)
     var stepCoordinates by remember(journey.startTime) {  // Added a key so that When journey.startTime changes, forget the old state and create fresh state
         mutableStateOf(Array<Offset?>(stepsCount) { null })
@@ -175,7 +180,7 @@ fun JourneySummaryContent(
             Column(modifier = Modifier.fillMaxWidth()) {
                 // Start Location
                 SummaryLocationStep(
-                    name = startLocation.primaryText,
+                    name = startLocation,
                     isStart = true
                 ) { offset ->
                     updateCoordinate(0, offset)
@@ -209,7 +214,7 @@ fun JourneySummaryContent(
                 VerticalSpace(40)
                 // End Location
                 SummaryLocationStep(
-                    name = destination.primaryText,
+                    name = destination,
                     isStart = false
                 ) { offset ->
                     updateCoordinate(stepsCount - 1, offset)
@@ -225,9 +230,14 @@ fun JourneySummaryContent(
             contentAlignment = Alignment.Center
         ) {
             Button(
-                // TODO: Go home if just come from progress tracker, otherwise pop backstack
-                onClick = onDone,
-                modifier = Modifier
+                onClick = {
+                    when (action) {
+                        "home" -> navController.navigate(Screen.Home.route)
+                        "repeat" -> onRepeatJourney(
+                            completedJourney.startLocationLatLng, completedJourney.destinationLatLng
+                        )
+                    }
+                }, modifier = Modifier
                     .fillMaxWidth(0.6f)
                     .height(50.dp),
                 colors = ButtonDefaults.buttonColors(
@@ -236,9 +246,8 @@ fun JourneySummaryContent(
                 shape = RoundedCornerShape(25.dp)
             ) {
                 Text(
-                    text = "Done",
-                    color = Color.White,
-                    style = MaterialTheme.typography.labelLarge
+                    text = if (action == "repeat") "Repeat Journey" else "Back to Home",
+                    color = Color.White, style = MaterialTheme.typography.labelLarge
                 )
             }
         }

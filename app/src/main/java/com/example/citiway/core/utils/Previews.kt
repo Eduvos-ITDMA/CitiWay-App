@@ -21,6 +21,8 @@ import com.example.citiway.features.journey_selection.LocationFieldActions
 import com.example.citiway.features.journey_summary.JourneySummaryContent
 import com.example.citiway.features.progress_tracker.ProgressTrackerContent
 import com.example.citiway.features.schedules.SchedulesContent
+import com.example.citiway.features.shared.CompletedJourney
+import com.example.citiway.features.shared.CompletedJourneysActions
 import com.example.citiway.features.shared.CompletedJourneysState
 import com.example.citiway.features.shared.Instruction
 import com.example.citiway.features.shared.Journey
@@ -157,7 +159,7 @@ val mockPlacesActions = PlacesActions(
             placeId = "mock_id",
             primaryText = "Mock Address",
 
-        )
+            )
     },
     onClearLocations = {}
 
@@ -192,7 +194,7 @@ fun HomeScreenPreview() {
         onFavouritesTitleClick = {},
         onRecentTitleClick = {},
         onViewJourneySummary = {},
-        onStartJourney = TODO(),
+        onRepeatJourney = { a, b -> },
     )
 
     CitiWayTheme {
@@ -214,7 +216,10 @@ fun FavouritesScreenPreview() {
         FavouritesContent(
             paddingValues = PaddingValues(),
             journeys = emptyList(),
-            onToggleFavourite = {}
+            onToggleFavourite = {},
+            actions = CompletedJourneysActions(
+                {}, { a, b -> }
+            )
         )
     }
 }
@@ -272,12 +277,17 @@ fun JourneySelectionScreenPreview() {
 fun JourneySummaryScreenPreview() {
     CitiWayTheme {
         JourneySummaryContent(
-            journey = mockJourney,
-            startLocation = SelectedLocation(LatLng(0.0, 0.0), "mock_id", "Mowbray"),
-            destination = SelectedLocation(LatLng(0.0, 0.0), "mock_id_2", "Century City"),
+            completedJourney = CompletedJourney(
+                "Mowbray",
+                "Century City",
+                LatLng(0.0, 0.0),
+                LatLng(0.0, 0.0),
+                mockJourney
+            ),
+            onRepeatJourney = { a, b -> },
             paddingValues = PaddingValues(),
             navController = rememberNavController(),
-            onDone = {}
+            primaryButtonAction = "Repeat Journey"
         )
     }
 }

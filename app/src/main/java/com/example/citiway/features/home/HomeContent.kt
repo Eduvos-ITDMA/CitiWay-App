@@ -64,12 +64,6 @@ fun HomeContent(
     paddingValues: PaddingValues,
     userName: String = "Commuter",
 ) {
-
-    // Storing trip selection state
-    var selectedTripId by remember { mutableStateOf<Int?>(null) }
-    var selectedTripStartStop by remember { mutableStateOf<String?>(null) }
-    var selectedTripEndStop by remember { mutableStateOf<String?>(null) }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -93,11 +87,7 @@ fun HomeContent(
             "Recent Trips",
             "No recent trips",
             onTitleClick = homeActions.onRecentTitleClick,
-            onJourneyClick = { journey ->  // Extracting the fields we need
-                selectedTripId = journey.tripId
-                selectedTripStartStop = journey.startStop
-                selectedTripEndStop = journey.endStop
-            }
+            homeActions.onViewJourneySummary
         )
 
         VerticalSpace(24)
@@ -108,11 +98,7 @@ fun HomeContent(
             "Favourite Trips",
             "No trips saved as favourite yet",
             onTitleClick = homeActions.onFavouritesTitleClick,
-            onJourneyClick = { journey ->
-                selectedTripId = journey.tripId
-                selectedTripStartStop = journey.startStop
-                selectedTripEndStop = journey.endStop
-            }
+            homeActions.onViewJourneySummary
         )
 
         VerticalSpace(24)
@@ -121,34 +107,6 @@ fun HomeContent(
 
         VerticalSpace(18)
     }
-
-    // When selected where to go
-    // Show dialogbox when trip is selected
-    if (selectedTripId != null && selectedTripStartStop != null && selectedTripEndStop != null) {
-        JourneyActionDialog(
-            tripId = selectedTripId!!,
-            startStop = selectedTripStartStop!!,
-            endStop = selectedTripEndStop!!,
-            onDismiss = {
-                selectedTripId = null
-                selectedTripStartStop = null
-                selectedTripEndStop = null
-            },
-            onViewSummary = { tripId ->
-                homeActions.onViewJourneySummary(tripId)  // Calling the action
-                selectedTripId = null
-                selectedTripStartStop = null
-                selectedTripEndStop = null
-            },
-            onStartJourney = { tripId ->
-                homeActions.onStartJourney(tripId)  // Calling the action, by passing tripId not stops.
-                selectedTripId = null
-                selectedTripStartStop = null
-                selectedTripEndStop = null
-            }
-        )
-    }
-
 }
 
 @Composable
@@ -228,7 +186,7 @@ fun CompletedTripsSection(
     title: String,
     noJourneysText: String,
     onTitleClick: (() -> Unit)? = null,
-    onJourneyClick: (CompletedJourney) -> Unit = {}
+    viewSummary: (Int) -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         SectionTitleWithArrow(title = title, onClick = onTitleClick)
@@ -254,7 +212,7 @@ fun CompletedTripsSection(
                     date = journey.date,
                     durationMin = journey.durationMin,
                     mode = journey.mode,
-                    onClick = { onJourneyClick(journey) },
+                    onClick = { viewSummary(journey.tripId) },
                     icon = { modifier ->
                         Icon(
                             imageVector = if (journey.isFavourite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,

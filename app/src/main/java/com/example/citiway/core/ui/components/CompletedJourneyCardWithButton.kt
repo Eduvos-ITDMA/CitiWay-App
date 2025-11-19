@@ -33,7 +33,6 @@ fun CompletedJourneyCardWithButton(
     mode: String = "",
     outlined: Boolean = false,
     onClick: () -> Unit = {}  // Added for pop-Up Dialog
-
 ) {
     Row {
         CompletedJourneyCard(route, date, mode, durationMin, modifier = Modifier.clickable { onClick() })

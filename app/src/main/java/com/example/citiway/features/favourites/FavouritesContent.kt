@@ -29,12 +29,14 @@ import com.example.citiway.core.ui.components.CompletedJourneyCardWithButton
 import com.example.citiway.core.ui.components.Title
 import com.example.citiway.core.ui.components.VerticalSpace
 import com.example.citiway.data.local.CompletedJourney
+import com.example.citiway.features.shared.CompletedJourneysActions
 
 @Composable
 fun FavouritesContent(
     journeys: List<CompletedJourney>,
     paddingValues: PaddingValues,
-    onToggleFavourite: (String) -> Unit
+    onToggleFavourite: (String) -> Unit,
+    actions: CompletedJourneysActions,
 ) {
     Column(
         modifier = Modifier
@@ -88,7 +90,8 @@ fun FavouritesContent(
                                 tint = if (journey.isFavourite) Color.Red else MaterialTheme.colorScheme.onPrimary,
                                 modifier = modifier.clickable { onToggleFavourite(journey.id) }
                             )
-                        }
+                        },
+                        onClick = { actions.onViewJourneySummary(journey.tripId) }
                     )
                 }
             }
