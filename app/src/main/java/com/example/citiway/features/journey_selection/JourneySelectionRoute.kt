@@ -115,7 +115,18 @@ fun JourneySelectionRoute(
                             selectedLocation
                         )
                     }
+                    // Check if locations are too close
+                    val currentState = journeyViewModel.state.value
+                    val tooClose = journeyViewModel.metersBetween(
+                        currentState.startLocation,
+                        currentState.destination
+                    ) < 1000
+                    journeyViewModel.actions.onSetLocationsTooClose(tooClose)
 
+                    // Only fetch journey options if locations aren't too close
+                    if (!tooClose) {
+                        journeyViewModel.actions.onGetJourneyOptions()
+                    }
 
                     // Note: getJourneyOptions() will be called automatically by LaunchedEffect
                     // when the state updates, so we don't need to call it here

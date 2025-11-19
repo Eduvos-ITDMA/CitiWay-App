@@ -171,6 +171,7 @@ private val mockJourneySelectionActions = JourneySelectionScreenActions(
         { location -> },
         {},
         { l, m -> },
+        {},
         {}
     ),
     {},

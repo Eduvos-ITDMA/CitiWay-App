@@ -14,6 +14,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -27,6 +29,16 @@ fun StatsContent(
     state: StatsState,
     onRefresh: () -> Unit
 ) {
+    // Stats page specific colors
+    val statsCardBackground = if (MaterialTheme.colorScheme.background == Color(0xFF122140)) {
+        Color(0xFF1A2F4F) // Slightly lighter than dark background
+    } else {
+        Color.White
+    }
+
+    val accentGradientStart = MaterialTheme.colorScheme.primary
+    val accentGradientEnd = MaterialTheme.colorScheme.secondary
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -50,11 +62,16 @@ fun StatsContent(
                 Text(
                     text = state.currentMonth,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
                 )
             }
 
-            IconButton(onClick = onRefresh) {
+            IconButton(
+                onClick = onRefresh,
+                colors = IconButtonDefaults.iconButtonColors(
+                    containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+                )
+            ) {
                 Icon(
                     imageVector = Icons.Default.Refresh,
                     contentDescription = "Refresh stats",
@@ -80,7 +97,8 @@ fun StatsContent(
                 // Main content
                 TotalSpendingCard(
                     totalSpent = state.totalSpent,
-                    monthlyBudget = state.monthlyBudget
+                    monthlyBudget = state.monthlyBudget,
+                    cardBackground = statsCardBackground
                 )
 
                 VerticalSpace(30)
@@ -94,32 +112,44 @@ fun StatsContent(
                         text = "Spending Breakdown",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
-                        fontSize = 18.sp,
+                        fontSize = 20.sp,
                         color = MaterialTheme.colorScheme.onBackground
                     )
 
+                    // Bus - Primary blue
                     TransportModeCard(
                         icon = Icons.Default.DirectionsBus,
                         label = "MyCiti Bus",
                         amount = state.busSpent,
                         distance = state.busDistance,
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.primary,
+                        cardBackground = statsCardBackground
                     )
 
+                    // Train - Gold/Orange
                     TransportModeCard(
                         icon = Icons.Default.Train,
                         label = "Metrorail Train",
                         amount = state.trainSpent,
                         distance = state.trainDistance,
-                        color = MaterialTheme.colorScheme.tertiary
+                        color = MaterialTheme.colorScheme.secondary,
+                        cardBackground = statsCardBackground
                     )
+
+                    // Walking - Complementary color
+                    val walkingColor = if (MaterialTheme.colorScheme.background == Color(0xFF122140)) {
+                        Color(0xFF4ECDC4) // Teal for dark mode
+                    } else {
+                        Color(0xFF14A38B) // Green-teal for light mode
+                    }
 
                     TransportModeCard(
                         icon = Icons.Default.DirectionsWalk,
                         label = "Walking",
                         amount = null,
                         distanceMeters = state.walkingDistanceMeters,
-                        color = MaterialTheme.colorScheme.secondary
+                        color = walkingColor,
+                        cardBackground = statsCardBackground
                     )
                 }
 
@@ -141,7 +171,9 @@ private fun LoadingState() {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            CircularProgressIndicator()
+            CircularProgressIndicator(
+                color = MaterialTheme.colorScheme.primary
+            )
             Text(
                 text = "Loading your stats...",
                 style = MaterialTheme.typography.bodyMedium,
@@ -173,7 +205,12 @@ private fun ErrorState(error: String, onRetry: () -> Unit) {
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.error
             )
-            Button(onClick = onRetry) {
+            Button(
+                onClick = onRetry,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                )
+            ) {
                 Text("Retry")
             }
         }
@@ -182,31 +219,47 @@ private fun ErrorState(error: String, onRetry: () -> Unit) {
 
 @Composable
 private fun EmptyState() {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(400.dp),
-        contentAlignment = Alignment.Center
+    val emptyStateBackground = if (MaterialTheme.colorScheme.background == Color(0xFF122140)) {
+        Color(0xFF1A2F4F)
+    } else {
+        Color.White
+    }
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = emptyStateBackground
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(48.dp),
+            contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = "📊",
-                fontSize = 48.sp
-            )
-            Text(
-                text = "No trips this month yet",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold
-            )
-            Text(
-                text = "Start tracking your journeys to see statistics here",
-                style = MaterialTheme.typography.bodyMedium,
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
-            )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Text(
+                    text = "📊",
+                    fontSize = 64.sp
+                )
+                Text(
+                    text = "No trips this month yet",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+                Text(
+                    text = "Start tracking your journeys to see statistics here",
+                    style = MaterialTheme.typography.bodyMedium,
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+                )
+            }
         }
     }
 }
@@ -214,49 +267,80 @@ private fun EmptyState() {
 @Composable
 fun TotalSpendingCard(
     totalSpent: Double,
-    monthlyBudget: Double
+    monthlyBudget: Double,
+    cardBackground: Color
 ) {
     val progress = (totalSpent / monthlyBudget).toFloat().coerceIn(0f, 1f)
+    val isOverBudget = totalSpent > monthlyBudget
+
+    val progressColor = if (isOverBudget) {
+        Color(0xFFE74C3C) // Red for over budget
+    } else {
+        Brush.sweepGradient(
+            colors = listOf(
+                MaterialTheme.colorScheme.primary,
+                MaterialTheme.colorScheme.secondary,
+                MaterialTheme.colorScheme.primary
+            )
+        )
+    }
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
+            containerColor = cardBackground
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(24.dp),
+                .padding(32.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
                 text = "Total Spent",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
             )
 
-            VerticalSpace(16)
+            VerticalSpace(24)
 
             // Circular progress indicator
             Box(
                 contentAlignment = Alignment.Center,
-                modifier = Modifier.size(180.dp)
+                modifier = Modifier.size(200.dp)
             ) {
+                // Background circle
                 CircularProgressIndicator(
                     progress = { 1f },
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
-                    strokeWidth = 12.dp,
+                    color = if (MaterialTheme.colorScheme.background == Color(0xFF122140)) {
+                        Color(0xFF0D1B33)
+                    } else {
+                        Color(0xFFF0F0F0)
+                    },
+                    strokeWidth = 14.dp,
                 )
-                CircularProgressIndicator(
-                    progress = { progress },
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.primary,
-                    strokeWidth = 12.dp,
-                )
+
+                // Progress circle
+                if (isOverBudget) {
+                    CircularProgressIndicator(
+                        progress = { progress },
+                        modifier = Modifier.fillMaxSize(),
+                        color = Color(0xFFE74C3C),
+                        strokeWidth = 14.dp,
+                    )
+                } else {
+                    CircularProgressIndicator(
+                        progress = { progress },
+                        modifier = Modifier.fillMaxSize(),
+                        color = MaterialTheme.colorScheme.primary,
+                        strokeWidth = 14.dp,
+                    )
+                }
 
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -265,35 +349,57 @@ fun TotalSpendingCard(
                         text = "R${String.format("%.2f", totalSpent)}",
                         style = MaterialTheme.typography.headlineLarge,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary,
-                        fontSize = 32.sp
+                        color = if (isOverBudget) {
+                            Color(0xFFE74C3C)
+                        } else {
+                            MaterialTheme.colorScheme.primary
+                        },
+                        fontSize = 36.sp
                     )
                     Text(
                         text = "of R${String.format("%.2f", monthlyBudget)}",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
                     )
                 }
             }
 
-            VerticalSpace(16)
+            VerticalSpace(24)
 
             // Budget remaining
-            Row(
+            Surface(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                shape = RoundedCornerShape(12.dp),
+                color = if (MaterialTheme.colorScheme.background == Color(0xFF122140)) {
+                    Color(0xFF0D1B33)
+                } else {
+                    Color(0xFFF8F9FA)
+                }
             ) {
-                Text(
-                    text = "Remaining",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Text(
-                    text = "R${String.format("%.2f", monthlyBudget - totalSpent)}",
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = if (isOverBudget) "Over Budget" else "Remaining",
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
+                    )
+                    Text(
+                        text = "R${String.format("%.2f", kotlin.math.abs(monthlyBudget - totalSpent))}",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = if (isOverBudget) {
+                            Color(0xFFE74C3C)
+                        } else {
+                            MaterialTheme.colorScheme.secondary
+                        }
+                    )
+                }
             }
         }
     }
@@ -306,16 +412,21 @@ fun TransportModeCard(
     amount: Double? = null,
     distance: Double? = null,
     distanceMeters: Int? = null,
-    color: androidx.compose.ui.graphics.Color
+    color: androidx.compose.ui.graphics.Color,
+    cardBackground: Color
 ) {
+    val hasData = (amount != null && amount > 0) ||
+            (distance != null && distance > 0) ||
+            (distanceMeters != null && distanceMeters > 0)
+
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = cardBackground
         ),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = 4.dp
+            defaultElevation = 2.dp
         )
     ) {
         Row(
@@ -328,14 +439,14 @@ fun TransportModeCard(
             // Left side: Icon + Label
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(14.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
                 modifier = Modifier.weight(1f)
             ) {
                 // Icon container
                 Surface(
-                    modifier = Modifier.size(44.dp),
-                    shape = RoundedCornerShape(8.dp),
-                    color = color.copy(alpha = 0.15f)
+                    modifier = Modifier.size(52.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    color = color.copy(alpha = 0.12f)
                 ) {
                     Box(
                         modifier = Modifier.fillMaxSize(),
@@ -345,7 +456,7 @@ fun TransportModeCard(
                             imageVector = icon,
                             contentDescription = null,
                             tint = color,
-                            modifier = Modifier.size(26.dp)
+                            modifier = Modifier.size(28.dp)
                         )
                     }
                 }
@@ -354,37 +465,34 @@ fun TransportModeCard(
                     Text(
                         text = label,
                         style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Medium,
+                        fontWeight = FontWeight.SemiBold,
                         fontSize = 17.sp,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.onBackground
                     )
-                    Spacer(modifier = Modifier.height(2.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = when {
                             distanceMeters != null && distanceMeters > 0 -> "$distanceMeters m"
                             distance != null && distance > 0 -> "${String.format("%.1f", distance)} km"
                             else -> "No trips yet"
                         },
-                        style = MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.bodyMedium,
                         fontSize = 14.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
                     )
                 }
             }
 
-            // Right side: Amount or meters
+            // Right side: Amount
             Text(
                 text = when {
                     amount != null && amount > 0 -> "R${String.format("%.2f", amount)}"
                     else -> "R0.00"
                 },
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 18.sp,
-                color = when {
-                    amount != null && amount > 0 -> MaterialTheme.colorScheme.onSurface
-                    else -> MaterialTheme.colorScheme.secondary
-                }
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                fontSize = 20.sp,
+                color = if (hasData) color else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f)
             )
         }
     }
