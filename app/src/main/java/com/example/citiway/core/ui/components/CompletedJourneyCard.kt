@@ -4,9 +4,7 @@ import com.example.citiway.R
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.TrendingFlat
-import androidx.compose.material.icons.filled.TrendingFlat
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -17,10 +15,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.example.citiway.data.local.CompletedJourney
 import com.example.citiway.data.local.JourneyOverview
-import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 /**
@@ -62,8 +59,10 @@ fun RowScope.CompletedJourneyCard(
 
     // Parse route into start and end locations
     val routeParts = journey.route.split("|")
-    val startLocation = routeParts.getOrNull(0) ?: "Start"
-    val endLocation = routeParts.getOrNull(1) ?: "End"
+    val (startLocation, endLocation) = getDisplayNames(
+        routeParts.getOrNull(0) ?: "Start",
+        routeParts.getOrNull(1) ?: "End"
+    )
 
 
     // ========== Component composable ==========
@@ -87,7 +86,10 @@ fun RowScope.CompletedJourneyCard(
                     Text(
                         text = startLocation,
                         color = MaterialTheme.colorScheme.onPrimary,
-                        style = MaterialTheme.typography.titleMedium
+                        style = MaterialTheme.typography.titleMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f, fill = false)
                     )
 
                     Spacer(modifier = Modifier.width(1.dp))
@@ -104,62 +106,93 @@ fun RowScope.CompletedJourneyCard(
                     Text(
                         text = endLocation,
                         color = MaterialTheme.colorScheme.onPrimary,
-                        style = MaterialTheme.typography.titleMedium
+                        style = MaterialTheme.typography.titleMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f, fill = false)
                     )
                 }
                 Spacer(modifier = Modifier.height(8.dp))
 
                 // ========== Date and Duration ==========
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_calendar),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.secondary,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = formattedDate,
-                        color = MaterialTheme.colorScheme.background,
-                        style = MaterialTheme.typography.bodyLarge
-                    )
+                FlowRow(
+                    itemVerticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    // Item 1: Date
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_calendar),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.secondary,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = formattedDate,
+                            color = MaterialTheme.colorScheme.background,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
 
-                    Spacer(modifier = Modifier.width(10.dp))
+                    // Item 2: Duration
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_clock),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.secondary,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = durationText,
+                            color = MaterialTheme.colorScheme.background,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
 
-                    // ========== Duration Icon and Text ==========
-                    Icon(
-                        painter = painterResource(R.drawable.ic_clock),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.secondary,
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-
-                    Text(
-                        text = durationText,
-                        color = MaterialTheme.colorScheme.background,
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-
-                    Spacer(modifier = Modifier.width(10.dp))
-
-                    // ========== Mode of transport (conditional icon) ==========
-                    Icon(
-                        painter = painterResource(modeIcon),
-                        contentDescription = normalizedMode,
-                        tint = MaterialTheme.colorScheme.secondary,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-
-                    Text(
-                        text = normalizedMode,
-                        color = MaterialTheme.colorScheme.background,
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Bold
-                    )
+                    // Item 3: Mode of Transport
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            painter = painterResource(modeIcon),
+                            contentDescription = normalizedMode,
+                            tint = MaterialTheme.colorScheme.secondary,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = normalizedMode,
+                            color = MaterialTheme.colorScheme.background,
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
             }
         }
     }
+}
+
+
+private fun getDisplayNames(locationText1: String, locationText2: String): Array<String> {
+    val lt1Parts = locationText1.split(",")
+    val lt2Parts = locationText2.split(",")
+
+    val lt1Area = lt1Parts.last()
+    val lt2Area = lt2Parts.last()
+
+    return if (lt1Area == lt2Area) {
+        arrayOf(
+            removeStartingNumberAndSpace(lt1Parts.first()),
+            removeStartingNumberAndSpace(lt2Parts.first())
+        )
+    } else {
+        arrayOf(lt1Area, lt2Area)
+    }
+}
+
+private fun removeStartingNumberAndSpace(input: String): String {
+    val regex = Regex("^\\d+\\s")
+    return input.replaceFirst(regex, "")
 }
